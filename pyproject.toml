@@ -15,7 +15,8 @@ python-dotenv = "^1.0.1"
 ipython = "^8.27.0"
 pytils = "^0.4.1"
 redis = "^5.0.8"
-django-phonenumber-field = "^8.0.0"
+django-phonenumber-field = {extras = ["phonenumbers"], version = "^8.0.0"}
+django-cors-headers = "^4.4.0"
 
 
 [tool.poetry.group.dev.dependencies]

@@ -42,10 +42,9 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
+    "phonenumber_field",
     "corsheaders",
     "users",
-    'mailapp',
-    'phonenumber_field',
 
 ]
 
