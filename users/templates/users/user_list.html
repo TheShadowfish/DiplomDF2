@@ -1,0 +1,158 @@
+{% extends 'mailapp/base.html'%}
+{% load static %}
+{% load my_tags %}
+{% block content %}
+
+
+<div class="row text-right">
+    {% if perms.users.can_set_user_inactive %}
+    <div class="col-12">
+
+        <div class="card mb-3 box-shadow">
+
+            <div class="card-body">
+                <h5 class="card-title">
+                    <div style="color: red"><b>Список пользователей: &nbsp; режим модератора. </b></div>
+                    {% if user.is_superuser %}
+                    <div style="color: red"><b>Вы - суперпользователь. Поэтому можете удалять других пользователей. И себя тоже.</b></div>
+                    {%endif%}
+
+                </h5>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div style="color: red"><b>Список пользователей: &nbsp; </b></div>
+    {% endif %}
+
+
+    {% for object in object_list %}
+
+    <div class="col-4">
+
+        <div class="card mb-3 box-shadow">
+
+
+            <div class="card-body">
+                <h5 class="card-title">
+                    Пользователь: &nbsp;
+                    <div style="color: orange"><b> {{object.name}}</b></div>
+                </h5>
+                <p class="card-text">
+
+
+                    <br>
+
+
+                    <b>Аватар:</b><br> <img src="{{ object.avatar|user_media_filter }}" width="100"
+                                            alt={{object.avatar|user_media_filter}}> <br>
+
+                    <b>Имя:</b> {{object.name}} <br>
+                    <b>Email:</b> {{object.email}} <br>
+                    <b>Телефон:</b> {{object.phone_number}} <br>
+                    <b>Должность == Модератор:</b> {{object.is_moderator}} <br>
+                    <b>Должность == Контент-менеджер:</b> {{object.is_content_manager}} <br>
+                    <b>Комментарий:</b> {{object.description}} <br>
+
+
+                </p>
+                <div class="btn-group">
+                    <a class="btn btn-primary" href="{%url 'users:user_detail' object.pk%}" role="button">Информация</a>
+
+                    {% if perms.users.can_set_user_inactive %}
+                    {%if object.is_active %}
+                    <a class="btn btn-danger" href="{%url 'users:user_activity' object.pk%}"
+                       role="button">Заблокировать</a>
+                    {% else %}
+                    <a class="btn btn-success" href="{%url 'users:user_activity' object.pk%}"
+                       role="button">Разблокировать</a>
+
+                    {%endif%}
+                    {%endif%}
+
+
+                    {% if user.is_superuser %}
+                    <a class="btn btn-dark" href="{%url 'users:user_delete' object.pk%}"
+                       role="button">Удалить</a>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+
+
+    </div>
+    {% endfor %}
+
+
+</div>
+
+
+{% if is_paginated %}
+
+<div class="col-12">
+    <div class="card mb-3 box-shadow">
+
+        <div class="card-body">
+
+            <div class="btn-group">
+
+
+                <ul class="pagination">
+                    {% if page_obj.has_previous %}
+
+
+                    <li>
+
+                        <a class="p-2 btn btn-outline-primary"
+                           href="?page={{ page_obj.previous_page_number }}"
+                           role="button"> &laquo; </a> &nbsp;
+
+
+                    </li>
+                    {% else %}
+
+                    <li class="disabled p-2 btn btn-outline-primary" role="button"><span>&laquo;</span></li> &nbsp;
+                    {% endif %}
+
+
+                    {% for i in paginator.page_range %}
+                    {% if page_obj.number == i %}
+                    <li class="disabled p-2 btn btn-outline-primary" role="button"><span>{{ i }}(текущая);</span></li>
+                    &nbsp;
+                    {% else %}
+                    <li>
+
+
+                        <a class="p-2 btn btn-outline-primary"
+                           href="?page={{ i }}"
+                           role="button"> {{ i }} </a> &nbsp;
+
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                    <li>
+
+                        <a class="p-2 btn btn-outline-primary"
+                           href="?page={{ page_obj.next_page_number }}"
+                           role="button"> &raquo; </a>
+
+                    </li>
+                    {% else %}
+                    <li class="disabled p-2 btn btn-outline-primary" role="button"><span>&raquo; </span></li> &nbsp;
+                    {% endif %}
+                </ul>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endif %}
+
+
+</div>
+
+{% endblock %}
