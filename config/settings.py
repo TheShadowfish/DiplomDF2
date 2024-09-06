@@ -41,9 +41,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
-    "phonenumber_field",
     "corsheaders",
+    "phonenumber_field",
     "users",
 
 ]
@@ -93,7 +92,7 @@ WSGI_APPLICATION = "config.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "PectopaH",
+        "NAME": "pectopah",
         "USER": "postgres",
         "HOST": "localhost",
         "PORT": 5432,
