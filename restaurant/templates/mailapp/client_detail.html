@@ -1,0 +1,59 @@
+{% extends 'mailapp/base.html'%}
+{% load static %}
+<!--{% load tz %}-->
+
+{% block content %}
+
+<div class="row text-right">
+
+    <div class="col-12">
+
+        <div class="card mb-3 box-shadow">
+            <div class="card-header">
+                <h4 class="my-0 font-weight-normal">Информация о клиенте</h4>
+            </div>
+
+
+            <div class="card-body">
+                <h5 class="card-title">
+                    <div style="color: orange"><b>{{object.name}}</b></div>
+                </h5>
+                <p class="card-text">
+
+                    <b>Имя (ФИО) клиента:</b> {{ object.name }} <br>
+                    <b>Email клиента:</b> {{ object.email }} <br>
+                    <b>Комментарий:</b> {{ object.comment }} <br>
+                    <b>Активен (получает рассылку):</b> {{ object.is_active }} <br>
+                    <b>Рассылка:</b> {{ object.mailing }} <br>
+                    <br>
+                  <h5 class="my-0 font-weight-normal" style="color: orange">Дополнительная информация о рассылке:</h5>
+                    <br>
+                    <b>Рассылка - заголовок:</b> {{object.mailing.message.title}}<br>
+                    <b>Рассылка - текст:</b> {{object.mailing.message.body}}<br>
+                    <br>
+                    <b>Время старта рассылки:</b> {{object.mailing.settings.datetime_send}}<br>
+                    <b>Периодичность (дни):</b> {{object.mailing.settings.periodicity}}<br>
+                    <b>Статус (активна):</b> {{object.mailing.settings.status}}<br>
+                    <b>Запущена сейчас:</b> {{object.mailing.settings.active}}<br>
+                <br><br>
+
+
+                <div class="btn-group">
+                    <a class="btn btn-primary" href="{% url 'mailapp:mail_list' %}" role="button">Вернуться к
+                        каталогу</a>
+
+
+                </div>
+                <br>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+</div>
+
+{% endblock %}

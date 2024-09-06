@@ -1,0 +1,207 @@
+{% extends 'mailapp/base.html'%}
+{% load static %}
+<!--{% load tz %}-->
+
+{% block content %}
+
+<div class="row text-right">
+
+    <div class="col-6">
+
+        <div class="card mb-3 box-shadow">
+            <div class="card-header">
+                <h4 class="my-0 font-weight-normal">Информация о рассылке</h4>
+            </div>
+
+
+            <div class="card-body">
+                <h5 class="card-title">
+                    <div style="color: orange"><b>{{object.name}}</b></div>
+                </h5>
+                <p class="card-text">
+
+                    <b>Название рассылки:</b> {{ object.title }} <br>
+                    <b>Комментарий:</b> {{ object.message_in }} <br>
+                    <b>Рассылка создана:</b> {{ object.created_at }} <br>
+                    <b>Пользователь (создатель рассылки):</b> {{ object.user }} <br>
+
+
+                <hr>
+                <h5 class="card-title">
+                    <div style="color: orange"><b>Сообщение:</b></div>
+                </h5>
+
+
+                <table class="table table-stripped">
+                    <tr>
+                        <th>Тема</th>
+                        <th>Текст</th>
+
+
+                    </tr>
+
+
+                    <tr>
+
+                        <td>{{message.title}}</td>
+                        <td>{{message.body}}</td>
+
+                    </tr>
+
+
+                </table>
+
+                <hr>
+                <h5 class="card-title">
+                    <div style="color: orange"><b>Настройки:</b></div>
+                </h5>
+
+
+                <table class="table table-stripped">
+                    <tr>
+                        <th>Время старта</th>
+                        <th>Периодичность (дни)</th>
+                        <th>Статус (активна)</th>
+                        <th>Запущена сейчас</th>
+
+
+                    </tr>
+
+                    <tr>
+
+                        <td>{{settings.datetime_send}}</td>
+                        <td>{{settings.periodicity}}</td>
+                        <td>{{settings.status}}</td>
+                        <td>{{settings.active}}</td>
+
+
+                    </tr>
+
+
+                </table>
+
+
+                </p>
+                <div class="btn-group">
+                    <a class="btn btn-primary" href="{% url 'mailapp:mailing_list' %}" role="button">Вернуться к
+                        каталогу</a>
+
+
+                </div>
+                <br>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+    <div class="col-6">
+
+        <div class="card mb-3 box-shadow">
+
+
+            <div class="card-header">
+                <h4 class="my-0 font-weight-normal">Информация о рассылке</h4>
+            </div>
+
+
+            <div class="card-body">
+                <h5 class="card-title">
+                    <div style="color: orange"><b>{{object.name}}</b></div>
+                </h5>
+                <p class="card-text">
+
+                <h5 class="card-title">
+                    <div style="color: orange"><b>Список адресов рассылки:</b></div>
+                </h5>
+
+
+                <table class="table table-stripped">
+                    <tr>
+                        <th>Обращение</th>
+                        <th>Email</th>
+                        <th>Комментарий</th>
+                        <th>Активен</th>
+
+
+                    </tr>
+
+
+                    {% for client_item in clients%}
+                    <tr>
+
+                        <td>{{client_item.name}}</td>
+                        <td>{{client_item.email}}</td>
+                        <td>{{client_item.comment}}</td>
+                        <td>{{client_item.is_active}}</td>
+
+                    </tr>
+
+
+                    {% endfor %}
+
+
+                </table>
+                <hr>
+
+                <h5 class="card-title">
+                    <div style="color: orange"><b>Список логов рассылки:</b></div>
+                </h5>
+
+
+                <table class="table table-stripped">
+                    <tr>
+                        <th>Текст лога</th>
+                        <th>Создан</th>
+
+                        <th>Статус попытки рассылки</th>
+                        <th>Ответ почтового сервера</th>
+
+                    </tr>
+
+
+                    {% for log_item in logs%}
+                    <tr>
+
+                        <td>{{log_item.log_text}}</td>
+
+
+                        <td>
+<!--                            {% get_current_timezone as TIME_ZONE %}-->
+<!--                            {% timezone TIME_ZONE %}-->
+                            {{log_item.created_at}}
+<!--                            {% endtimezone %}-->
+                        </td>
+
+                        <td>{{log_item.status}}</td>
+                        <td>{{log_item.mail_answer}}</td>
+
+
+                    </tr>
+
+
+                    {% endfor %}
+
+
+                </table>
+
+
+                </p>
+                <br>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+{% endblock %}

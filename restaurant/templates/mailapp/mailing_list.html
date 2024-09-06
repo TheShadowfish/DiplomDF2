@@ -1,0 +1,173 @@
+{% extends 'mailapp/base.html'%}
+{% load static %}
+{% block content %}
+
+
+<div class="row text-right">
+    <div class="col-12 mb-3">
+        <div class="card mb-3 box-shadow">
+            <br>
+            <div class="btn-group">
+                {% if perms.mailapp.can_turn_off_mailing %}
+                <div class="card-body">
+                <div style="color: red"><b>Рассылки: &nbsp; режим модератора. Добавление невозможно. </b></div>
+                    </div>
+
+                    {%else%}
+
+
+                     &nbsp; &nbsp; &nbsp; <a class="p-2 btn btn-outline-primary btn-lg btn-block"
+                                        href="{%url 'mailapp:mailing_create' %}">Добавить рассылку</a> &nbsp; &nbsp;
+                &nbsp;
+                    {% endif %}
+
+
+            </div>
+            <br>
+        </div>
+    </div>
+
+
+    <div class="col-12">
+
+        <div class="card mb-3 box-shadow">
+
+
+
+            {% if perms.mailapp.can_turn_off_mailing %}
+
+            <div class="card-body">
+                <h5 class="card-title">
+
+                     <div style="color: red"><b>Рассылки: &nbsp; режим модератора. </b></div>
+
+                </h5>
+                <p class="card-text">
+
+                <table class="table table-stripped">
+                    <tr>
+                        <th>Название</th>
+                        <th>Текст рассылки</th>
+                        <th>Дата создания</th>
+                        <th>Владелец рассылки</th>
+                        <th>Статус</th>
+                        <th>Информация</th>
+                        <th>Изменить</th>
+
+                    </tr>
+
+
+                    {% for object in object_list %}
+                    {% if only_send and object.settings.status == False or only_send == False %}
+
+                    <tr>
+                        <td>{{object.title}}</td>
+                        <td>{{object.message.body}}</td>
+                        <td>{{object.created_at}}</td>
+                        <td>{{object.user}}</td>
+                        <td>{{object.settings.status}}</td>
+
+                        <td>
+                            <a class="btn btn-primary" href="{%url 'mailapp:mailing_detail' object.pk%}" role="button">Информация</a>
+                        </td>
+                        <td>
+                            {%if object.settings.status %}
+                            <a class="btn btn-success" href="{%url 'mailapp:mailing_activity' object.pk%}"
+                               role="button">Деактивировать</a>
+                            {% else %}
+                            <a class="btn btn-danger" href="{%url 'mailapp:mailing_activity' object.pk%}"
+                               role="button">&nbsp;&nbsp;Активировать&nbsp;&nbsp;</a>
+                            {%endif%}
+                        </td>
+
+
+
+                    </tr>
+                    {% endif %}
+
+                    {% endfor %}
+
+                </table>
+
+                {% endif %}
+
+
+
+
+            <div class="card-body">
+                <h5 class="card-title">
+
+                    <div style="color: orange"><b> Рассылки: &nbsp; режим владельца</b></div>
+
+                </h5>
+                <p class="card-text">
+
+
+
+
+                <table class="table table-stripped">
+                    <tr>
+                        <th>Название</th>
+                        <th>Текст рассылки</th>
+                        <th>Дата создания</th>
+                        <th>Владелец рассылки</th>
+                        <th>Статус</th>
+                        <th>Информация</th>
+                        <th>Изменить</th>
+                        <th>Удалить</th>
+                        <th>Отправить</th>
+
+                    </tr>
+
+
+                    {% for object in object_list %}
+                    {% if only_send and object.settings.status == False or only_send == False %}
+
+
+                    <tr>
+                        {% if user == object.user %}
+
+                        <td>{{object.title}}</td>
+                        <td>{{object.message.body}}</td>
+                        <td>{{object.created_at}}</td>
+                        <td>{{object.user}}</td>
+                        <td>{{object.settings.status}}</td>
+
+                        <td>
+                            <a class="btn btn-primary" href="{%url 'mailapp:mailing_detail' object.pk%}" role="button">Информация</a>
+                        </td>
+                        <td>
+                            <a class="btn btn-primary" href="{%url 'mailapp:mailing_update' object.pk%}"
+                               role="button">Изменить</a>
+                        </td>
+                        <td>
+                            <a class="btn btn-primary" href="{%url 'mailapp:mailing_delete' object.pk%}"
+                               role="button">Удалить</a>
+                        </td>
+                        <td>
+                            <a class="btn btn-danger" href="{%url 'mailapp:mailing_send' object.pk%}"
+                               role="button">Отправить</a>
+                        </td>
+                        {% endif %}
+
+                    </tr>
+
+                    {% endif %}
+                    {% endfor %}
+
+                </table>
+
+
+                </p>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+</div>
+
+{% endblock %}

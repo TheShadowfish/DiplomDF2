@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+{% extends 'mailapp/base.html'%}
+{% load static %}
+{% load my_tags %}
+{% block content %}
+
+
+<div class="row text-right">
+    <div class="col-12 mb-3">
+        <div class="card mb-3 box-shadow">
+            <br>
+            <h1 class="card-title  text-center">
+                <div style="color: orange "><small>The </small><b>Главная страница.</b></div>
+            </h1>
+        </div>
+        <br>
+    </div>
+</div>
+
+<div class="row text-right">
+<div class="col-4">
+
+    <div class="card mb-3 box-shadow">
+
+
+        <div class="card-body">
+
+            <p class="card-text">
+
+                <img
+                        src="{% static 'image/mailings.png' %}"
+                        alt="рассылок всего (картинка)"/>
+
+            <h4><b>Количество рассылок на сервисе (всего): </b> {{mailings_count}}</h4> <br>
+
+            </p>
+        </div>
+    </div>
+</div>
+<div class="col-4">
+
+    <div class="card mb-3 box-shadow">
+
+
+        <div class="card-body">
+
+            <p class="card-text">
+
+                <img
+                        src="{% static 'image/mailings_check.png' %}"
+                        alt="рассылок активных (картинка)"
+                />
+
+            <h4><b>Количество активных рассылок: </b> {{mailings_count_active}}</h4> <br>
+
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="col-4">
+    <div class="card mb-3 box-shadow">
+
+
+        <div class="card-body">
+
+            <p class="card-text">
+
+                <img
+                        src="{% static 'image/email.png' %}"
+                        alt="уникальных клиентов (картинка)"
+                />
+
+                <h4><b>Количество уникальных клиентов для рассылок: </b> {{emails_unique_count}}</h4> <br>
+
+            </p>
+        </div>
+    </div>
+
+</div>
+</div>
+<div class="row text-right">
+{% for article in random_articles %}
+
+    <div class="col-4">
+
+        <div class="card mb-3 box-shadow">
+            <img src="{{ article.image | media_filter }}" class="card-img-top" alt={{article.image|media_filter}}>
+
+
+            <div class="card-body">
+                <h5 class="card-title">
+                    <div style="color: orange"><b> {{article.title}}</b></div>
+                </h5>
+                <p class="card-text">
+                  {% if article.body|comment_markdown|length >= 300 %}
+                    {{ article.body|comment_markdown|slice:":300"}} ...
+                    {% else %}
+                    {{ article.body}}
+                    {% endif %}
+                </p>
+                <br>
+                <p class="card-text">
+                    <b>Опубликовано</b> {{article.created_at}}<br>
+                    <b>Просмотров</b>{{article.views_count}}<br>
+                   </p>
+
+
+                <div class="btn-group">
+                    <a class="btn btn-success" href="{% url 'blogapp:article_detail' article.pk%}" role="button">Посмотреть</a>
+
+                </div>
+
+            </div>
+
+    </div>
+
+
+    </div>
+    {% endfor %}
+</div>
+
+
+
+{% comment "Этот HTML код пока не нужен, но вдруг пригодится потом" %}
+<div class="col-4">
+
+    <div class="card mb-3 box-shadow">
+
+
+        <div class="card-body">
+            <h5 class="card-title">
+                <div style="color: orange"><b>Список уникальных клиентов</b></div>
+            </h5>
+            <p class="card-text">
+
+                {% for client in emails_unique%}
+
+                {{client.email}} <br>
+
+                {% endfor %}
+                <br><br>
+                <b>Количество статей в блоге: </b> {{article_list_len}}
+
+
+
+
+            </p>
+        </div>
+    </div>
+
+</div>
+{% endcomment%}
+</div>
+
+
+</div>
+</div>
+{% endblock %}

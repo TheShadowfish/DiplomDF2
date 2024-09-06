@@ -1,0 +1,20 @@
+{% extends 'mailapp/base.html'%}
+{% load my_tags %}
+{% block content %}
+<div class="container">
+    <form class="row" method="post" enctype="multipart/form-data">
+        <div class="col-6">
+            <div class="row">
+                <div class="card">
+                    <div class="card-body">
+                        <p>
+                            Email успешно подтвержден!
+                        </p>
+                        <a class="p-2 btn btn-outline-primary" href="{% url 'users:login' %}">Войти</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
