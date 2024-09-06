@@ -1,0 +1,109 @@
+{% extends 'catalog/base.html'%}
+{% block content %}
+{% load my_tags %}
+
+<div class="row text-start">
+    <div class="col-lg-9 col-md-6 col-sm-12">
+        <div class="card mb-4 box-shadow">
+            <div class="card-body">
+                <table class="table table-striped">
+                    <tr>
+                        <td class="w-25">Страна</td>
+                        <td>USA</td>
+                    </tr>
+                    <tr>
+                        <td class="w-25">ИНН</td>
+                        <td>91-1144442</td>
+                    </tr>
+                    <tr>
+                        <td class="w-25">Адрес</td>
+                        <td>Redmond,WA,98052-6399</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 col-sm-12">
+        <div class="card mb-4 box-shadow">
+            <div class="card-header">
+                <h4 class="my-0 font-weight-normal">Свяжитесь с нами</h4>
+            </div>
+            <div class="card-body">
+                <form method="post" action="" class="form-floating">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label for="name">Имя</label>
+                        <input type="text" name="name" class="form-control" id="name" placeholder="Ваше имя" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="phone">Телефон</label>
+                        <input type="text" name="phone" class="form-control" id="phone" placeholder="Контактный телефон"
+                               required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="message">Сообщение</label>
+                        <textarea type="text" name="message" class="form-control" id="message"
+                                  placeholder="С00бщение" required></textarea>
+
+                    </div>
+
+
+                    <button type="submit" class="btn btn-lg btn-block btn-outline-primary">Отправить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="col-12">
+
+
+    <div class="card mb-3 box-shadow">
+
+        <div class="card-body">
+            <h5 class="card-title">Последние контакты</h5>
+            <p class="card-text">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">Имя</th>
+                    <th scope="col">Телефон</th>
+                    <th scope="col">Сообщение</th>
+                    <th scope="col">Время</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                {% load my_tags %}
+
+                {% if latest_contacts %}
+                <p>КОНТЕКСТ ЕСТЬ</p>
+                {% else %}
+                <p>КОНТЕКСТА НЕТ</p>
+                {% endif %}
+
+                {% for object in latest_contacts %}
+
+                <tr>
+                    <td>{{object.name | initial_letter_filter}}</td>
+                    <td>{{object.phone}}</td>
+                    <td>{{object.message | initial_letter_filter}}</td>
+                    <td>{{object.time}}</td>
+                </tr>
+                {% endfor %}
+
+                </tbody>
+            </table>
+            </p>
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'catalog/base.html'%}
+{% block content %}
+
+
+<div class="row text-start">
+
+    <div class="col-lg-12 col-md-6 col-sm-12">
+        <div class="card mb-4 box-shadow">
+            <div class="card-header">
+                <h4 class="my-0 font-weight-normal">Добавить свой продукт</h4>
+            </div>
+            <div class="card-body">
+                <form method="post" action="" class="form-floating" enctype="multipart/form-data">
+                    <div class="mb-3">
+
+                    {% csrf_token %}
+                    {{form.as_p}}
+
+
+
+                    </div>
+
+
+                    <button type="submit" class="btn btn-lg btn-block btn-outline-primary">
+                        {% if object %}
+                        Изменить
+                        {% else %}
+                        Создать
+                        {% endif %}
+
+
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+{% endblock %}

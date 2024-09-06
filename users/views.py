@@ -108,18 +108,6 @@ class UserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     permission_required = "users.view_user"
 
 
-# class UserCreateView(CreateView):
-#     model = User
-#     form_class = UserForm
-#     success_url = reverse_lazy('users:user_list')
-
-#
-# class UserUpdateView(LoginRequiredMixin, UpdateView):
-#     model = User
-#     form_class = UserProfileForm
-#     success_url = reverse_lazy('users:user_list')
-
-
 class ProfileView(LoginRequiredMixin, UpdateView):
     model = User
     form_class = UserProfileForm
