@@ -157,6 +157,28 @@ STATIC_ROOT = BASE_DIR / "static"
 MEDIA_URL = "media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
+EMAIL_HOST="smtp.yandex.ru"
+EMAIL_PORT=465
+EMAIL_HOST_USER = "waterbat@yandex.ru"
+EMAIL_HOST_PASSWORD="omgmxjebrljetcok"
+# EMAIL_TO=waterbat@mail.ru, shadowfish@yandex.ru, acc4androidIH@gmail.com
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
+#для яндекса
+#SERVER_EMAIL=EMAIL_HOST_USER
+#DEFAULT_FROM_EMAIL=EMAIL_HOST_USER
+SERVER_EMAIL="waterbat@yandex.ru"
+DEFAULT_FROM_EMAIL="waterbat@yandex.ru"
+
+# EMAIL_HOST = os.getenv('EMAIL_HOST')
+# EMAIL_PORT = os.getenv('EMAIL_PORT')
+# EMAIL_HOST_USER = os.getenv('EMAIL_USER')
+# EMAIL_HOST_PASSWORD = os.getenv('EMAIL_PASSWORD')
+# EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS') == 'True'
+# EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL') == 'True'
+
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
@@ -165,6 +187,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "users.User"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
+
+LOGIN_URL = '/users/'
 
 REDIRECT_FIELD_NAME = "users/login.html"
 

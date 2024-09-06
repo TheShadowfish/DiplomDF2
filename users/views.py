@@ -10,7 +10,7 @@ from django.utils import timezone
 from django.views.generic import CreateView, ListView, UpdateView, DetailView, DeleteView
 
 from config.settings import EMAIL_HOST_USER
-from mailapp.models import Mailing
+# from mailapp.models import Mailing
 from users.forms import UserRegisterForm, UserProfileForm
 from users.models import User, UserToken
 
