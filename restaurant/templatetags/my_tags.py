@@ -3,8 +3,8 @@ from django import template
 
 import random
 import string
-import bleach
-import markdown
+# import bleach
+# import markdown
 
 
 from django.utils.html import conditional_escape

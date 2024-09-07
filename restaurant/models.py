@@ -1,11 +1,7 @@
 from django.urls import path
 from django.views.decorators.cache import cache_page
 
-from .views import ClientListView, \
-    MailingListView, MailingCreateView, MailingUpdateView, MailingListViewSend, MailingDeleteView, ClientCreateView, \
-    ClientUpdateView, ClientDeleteView, MailingDetailView, mailing_send, MessageListView, MessageUpdateView, \
-    MessageSettingsUpdateView, MailingSettingsListView, MailingSettingsUpdateView, \
-    toggle_activity_mailing, ClientDetailView, HomePageView
+from .views import HomePageView
 
 # MessageCreateView,
 

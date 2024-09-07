@@ -16,7 +16,7 @@
                 height="100px"
                 width="100px"/>
         <br>
-        Fishstore
+
                 <div style="color: orange "><small>The </small><b>Ресторан "Hungry Shark" - Главная страница.</b></div>
             </h1>
             <li> Описание ресторана </li>
@@ -102,11 +102,9 @@
 
 <div class="row text-right">
 
-    <div class="col-4">
+    <div class="col-12">
 
         <div class="card mb-3 box-shadow">
-            <img src="{{ article.image | media_filter }}" class="card-img-top" alt={{article.image|media_filter}}>
-
 
             <div class="card-body">
                 <h5 class="card-title">
@@ -122,10 +120,6 @@
                    </p>
 
 
-                <div class="btn-group">
-                    <a class="btn btn-success" href="{% url 'blogapp:article_detail' article.pk%}" role="button">Посмотреть</a>
-
-                </div>
 
             </div>
 
