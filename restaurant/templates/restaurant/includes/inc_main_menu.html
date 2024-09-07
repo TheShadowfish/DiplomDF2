@@ -1,5 +1,5 @@
 <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom box-shadow">
-    <h5 class="my-0 mr-md-auto font-weight-normal">Mailling:
+    <h5 class="my-0 mr-md-auto font-weight-normal">Hungry Shark:
         {% if title %}
         - {{title}}
         {% endif %}
@@ -23,13 +23,24 @@
 
         <a class="p-2 btn btn-outline-primary" href="{%url 'restaurant:main'%}">Домашняя страница</a>
 
-        <a class="p-2 btn btn-outline-primary" href="#">Список проведенных рассылок</a>
 
-        <a class="p-2 btn btn-outline-primary" href="#">Список email-адресов</a>
+        {% if user.is_authenticated %}
 
-        <a class="p-2 btn btn-outline-primary" href="#">Список сообщений рассылок</a>
+        <a class="p-2 btn btn-outline-primary" href="#">Бронирование столика</a>
+        <a class="p-2 btn btn-outline-primary" href="#">История бронирований</a>
+        <a class="p-2 btn btn-outline-primary" href="#">Оставить отзыв</a>
 
-        <a class="p-2 btn btn-outline-primary" href="#">Список настроек рассылок</a>
+        {% else %}
+        <a class="p-2 btn btn-outline-primary" href="{% url 'users:login' %}">Бронирование столика</a>
+        <a class="p-2 btn btn-outline-primary" href="{% url 'users:login' %}">История бронирований</a>
+        <a class="p-2 btn btn-outline-primary" href="{% url 'users:login' %}">Оставить отзыв</a>
+        {% endif %}
+
+
+
+
+
+        <a class="p-2 btn btn-outline-primary" href="#">Наши блюда</a>
 
         <a class="p-2 btn btn-outline-primary" href="#">Наш блог</a>
 

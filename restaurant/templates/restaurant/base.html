@@ -23,22 +23,25 @@
         <img
                 src="{% static 'image/shark.svg' %}"
                 alt="Fishstore. We are sharks of business!"
-                height="100px"
-                width="100px"/>
+                height="200px"
+                width="200px"/>
         <br>
-        Restaurant "Hungry Shark"
+        <div style="color: blue">Ресторан "Hungry Shark"</div>
     </h1>
-    <p class="lead">Hungry Shark - ресторан кухни рыбных блюд. У нас есть всё - от миноги до осьминога! Hungry Shark - разбуди в себе акулу - и накорми её!*
+    <p class="lead">Hungry Shark - ресторан кухни рыбных блюд. У нас есть всё - от миноги до осьминога! Hungry Shark - разбуди в себе акулу - и накорми её!* **
         <br>
 
         <small class="text-body-secondary">
                      <span class="text-muted">
 
-                    * Акулий аппетит гарантирован! <br> Поскольку мы специализируемся на рыбных блюдах, то мясные блюда только по спецзаказу. Имеется вегетарианское меню.
+                    * Акулий аппетит гарантирован! <br> ** Поскольку мы специализируемся на рыбных блюдах, то мясные блюда только по спецзаказу. Имеется вегетарианское меню.
                     <br>
 
                      </span>
+            <br>
+            <div style="color: blue">
                <label>Сегодня &nbsp;{%  current_time '%Y-%m-%d' %}  </label>
+
 
      {% if user.is_authenticated %}
      <label>, &nbsp; Добро пожаловать, пользователь <b>{{user.email}}</b>.
@@ -57,6 +60,7 @@
      {% else %}
     <label>, &nbsp;Вы находитесь на сайте как <b>анонимный пользователь</b>. </label>
      {% endif %}
+                </div>
 
 
         </small>
@@ -97,32 +101,12 @@
 
     <footer class="pt-4 my-md-5 pt-md-5 border-top">
         <div class="row text-center">
-            <div class="col-3 col-md">
-                SkyStore
-                <small class="d-block mb-3 text-muted">&copy; 2023 - {% now 'Y' %}</small>
+            <div class="col-12 col-md">
+                Powered by Django
+                <small class="d-block mb-3 text-muted">&copy; 2024 - {% now 'Y' %}</small>
             </div>
-            <div class="col-3 col-md">
-                <h5>Категории</h5>
-                <ul class="list-unstyled text-small">
-                    <li><a class="text-muted" href="#">Рассылки</a></li>
-                    <li><a class="text-muted" href="#">Телеграм боты</a></li>
-                    <li><a class="text-muted" href="#">Полезные утилиты</a></li>
-                    <li><a class="text-muted" href="#">Веб-приложения</a></li>
-                    <li><a class="text-muted" href="#">Микросервисы</a></li>
-                </ul>
-            </div>
-            <div class="col-3 col-md">
-                <h5>Дополнительно</h5>
-                <ul class="list-unstyled text-small">
-                    <li><a class="text-muted" href="#">Мы пишем</a></li>
-                </ul>
-            </div>
-            <div class="col-3 col-md">
-                <h5>О нас</h5>
-                <ul class="list-unstyled text-small">
-                    <li><a class="text-muted" href="/contacts/">Контакты</a></li>
-                </ul>
-            </div>
+
+
         </div>
     </footer>
 </div>
