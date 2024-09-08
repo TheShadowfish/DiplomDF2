@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils import timezone
-
+"""
 from users.models import User
 
 NULLABLE = {'blank': True, 'null': True}
@@ -37,9 +37,9 @@ class Booking(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='пользователь', help_text = 'пользователь', related_name = 'user', ** NULLABLE)
 
-    message = models.OneToOneField(Message, on_delete=models.CASCADE, verbose_name='сообщение', **NULLABLE, related_name = 'message')
-
-    settings = models.OneToOneField(MailingSettings, on_delete=models.CASCADE, verbose_name='настройки', **NULLABLE, related_name = 'settings')
+    # message = models.OneToOneField(Message, on_delete=models.CASCADE, verbose_name='сообщение', **NULLABLE, related_name = 'message')
+    #
+    # settings = models.OneToOneField(MailingSettings, on_delete=models.CASCADE, verbose_name='настройки', **NULLABLE, related_name = 'settings')
 
     class Meta:
         verbose_name = 'рассылка'
@@ -50,19 +50,19 @@ class Booking(models.Model):
     def __str__(self):
         return f" {self.title}"
 
+
+# # Функционал менеджера
+# - Может просматривать любые рассылки.  PermissionRequiredMixin permission_required = "article.view_article
+# - Может просматривать список пользователей сервиса.  PermissionRequiredMixin permission_required = "article.view_article
+# - Может блокировать пользователей сервиса. "can_set_user_inactive", "Can blocked user (bool is_active (is_blocked ?) = False)"
+# - Может отключать рассылки. "can_turn_off_mailing", "Can turn off mailing (mailing.settings.status = False"
+#
+# - Не может редактировать рассылки.
+# - Не может управлять списком рассылок.
+# - Не может изменять рассылки и сообщения.
+
+
 """
-# Функционал менеджера
-- Может просматривать любые рассылки.  PermissionRequiredMixin permission_required = "article.view_article
-- Может просматривать список пользователей сервиса.  PermissionRequiredMixin permission_required = "article.view_article
-- Может блокировать пользователей сервиса. "can_set_user_inactive", "Can blocked user (bool is_active (is_blocked ?) = False)"
-- Может отключать рассылки. "can_turn_off_mailing", "Can turn off mailing (mailing.settings.status = False"
-
-- Не может редактировать рассылки.
-- Не может управлять списком рассылок.
-- Не может изменять рассылки и сообщения.
- """
-
-
 
 
 #
