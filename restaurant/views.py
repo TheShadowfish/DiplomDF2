@@ -44,3 +44,6 @@ class HomePageView(TemplateView):
     #     # def sample(self, population, k, *, counts=None):
     #
     #     return context
+
+class AboutUsPageView(TemplateView):
+    template_name = "restaurant/about_us.html"

@@ -6,217 +6,118 @@
 
 
 <div class="row text-right">
-<div class="col-12">
-
-    <div class="card mb-3 box-shadow">
-
-
-        <div class="card-body">
-
-            <p class="card-text">
-
-                <h1 class="card-title  text-center">
-                        <img
-                src="{% static 'image/shark.svg' %}"
-                alt="Hungry Shark. Feed The Shark inside you!"
-                height="100px"
-                width="100px"/>
-        <br>
-
-                <div style="color: blue ">Hungry Shark</div>
-            </h1></p>
-
-
-            <p class="lead">Мы - ресторан, специализирующийся на рыбных блюдах.
-            У нас есть любая рыба, которую вы можете вообразить: от вяленой корюшки до рыбы фугу.
-            Моллюски, креветки, осьминог в собственных чернилах - и это у нас есть.
-            Добро пожаловать к нам!
-            Hungry Shark - накорми акулу внутри себя!
-                <br>
-                    - История ресторана.
-    - Миссия и ценности.
-    - Команда.
-            </p><br>
-
-            </p>
-        </div>
-    </div>
-</div>
-<div class="col-12">
-
-    <div class="card mb-3 box-shadow">
-
-
-        <div class="card-body">
-
-            <p class="card-text">
-
-            <p class="card-text">
-
-                <h1 class="card-title  text-center">
-                        <img
-                src="{% static 'image/honey-svgrepo-com.svg' %}"
-                alt="Feel our service!"
-                height="100px"
-                width="100px">
-        <br>
-
-                <div style="color: blue ">Предложения</div>
-            </h1></p>
-
-            <p class="lead">В нашем ассортименте блюда из рыбы 40 морей и 5 океанов.
-            Закажите столик - и мы будем ждать вас в назначенное время.
-            У нас имеется отдельный зал для проведения торжественных мероприятий.
-            Если вам нужен тамада - у нас он есть! (тамада хороший, и конкурсы интересные =:D ).
-            Также мы проводим корпоративые мероприятия по предварительной договоренности.
-            По специальной договоренности может быть осуществлена доставка готовых блюд по вашему адресу.</p> <br>
-
-            </p>
-        </div>
-    </div>
-</div>
-
-<div class="col-6">
-    <div class="card mb-3 box-shadow">
-
-
-        <div class="card-body">
-
-            <p class="card-text">
-
-                <h1 class="card-title  text-center">
-                        <img
-                src="{% static 'image/at-email-svgrepo-com.svg' %}"
-                alt="Contact us"
-                height="100px"
-                width="100px">
-        <br>
-
-                <div style="color: blue ">Контакты</div>
-            </h1></p>
-
-            <p class="lead">
-                Наш адрес: Санкт-Петербург, Невский проспект 6822, 1 этаж, телефон 89998887766
-                <li><a href="https://t.me/TheShadowfish">наш Telegram </a></li>
-                <li><a href="https://wa.me/79115604350">наш Whatsapp</a></li>
-                <li><a href="https://vk.com/shadowfish ">Мы в контакте </a></li>
-
-            </p> <br>
-
-            </p>
-        </div>
-    </div>
-
-</div>
-    <div class="col-6">
-    <div class="card mb-3 box-shadow">
-
-
-        <div class="card-body">
-
-            <p class="card-text">
-
-                <h1 class="card-title  text-center">
-                        <img
-                src="{% static 'image/cha-bubbles-two-svgrepo-com.svg' %}"
-                alt="Reflexion"
-                height="100px"
-                width="100px">
-        <br>
-
-                <div style="color: blue ">Обратная связь</div>
-            </h1></p>
-
-            <p class="lead">
-                <br>
-                <b>Задайте нам вопрос</b> (ссылка на страницу, где вопрос + обратный адрес)<br>
-                <b>Оставьте отзыв о посещении ресторана</b> (страница отзывов - необходима регистрация) <br>
-
-            </p> <br>
-
-            </p>
-        </div>
-    </div>
-
-</div>
-
-
-</div>
-
-
-{% comment "Можно всобачить примеры блюд" %}
-<div class="row text-right">
-{% for article in random_articles %}
-
-    <div class="col-4">
+    <div class="col-12">
 
         <div class="card mb-3 box-shadow">
-            <img src="{{ article.image | media_filter }}" class="card-img-top" alt={{article.image|media_filter}}>
 
 
             <div class="card-body">
-                <h5 class="card-title">
-                    <div style="color: orange"><b> {{article.title}}</b></div>
-                </h5>
+
                 <p class="card-text">
-                  {% if article.body|comment_markdown|length >= 300 %}
-                    {{ article.body|comment_markdown|slice:":300"}} ...
-                    {% else %}
-                    {{ article.body}}
-                    {% endif %}
+
+                <h1 class="card-title  text-center">
+                    <img
+                            src="{% static 'image/des-ink-well-svgrepo-com.svg' %}"
+                            alt="Our history"
+                            height="100px"
+                            width="100px"/>
+                    <br>
+
+                    <div style="color: blue ">История ресторана</div>
+                </h1>
                 </p>
-                <br>
-                <p class="card-text">
-                    <b>Опубликовано</b> {{article.created_at}}<br>
-                    <b>Просмотров</b>{{article.views_count}}<br>
-                   </p>
 
 
-                <div class="btn-group">
-                    <a class="btn btn-success" href="{% url 'blogapp:article_detail' article.pk%}" role="button">Посмотреть</a>
+                <p class="lead">Мы - ресторан, специализирующийся на рыбных блюдах.
+                    У нас есть любая рыба, которую вы можете вообразить: от вяленой корюшки до рыбы фугу.
+                    Моллюски, креветки, осьминог в собственных чернилах - и это у нас есть.
+                    Добро пожаловать к нам!
+                    Hungry Shark - накорми акулу внутри себя!
+                    <br>
+                    - История ресторана.
+                    - Миссия и ценности.
+                    - Команда.
+                </p><br>
 
-                </div>
-
+                </p>
             </div>
-
+        </div>
     </div>
+    <div class="col-12">
+
+        <div class="card mb-3 box-shadow">
 
 
-    </div>
-    {% endfor %}
-</div>
-{% endcomment %}
+            <div class="card-body">
 
+                <p class="card-text">
 
-{% comment "Этот HTML код пока не нужен, но вдруг пригодится потом" %}
-<div class="col-4">
+                <p class="card-text">
 
-    <div class="card mb-3 box-shadow">
+                <h1 class="card-title  text-center">
+                    <img
+                            src="{% static 'image/mountain-top-summit-sunrise-svgrepo-com.svg' %}"
+                            alt="Our mission"
+                            height="100px"
+                            width="100px">
+                    <br>
 
+                    <div style="color: blue ">Миссия и ценности</div>
+                </h1>
+                </p>
 
-        <div class="card-body">
-            <h5 class="card-title">
-                <div style="color: orange"><b>Список уникальных клиентов</b></div>
-            </h5>
-            <p class="card-text">
+                <p class="lead">В нашем ассортименте блюда из рыбы 40 морей и 5 океанов.
+                    Закажите столик - и мы будем ждать вас в назначенное время.
+                    У нас имеется отдельный зал для проведения торжественных мероприятий.
+                    Если вам нужен тамада - у нас он есть! (тамада хороший, и конкурсы интересные =:D ).
+                    Также мы проводим корпоративые мероприятия по предварительной договоренности.
+                    По специальной договоренности может быть осуществлена доставка готовых блюд по вашему адресу.</p>
+                <br>
 
-                {% for client in emails_unique%}
-
-                {{client.email}} <br>
-
-                {% endfor %}
-                <br><br>
-                <b>Количество статей в блоге: </b> {{article_list_len}}
-
-
-
-
-            </p>
+                </p>
+            </div>
         </div>
     </div>
 
+    <div class="col-6">
+        <div class="card mb-3 box-shadow">
+
+
+            <div class="card-body">
+
+                <p class="card-text">
+
+                <h1 class="card-title  text-center">
+                    <img
+                            src="{% static 'image/joint-command-team-svgrepo-com.svg' %}"
+                            alt="Our team"
+                            height="100px"
+                            width="100px">
+                    <br>
+
+                    <div style="color: blue ">Наша команда</div>
+                </h1>
+                </p>
+
+                <p class="lead">
+                    Наш адрес: Санкт-Петербург, Невский проспект 6822, 1 этаж, телефон 89998887766
+                    <li><a href="https://t.me/TheShadowfish">наш Telegram </a></li>
+                    <li><a href="https://wa.me/79115604350">наш Whatsapp</a></li>
+                    <li><a href="https://vk.com/shadowfish ">Мы в контакте </a></li>
+
+                </p>
+                <br>
+
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+
 </div>
-{% endcomment%}
+
+
 </div>
 
 

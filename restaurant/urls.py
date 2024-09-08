@@ -1,7 +1,7 @@
 from django.urls import path
 from django.views.decorators.cache import cache_page
 
-from .views import HomePageView
+from .views import HomePageView, AboutUsPageView
 
 # MessageCreateView,
 
@@ -11,6 +11,7 @@ app_name = RestaurantConfig.name
 
 urlpatterns = [
     path('', HomePageView.as_view(), name='main'),
+    path('about_us/', AboutUsPageView.as_view(), name='about_us'),
     #
     # path('mailing_list/', MailingListView.as_view(), name='mailing_list'),
     # path('mailing_list_send/', MailingListViewSend.as_view(), name='mailing_list_send'),
