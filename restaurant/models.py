@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils import timezone
-"""
+
 from users.models import User
 
 NULLABLE = {'blank': True, 'null': True}
@@ -26,52 +26,60 @@ class Table(models.Model):
 
 
 class Booking(models.Model):
-    title = models.CharField(max_length=150, unique=True, verbose_name='рассылка',
-    help_text = 'введите название рассылки')
-    message_in = models.TextField(verbose_name='описание', help_text='введите описание рассылки', **NULLABLE)
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name='дата создания',
-    help_text = 'введите дату создания рассылки')
-    # status = models.BooleanField(default=False, verbose_name='статус', help_text='введите статус рассылки')
-    # datetime_send = models.DateTimeField(auto_now_add=False, verbose_name='дата срабатывания',
-    #                                      help_text='введите дату срабатывания')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='пользователь', help_text='пользователь', related_name='user')
+    table = models.ForeignKey(Table, on_delete=models.CASCADE, verbose_name='столик', help_text='столик', related_name = 'table')
+    places = models.SmallIntegerField(verbose_name='Число бронируемых мест',
+                                      help_text="Введите число бронируемых мест", default=2)
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='пользователь', help_text = 'пользователь', related_name = 'user', ** NULLABLE)
+    date_field = models.DateField(verbose_name='дата бронирования', help_text='введите дата бронирования')
+    time_start = models.TimeField(verbose_name='начало бронирования', help_text='введите начало бронирования')
+    time_end = models.TimeField(verbose_name='конец бронирования', help_text='введите конец бронирования')
 
-    # message = models.OneToOneField(Message, on_delete=models.CASCADE, verbose_name='сообщение', **NULLABLE, related_name = 'message')
-    #
-    # settings = models.OneToOneField(MailingSettings, on_delete=models.CASCADE, verbose_name='настройки', **NULLABLE, related_name = 'settings')
+    active = models.BooleanField(verbose_name='активно ли бронирование', default=True, help_text='введите активно ли бронирование')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='дата создания', help_text = 'введите дату создания бронирования')
 
     class Meta:
-        verbose_name = 'рассылка'
-        verbose_name_plural = 'рассылки'
-        permissions = [
-            ("can_turn_off_mailing", "Can turn off mailing (mailing.settings.status = False"),
-        ]
+        verbose_name = 'бронирование'
+        verbose_name_plural = 'бронирования'
     def __str__(self):
-        return f" {self.title}"
+        return f"{self.pk}, {self.user} - {self.table}"
 
 
-# # Функционал менеджера
-# - Может просматривать любые рассылки.  PermissionRequiredMixin permission_required = "article.view_article
-# - Может просматривать список пользователей сервиса.  PermissionRequiredMixin permission_required = "article.view_article
-# - Может блокировать пользователей сервиса. "can_set_user_inactive", "Can blocked user (bool is_active (is_blocked ?) = False)"
-# - Может отключать рассылки. "can_turn_off_mailing", "Can turn off mailing (mailing.settings.status = False"
-#
-# - Не может редактировать рассылки.
-# - Не может управлять списком рассылок.
-# - Не может изменять рассылки и сообщения.
+class ContentText(models.Model):
+    title = models.CharField(max_length=150, verbose_name='контент-название', help_text="введите название текстового блока", unique=True)
+    body = models.TextField(verbose_name='тело текстового блока', help_text='введите тело текстового блока')
+
+    class Meta:
+        verbose_name = 'контент'
+        verbose_name_plural = 'контент'
 
 
-"""
+    def __str__(self):
+        return f"{self.title}: {self.body}"
 
+class ContentImage(models.Model):
+    title = models.CharField(max_length=150, verbose_name='картинка-название',
+                                 help_text="введите название картинки", unique=True)
 
-#
-# class Message(models.Model):
-#     title = models.CharField(max_length=150, verbose_name='тема сообщения', help_text="Введите тему сообщения",
-#                              default='рассылка')
-#     body = models.TextField(verbose_name='тело сообщения', help_text='Введите тело сообщения', default='текст рассылки')
-#
-#
+    description = models.TextField(
+        verbose_name = "Описание картинки",
+        help_text = "Введите описание картинки",
+        ** NULLABLE,
+        )
+    image = models.ImageField(
+        upload_to = "content/photo",
+        verbose_name = "Изображение",
+        help_text = "Загрузите изображение",
+        ** NULLABLE,
+        )
+
+    class Meta:
+        verbose_name = 'картинка'
+        verbose_name_plural = 'картинки'
+
+    def __str__(self):
+        return f"{self.title}: {self.description}"
+
 # """
 # **_Рассылка (настройки):_**
 # - дата и время первой отправки рассылки;
