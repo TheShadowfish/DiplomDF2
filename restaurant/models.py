@@ -26,10 +26,23 @@ class Table(models.Model):
 
 
 class Booking(models.Model):
+    NOTIFICATION_HOURS = (
+        (0, "Не оповещать"),
+        (1, "За час"),
+        (2, "За два часа"),
+        (3, "За три часа"),
+    )
+
+
+
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='пользователь', help_text='пользователь', related_name='user')
     table = models.ForeignKey(Table, on_delete=models.CASCADE, verbose_name='столик', help_text='столик', related_name = 'table')
     places = models.SmallIntegerField(verbose_name='Число бронируемых мест',
                                       help_text="Введите число бронируемых мест", default=2)
+
+    notification = models.SmallIntegerField(
+        default=0, verbose_name="Оповещение", choices=NOTIFICATION_HOURS
+    )
 
     date_field = models.DateField(verbose_name='дата бронирования', help_text='введите дата бронирования')
     time_start = models.TimeField(verbose_name='начало бронирования', help_text='введите начало бронирования')
