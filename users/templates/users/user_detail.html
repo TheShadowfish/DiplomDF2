@@ -36,25 +36,48 @@
                 <table class="table table-stripped">
                     <tr>
 
-                        <th>Название</th>
-                        <th>Текст рассылки</th>
+                        <th>Пользователь</th>
+                        <th>Столик</th>
+                        <th>Число мест</th>
+                        <th>Оповещение за</th>
+                        <th>Дата</th>
+                        <th>Забронирован с</th>
+                        <th>Забронирован до</th>
+                        <th>Активно</th>
                         <th>Дата создания</th>
-                        <th>Статус</th>
-                        <th>Время рассылки</th>
+
+                        <th>Информация</th>
+                        <th>Управление</th>
+
 
                     </tr>
 
                     {% for mailing_item in mailing_list %}
                     <tr>
 
+                        <td>{{object.user}}</td>
+                        <td>{{object.table}}</td>
+                        <td>{{object.places}}</td>
+                        <td>{{object.notification}}</td>
+                        <td>{{object.date_field}}</td>
+                        <td>{{object.time_start}}</td>
+                        <td>{{object.time_end}}</td>
+                        <td>{{object.active}}</td>
+                        <td>{{object.created_at}}</td>
 
-                        <td>{{mailing_item.title}}</td>
-                        <td>{{mailing_item.message}}</td>
-                        <td>{{mailing_item.created_at}}</td>
-                        <td>{{mailing_item.settings.status}}</td>
-                        <td>{{mailing_item.settings.datetime_send}}</td>
 
-                    </tr>
+                                            <td>
+                            <a class="btn btn-primary" href="{%url 'mailapp:mailing_detail' object.pk%}" role="button">Информация</a>
+                        </td>
+                        <td>
+                            {%if object.active %}
+                            <a class="btn btn-success" href="{%url 'mailapp:mailing_activity' object.pk%}"
+                               role="button">Деактивировать</a>
+                            {% else %}
+                            <a class="btn btn-danger" href="{%url 'mailapp:mailing_activity' object.pk%}"
+                               role="button">&nbsp;&nbsp;Активировать&nbsp;&nbsp;</a>
+                            {%endif%}
+                        </td>
 
                     {% endfor %}
 

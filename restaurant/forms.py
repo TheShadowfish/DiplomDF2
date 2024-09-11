@@ -20,16 +20,9 @@ class BookingForm(StyleFormMixin, forms.ModelForm):
     class Meta:
         model = Booking
         fields = '__all__'
-        # fields = (
-        # "user",
-        # "table",
-        # "date_field",
-        # "time_start",
-        # "time_end",
-        # "active",
-        # "created_at"
-        # ) казино, криптовалюта, крипта, биржа, дешево, бесплатно, обман, полиция, радар
-        exclude = ('owner','created_at',)
+        exclude = ('user','active','created_at')
+
+
 
     def clean(self):
         # def clean(self):
@@ -54,26 +47,58 @@ class BookingForm(StyleFormMixin, forms.ModelForm):
         work_end = datetime.time(23, 0, 0)
         period_of_booking = 14
 
+        # print(f"{ContentText.objects.get(title='work_start')} || {ContentText.objects.get(title='work_end')} || {ContentText.objects.get(title='period_of_booking')}")
+
         try:
-            work_start = datetime.time(ContentText.objects.get(title='work_start'))
-            work_end = datetime.time(ContentText.objects.get(title='work_end'))
-            period_of_booking = int(ContentText.objects.get(title='period_of_booking'))
+            #
+            # print("07/01/2015-14:31:58.520")
+            period_of_booking = int(ContentText.objects.get(title='period_of_booking').body)
+            # print(f"period_of_booking {str(period_of_booking)}")
+
+            # print(f"work_start {ContentText.objects.get(title='work_start').body}")
+
+            work_start = datetime.time.fromisoformat(ContentText.objects.get(title='work_start').body)
+            # work_start = datetime.time.strftime('10:00', '%H:%M')
+            # work_start = datetime.time.fromisoformat('10:00')
+
+
+            # work_start = datetime.time(ContentText.objects.get(title='work_start'))
+            # print(f"work_start {str(work_start)}")
+            work_end = datetime.time.fromisoformat(ContentText.objects.get(title='work_end').body)
+            # work_end = datetime.time(ContentText.objects.get(title='work_end'))
+
+
+            # print(f"work_end {str(work_end)}")
+
         except:
+            print(
+                f"{ContentText.objects.get(title='work_start')} || {ContentText.objects.get(title='work_end')} || {ContentText.objects.get(title='period_of_booking')}")
 
             raise forms.ValidationError(
-                'В базу данных не внесено время работы ресторана: work_start=<время открытия>, work_end=<время закрытия>, period_of_booking=<период предварительного бронирования>')
+                f'В базу данных не внесено время работы ресторана: work_start=<время открытия>, work_end=<время закрытия>, period_of_booking=<период предварительного бронирования>')
 
         date = datetime.date.today()
-        time = datetime.now().time()
+        time = datetime.datetime.now().time()
 
-        cleaned_data_date = self.cleaned_data['date_field']
+        print(f"{self.cleaned_data}")
+
+        # cleaned_data = self.cleaned_data['year_born']
+
+
+        cleaned_data_date_field = self.cleaned_data['date_field']
         cleaned_data_time_start = self.cleaned_data['time_start']
         cleaned_data_time_end = self.cleaned_data['time_end']
 
-        if date > cleaned_data_date:
+        # cleaned_data_date = time.strptime(self.cleaned_data['date_field'], '%d-%m-%y')
+        # cleaned_data_time_start = time.strptime(self.cleaned_data['time_start'], '%H:%M')
+        # cleaned_data_time_end = time.strptime(self.cleaned_data['time_end'], '%H:%M')
+
+        # time.strptime(ContentText.objects.get(title='work_start'), '%H:%M')
+
+        if date > cleaned_data_date_field:
             raise forms.ValidationError('Нельзя забронировать место на прошедшую дату')
 
-        if cleaned_data_date > date + datetime.timedelta(days=period_of_booking):
+        if cleaned_data_date_field > date + datetime.timedelta(days=period_of_booking):
             raise forms.ValidationError(f'Бронировать места можно не ранее чем за {period_of_booking} дней')
 
 

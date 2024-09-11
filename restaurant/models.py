@@ -7,7 +7,7 @@ NULLABLE = {'blank': True, 'null': True}
 
 
 class Table(models.Model):
-    number = models.SmallIntegerField(verbose_name='Номер столика', help_text="Введите номер столика")
+    number = models.SmallIntegerField(verbose_name='Номер столика', help_text="Введите номер столика", unique=True)
     places = models.SmallIntegerField(verbose_name='Число сидячих мест у столика',
                                       help_text="Введите число сидячих мест у столика", default=4)
     flour = models.SmallIntegerField(verbose_name='Этаж нахождения столика',
@@ -22,7 +22,7 @@ class Table(models.Model):
         #     ("can_turn_off_mailing", "Can turn off mailing (mailing.settings.status = False"),
         # ]
     def __str__(self):
-        return f"id = {self.pk}, numbe r= {self.number}"
+        return f"Столик номер {self.number}"
 
 
 class Booking(models.Model):

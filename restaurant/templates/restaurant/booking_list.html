@@ -1,6 +1,26 @@
-{% extends 'mailapp/base.html'%}
+{% extends 'restaurant/base.html'%}
 {% load static %}
 {% block content %}
+
+
+{% comment 'бронирования' %}
+user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='пользователь', help_text='пользователь', related_name='user')
+    table = models.ForeignKey(Table, on_delete=models.CASCADE, verbose_name='столик', help_text='столик', related_name = 'table')
+    places = models.SmallIntegerField(verbose_name='Число бронируемых мест',
+                                      help_text="Введите число бронируемых мест", default=2)
+
+    notification = models.SmallIntegerField(
+        default=0, verbose_name="Оповещение", choices=NOTIFICATION_HOURS
+    )
+
+    date_field = models.DateField(verbose_name='дата бронирования', help_text='введите дата бронирования')
+    time_start = models.TimeField(verbose_name='начало бронирования', help_text='введите начало бронирования')
+    time_end = models.TimeField(verbose_name='конец бронирования', help_text='введите конец бронирования')
+
+    active = models.BooleanField(verbose_name='активно ли бронирование', default=True, help_text='введите активно ли бронирование')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='дата создания', help_text = 'введите дату создания бронирования')
+{% endcomment %}
+
 
 
 <div class="row text-right">
@@ -46,13 +66,17 @@
 
                 <table class="table table-stripped">
                     <tr>
-                        <th>Название</th>
-                        <th>Текст рассылки</th>
+                        <th>Пользователь</th>
+                        <th>Столик</th>
+                        <th>Число мест</th>
+                        <th>Оповещение за</th>
+                        <th>Дата</th>
+                        <th>Забронирован с</th>
+                        <th>Забронирован до</th>
+                        <th>Активно</th>
                         <th>Дата создания</th>
-                        <th>Владелец рассылки</th>
-                        <th>Статус</th>
-                        <th>Информация</th>
-                        <th>Изменить</th>
+
+
 
                     </tr>
 
@@ -61,11 +85,16 @@
                     {% if only_send and object.settings.status == False or only_send == False %}
 
                     <tr>
-                        <td>{{object.title}}</td>
-                        <td>{{object.message.body}}</td>
-                        <td>{{object.created_at}}</td>
                         <td>{{object.user}}</td>
-                        <td>{{object.settings.status}}</td>
+                        <td>{{object.table}}</td>
+                        <td>{{object.places}}</td>
+                        <td>{{object.notification}}</td>
+                        <td>{{object.date_field}}</td>
+                        <td>{{object.time_start}}</td>
+                        <td>{{object.time_end}}</td>
+                        <td>{{object.active}}</td>
+                        <td>{{object.created_at}}</td>
+
 
                         <td>
                             <a class="btn btn-primary" href="{%url 'mailapp:mailing_detail' object.pk%}" role="button">Информация</a>
@@ -107,15 +136,15 @@
 
                 <table class="table table-stripped">
                     <tr>
-                        <th>Название</th>
-                        <th>Текст рассылки</th>
+                        <th>Пользователь</th>
+                        <th>Столик</th>
+                        <th>Число мест</th>
+                        <th>Оповещение за</th>
+                        <th>Дата</th>
+                        <th>Забронирован с</th>
+                        <th>Забронирован до</th>
+                        <th>Активно</th>
                         <th>Дата создания</th>
-                        <th>Владелец рассылки</th>
-                        <th>Статус</th>
-                        <th>Информация</th>
-                        <th>Изменить</th>
-                        <th>Удалить</th>
-                        <th>Отправить</th>
 
                     </tr>
 
@@ -127,11 +156,15 @@
                     <tr>
                         {% if user == object.user %}
 
-                        <td>{{object.title}}</td>
-                        <td>{{object.message.body}}</td>
-                        <td>{{object.created_at}}</td>
                         <td>{{object.user}}</td>
-                        <td>{{object.settings.status}}</td>
+                        <td>{{object.table}}</td>
+                        <td>{{object.places}}</td>
+                        <td>{{object.notification}}</td>
+                        <td>{{object.date_field}}</td>
+                        <td>{{object.time_start}}</td>
+                        <td>{{object.time_end}}</td>
+                        <td>{{object.active}}</td>
+                        <td>{{object.created_at}}</td>
 
                         <td>
                             <a class="btn btn-primary" href="{%url 'mailapp:mailing_detail' object.pk%}" role="button">Информация</a>
