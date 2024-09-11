@@ -3,6 +3,7 @@ import string
 
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
@@ -10,9 +11,30 @@ from django.utils import timezone
 from django.views.generic import CreateView, ListView, UpdateView, DetailView, DeleteView
 
 from config.settings import EMAIL_HOST_USER
+from restaurant.models import Booking
 # from mailapp.models import Mailing
 from users.forms import UserRegisterForm, UserProfileForm
 from users.models import User, UserToken
+
+
+
+
+class GetFormKwargsGetUserMixin:
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+class GetFormClassUserIsOwnerMixin:
+    def get_form_class(self):
+        user = self.request.user
+        pk = self.kwargs.get("pk")
+
+        print(f"{user.pk} =user.pk == self.kwargs.get('pk')= {object.pk}")
+
+        if user.pk == self.kwargs.get("pk"):
+            return UserProfileForm
+        raise PermissionDenied
 
 
 class RegisterView(CreateView):
@@ -108,26 +130,72 @@ class UserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     permission_required = "users.view_user"
 
 
+
 class ProfileView(LoginRequiredMixin, UpdateView):
     model = User
     form_class = UserProfileForm
 
+
+
+
     success_url = reverse_lazy('users:profile')
+
+
+    # def get_object(self, queryset=None):
+    #     return self.request.user
+
+    def get_success_url(self):
+        return reverse('users:user_detail', args=[self.kwargs.get("pk")])
+
+
+    # success_url = reverse_lazy('users:user_list')
+    # success_url = reverse_lazy('users:user_detail', kwargs={'pk': get_object().pk})
+    # success_url =  reverse_lazy('company', kwargs={'farm_id': farmid})
+    # "{% url 'catalog:product_update' object.pk%}"
+    # 'users/user_detail/(?P<pk>[0-9]+)/\\Z'
+
 
     def get_object(self, queryset=None):
         return self.request.user
 
 
-class UserDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
+class UserDetailView(LoginRequiredMixin, GetFormClassUserIsOwnerMixin, DetailView):
     model = User
-    permission_required = "users.view_user"
+    # permission_required = ""
+    # permission_required()
+    #
+    # permission_required = "users.view_user"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # context['mailing_list'] = Mailing.objects.all()
 
-        context['mailing_list'] = Mailing.objects.filter(user=self.object)
-        return context
+        context['booking_list'] = Booking.objects.filter(user=self.object)
+
+        user = self.request.user
+        pk = self.kwargs.get("pk")
+
+        # print(f"{user.pk} =user.pk == self.kwargs.get('pk')= {pk}")
+        if user.is_moderator or user.pk == pk:
+            return context
+        else:
+            raise PermissionDenied
+
+
+
+
+
+    # def get_form_class(self):
+    #     user = self.request.user
+    #     pk = self.kwargs.get("pk")
+    #
+    #     print(f"{user.pk} =user.pk == self.kwargs.get('pk')= {object.pk}")
+    #
+    #     if user.pk == self.kwargs.get("pk"):
+    #         return UserProfileForm
+    #     raise PermissionDenied
+
+
 
 
 class UserDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):

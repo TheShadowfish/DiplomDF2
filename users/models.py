@@ -46,8 +46,17 @@ class User(AbstractUser):
     name = models.CharField(max_length=150, verbose_name='имя пользователя', help_text='Введите ваше имя', **NULLABLE)
     description = models.TextField(verbose_name='описание', help_text='Введите дополнительную информацию', **NULLABLE)
     phone_number = PhoneNumberField(**NULLABLE, verbose_name='телефон', help_text='Введите ваш номер телефона')
+    phone_number = PhoneNumberField(**NULLABLE, verbose_name='телефон', help_text='Введите ваш номер телефона')
     avatar = models.ImageField(upload_to='users/avatars', verbose_name='аватар', help_text='Выберите аватар',
                                **NULLABLE)
+
+    tg_nick = models.CharField(max_length=50, **NULLABLE, verbose_name="Tg name", help_text="Укажите telegram-ник",)
+
+    tg_chat_id = models.CharField(max_length=50, verbose_name="Телеграм chat-id", help_text="Укажите телеграм chat-id",  **NULLABLE,)
+    time_offset = models.IntegerField(default=3, verbose_name="Смещение часового пояса", help_text="От -12 до +14, по умолчанию UTC+3 (Московское время)")
+
+
+
 
     # is_active = models.BooleanField(default=True, verbose_name='активен', )
     is_content_manager = models.BooleanField(default=False, verbose_name='админ', )

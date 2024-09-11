@@ -32,6 +32,17 @@ class BookingForm(StyleFormMixin, forms.ModelForm):
         exclude = ('owner','created_at',)
 
     def clean(self):
+        # def clean(self):
+        #     cleaned_data = self.cleaned_data['year_born']
+        #     year_born = int(self.cleaned_data['year_born'])
+        #     current_year = timezone.now().year
+        #     timedelta = current_year - year_born
+        #     if timedelta >= 100:
+        #         raise forms.ValidationError("Собаки столько не живут. проверьте год рождения.")
+        #
+        #     return self.cleaned_data
+
+
         # blacklist = ['казино', 'криптовалюта', 'крипта', 'биржа', 'дешево', 'бесплатно', 'обман', 'полиция', 'радар']
         #
         # cleaned_data = self.cleaned_data['name'] + self.cleaned_data['description']

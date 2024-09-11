@@ -1,5 +1,6 @@
-{% extends 'mailapp/base.html'%}
+{% extends 'restaurant/base.html'%}
 {% block content %}
+{% load my_tags %}
 
 
 <div class="row text-start">
@@ -7,32 +8,43 @@
     <div class="col-lg-12 col-md-6 col-sm-12">
         <div class="card mb-4 box-shadow">
             <div class="card-header">
+
+
+                {% if user.is_authenticated %}
+                <div class="align-center">
+                <img src="{{ user.avatar|user_media_filter }}" width="100"
+                     alt={{user.avatar|user_media_filter}}> <br>
+
+
+                <label><b>{{user.name}}</b>,<br> {{user.email}} <br><br><br>
+
+                </label>
+                </div>
+                {% endif %}
+
                 <h4 class="my-0 font-weight-normal">Профиль</h4>
             </div>
             <div class="card-body">
                 <form method="post" action="" class="form-floating" enctype="multipart/form-data">
                     <div class="mb-3">
 
-                    {% csrf_token %}
-                    {{form.as_p}}
 
+                        {% csrf_token %}
+                        {{form.as_p}}
 
 
                     </div>
 
 
-                    <button type="submit" class="btn btn-lg btn-block btn-outline-primary">
-                        Сохранить
+                    <button type="submit" class="btn btn-lg btn-block btn-outline-primary">Сохранить</button>
 
 
-                    </button>
+                    <a class="btn btn-lg btn-block btn-outline-primary" href="/">Отмена</a>
                 </form>
             </div>
         </div>
     </div>
 </div>
-
-
 
 
 {% endblock %}

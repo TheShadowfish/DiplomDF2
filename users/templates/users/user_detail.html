@@ -1,4 +1,4 @@
-{% extends 'mailapp/base.html'%}
+{% extends 'restaurant/base.html'%}
 {% load static %}
 {% load my_tags %}
 {% block content %}
@@ -19,18 +19,18 @@
                 </h5>
                 <p class="card-text">
 
-                    <b>Аватар:</b><br> <img src="{{ object.avatar|user_media_filter }}" width="100"
+                    <img src="{{ object.avatar|user_media_filter }}" width="100"
                                             alt={{object.avatar|user_media_filter}}> <br>
                     <b>Имя:</b> {{object.name}} <br>
                     <b>Email:</b> {{object.email}} <br>
                     <b>Телефон:</b> {{object.phone_number}} <br>
-                    <b>Должность == Модератор:</b> {{object.is_moderator}} <br>
-                    <b>Должность == Контент-менеджер:</b> {{object.is_content_manager}} <br>
+                    <b>Суперпользователь:</b> {{object.is_superuser}} <br>
+                    <b>Персонал:</b> {{object.is_staff}} <br>
                     <b>Комментарий:</b> {{object.description}} <br>
 
                 <hr>
                 <h5 class="card-title">
-                    <div style="color: orange"><b>Список рассылок пользователя:</b></div>
+                    <div style="color: orange"><b>Список бронирований пользователя:</b></div>
                 </h5>
 
                 <table class="table table-stripped">

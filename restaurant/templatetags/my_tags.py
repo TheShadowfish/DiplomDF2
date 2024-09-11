@@ -84,14 +84,14 @@ def user_media_filter(path):
 
     return '/static/image/no_avatar.png'
 
+#
+# def markdown_comment(value):
+#     return bleach.clean(
+#         markdown.markdown(value, extensions=['nl2br']),
+#         strip=True,
+#         tags=['strong', 'p', 'b', 'li', 'blockquote', 'br'])
 
-def markdown_comment(value):
-    return bleach.clean(
-        markdown.markdown(value, extensions=['nl2br']),
-        strip=True,
-        tags=['strong', 'p', 'b', 'li', 'blockquote', 'br'])
-
-
-@register.filter
-def comment_markdown(value):
-    return mark_safe(markdown_comment(value))
+#
+# @register.filter
+# def comment_markdown(value):
+#     return mark_safe(markdown_comment(value))
