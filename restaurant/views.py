@@ -171,11 +171,5 @@ def toggle_activity_booking(request, pk):
 
     booking_item.save()
 
-    # <a class ="p-2 btn btn-outline-primary" href="{% url 'users:user_detail' user.pk%}" > История бронирований < / a >
     user_pk = booking_item.user.pk
-    #
-    # 'user_detail/<int:pk>/'
-    # url(r'test_suite/(?P<test_name>\w+)/(?P<test_id>\d+)$', 'test', name='test')
-    # reverse('test', kwargs={'test_name': 'haha', 'test_id': 1})
-
     return redirect(reverse('users:user_detail', kwargs={'pk': user_pk}))

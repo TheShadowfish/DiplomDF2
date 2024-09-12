@@ -48,6 +48,7 @@ class Booking(models.Model):
     time_start = models.TimeField(verbose_name='начало бронирования', help_text='введите начало бронирования')
     time_end = models.TimeField(verbose_name='конец бронирования', help_text='введите конец бронирования')
 
+
     active = models.BooleanField(verbose_name='активно ли бронирование', default=True, help_text='введите активно ли бронирование')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='дата создания', help_text = 'введите дату создания бронирования')
 

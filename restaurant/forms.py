@@ -1,7 +1,7 @@
 import datetime
 
 from django import forms
-from django.forms import BooleanField
+from django.forms import BooleanField, TimeField, TimeInput, SelectDateWidget, DateField, NumberInput
 
 from restaurant.models import Table, Booking, ContentText, ContentImage
 
@@ -10,13 +10,54 @@ class StyleFormMixin:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field_name, field in self.fields.items():
+
+            # if isinstance(field, DateField):
+            #     field.widget=SelectDateWidget()
+
+            if isinstance(field, DateField):
+                field.widget=NumberInput(attrs={'type': 'date'})
+
+            if isinstance(field, TimeField):
+                field.widget=NumberInput(attrs={'type': 'time'})
+
             if isinstance(field, BooleanField):
                 field.widget.attrs['class'] = 'form-check-input'
             else:
                 field.widget.attrs['class'] = 'form-control'
 
 
+            # else:
+            #     field.widget.attrs['class'] = 'form-control'
+
+
 class BookingForm(StyleFormMixin, forms.ModelForm):
+
+    # date_field = forms.DateField()
+    # time_start = forms.TimeInput()
+    # time_start = forms.TimeField(
+    #     widget=forms.TimeInput())
+    # date_field = forms.DateField()
+
+    # time_start = forms.TimeField(widget=TimeInput(attrs={'type': 'datetime-local'}))
+
+
+
+    """
+        date_field = models.DateField(verbose_name='дата бронирования', help_text='введите дата бронирования')
+    time_start = models.TimeField(verbose_name='начало бронирования', help_text='введите начало бронирования')
+    time_end = models.TimeField(verbose_name='конец бронирования', help_text='введите конец бронирования')
+    
+    В моём случае:
+1) Обернуть в кортеж (или список)
+2) Неправильно писать %yyyy-%dd-%mm, нужно так %Y-%m-%d, по аналогии с документацией
+Итого рабочий вариант:
+input_formats=['%Y-%m-%dT%H:%M']
+
+P.S. и начальное значение тоже пришлось обернуть
+initial=format(datetime.date.today(),'%Y-%m-%dT%H:%M')"""
+
+    # time_end = forms.TimeField()
+
     class Meta:
         model = Booking
         fields = '__all__'
