@@ -22,7 +22,7 @@ class Table(models.Model):
         #     ("can_turn_off_mailing", "Can turn off mailing (mailing.settings.status = False"),
         # ]
     def __str__(self):
-        return f"Столик номер {self.number}"
+        return f"cтолик {self.number}"
 
 
 class Booking(models.Model):
@@ -35,7 +35,7 @@ class Booking(models.Model):
 
 
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='пользователь', help_text='пользователь', related_name='user')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='пользователь', help_text='пользователь', related_name='user', **NULLABLE)
     table = models.ForeignKey(Table, on_delete=models.CASCADE, verbose_name='столик', help_text='столик', related_name = 'table')
     places = models.SmallIntegerField(verbose_name='Число бронируемых мест',
                                       help_text="Введите число бронируемых мест", default=2)

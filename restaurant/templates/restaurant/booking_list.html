@@ -28,20 +28,10 @@ user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='поль�
         <div class="card mb-3 box-shadow">
             <br>
             <div class="btn-group">
-                {% if perms.mailapp.can_turn_off_mailing %}
-                <div class="card-body">
-                <div style="color: red"><b>Рассылки: &nbsp; режим модератора. Добавление невозможно. </b></div>
-                    </div>
-
-                    {%else%}
-
 
                      &nbsp; &nbsp; &nbsp; <a class="p-2 btn btn-outline-primary btn-lg btn-block"
-                                        href="{%url 'mailapp:mailing_create' %}">Добавить рассылку</a> &nbsp; &nbsp;
+                                        href="{%url 'restaurant:booking_create' %}">Добавить бронирование</a> &nbsp; &nbsp;
                 &nbsp;
-                    {% endif %}
-
-
             </div>
             <br>
         </div>
@@ -51,75 +41,6 @@ user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='поль�
     <div class="col-12">
 
         <div class="card mb-3 box-shadow">
-
-
-
-            {% if perms.mailapp.can_turn_off_mailing %}
-
-            <div class="card-body">
-                <h5 class="card-title">
-
-                     <div style="color: red"><b>Рассылки: &nbsp; режим модератора. </b></div>
-
-                </h5>
-                <p class="card-text">
-
-                <table class="table table-stripped">
-                    <tr>
-                        <th>Пользователь</th>
-                        <th>Столик</th>
-                        <th>Число мест</th>
-                        <th>Оповещение за</th>
-                        <th>Дата</th>
-                        <th>Забронирован с</th>
-                        <th>Забронирован до</th>
-                        <th>Активно</th>
-                        <th>Дата создания</th>
-
-
-
-                    </tr>
-
-
-                    {% for object in object_list %}
-                    {% if only_send and object.settings.status == False or only_send == False %}
-
-                    <tr>
-                        <td>{{object.user}}</td>
-                        <td>{{object.table}}</td>
-                        <td>{{object.places}}</td>
-                        <td>{{object.notification}}</td>
-                        <td>{{object.date_field}}</td>
-                        <td>{{object.time_start}}</td>
-                        <td>{{object.time_end}}</td>
-                        <td>{{object.active}}</td>
-                        <td>{{object.created_at}}</td>
-
-
-                        <td>
-                            <a class="btn btn-primary" href="{%url 'mailapp:mailing_detail' object.pk%}" role="button">Информация</a>
-                        </td>
-                        <td>
-                            {%if object.settings.status %}
-                            <a class="btn btn-success" href="{%url 'mailapp:mailing_activity' object.pk%}"
-                               role="button">Деактивировать</a>
-                            {% else %}
-                            <a class="btn btn-danger" href="{%url 'mailapp:mailing_activity' object.pk%}"
-                               role="button">&nbsp;&nbsp;Активировать&nbsp;&nbsp;</a>
-                            {%endif%}
-                        </td>
-
-
-
-                    </tr>
-                    {% endif %}
-
-                    {% endfor %}
-
-                </table>
-
-                {% endif %}
-
 
 
 
@@ -138,54 +59,46 @@ user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='поль�
                     <tr>
                         <th>Пользователь</th>
                         <th>Столик</th>
-                        <th>Число мест</th>
-                        <th>Оповещение за</th>
+
                         <th>Дата</th>
-                        <th>Забронирован с</th>
-                        <th>Забронирован до</th>
+                        <th>Время</th>
                         <th>Активно</th>
+                        <th>Напомнить за</th>
                         <th>Дата создания</th>
 
                     </tr>
 
 
                     {% for object in object_list %}
-                    {% if only_send and object.settings.status == False or only_send == False %}
-
 
                     <tr>
                         {% if user == object.user %}
 
                         <td>{{object.user}}</td>
-                        <td>{{object.table}}</td>
-                        <td>{{object.places}}</td>
-                        <td>{{object.notification}}</td>
+                        <td>{{object.table}}, {{object.places}} места</td>
+
                         <td>{{object.date_field}}</td>
-                        <td>{{object.time_start}}</td>
-                        <td>{{object.time_end}}</td>
+                        <td>{{object.time_start}} - {{object.time_end}}</td>
                         <td>{{object.active}}</td>
+                        <td>{{object.notification}} часа</td>
                         <td>{{object.created_at}}</td>
+                        <td>{{object.pk}}</td>
 
                         <td>
-                            <a class="btn btn-primary" href="{%url 'mailapp:mailing_detail' object.pk%}" role="button">Информация</a>
+                            <a class="btn btn-primary" href="{%url 'restaurant:booking_detail' object.pk%}" role="button">Информация</a>
                         </td>
                         <td>
-                            <a class="btn btn-primary" href="{%url 'mailapp:mailing_update' object.pk%}"
+                            <a class="btn btn-primary" href="{%url 'restaurant:booking_update' object.pk%}"
                                role="button">Изменить</a>
                         </td>
                         <td>
-                            <a class="btn btn-primary" href="{%url 'mailapp:mailing_delete' object.pk%}"
+                            <a class="btn btn-primary" href="{%url 'restaurant:booking_delete' object.pk%}"
                                role="button">Удалить</a>
-                        </td>
-                        <td>
-                            <a class="btn btn-danger" href="{%url 'mailapp:mailing_send' object.pk%}"
-                               role="button">Отправить</a>
                         </td>
                         {% endif %}
 
                     </tr>
 
-                    {% endif %}
                     {% endfor %}
 
                 </table>

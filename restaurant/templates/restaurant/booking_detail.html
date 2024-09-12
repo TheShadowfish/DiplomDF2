@@ -1,0 +1,58 @@
+{% extends 'restaurant/base.html'%}
+{% load static %}
+<!--{% load tz %}-->
+
+{% block content %}
+
+<div class="row text-right">
+
+    <div class="col-12">
+
+        <div class="card mb-3 box-shadow">
+            <div class="card-header">
+                <h4 class="my-0 font-weight-normal">Информация о бронировании</h4>
+            </div>
+
+
+            <div class="card-body">
+                <h5 class="card-title">
+                    <div style="color: orange"><b>{{object.user}} - {{object.table}}</b></div>
+                </h5>
+                <p class="card-text">
+                Пользователь: &nbsp; {{object.user}} <br>
+                Столик:&nbsp; {{object.table}}, число мест {{object.places}}<br>
+                Дата:&nbsp; {{object.date_field}} <br>
+                Время:&nbsp; {{object.time_start}} - {{object.time_end}} <br>
+                Активно:&nbsp; {{object.active}} <br>
+                Напомнить за:&nbsp; {{object.notification}} часа <br>
+
+                            <a class="btn btn-primary" href="{%url 'restaurant:booking_update' object.pk%}"
+                               role="button">Изменить</a>
+
+
+                            <a class="btn btn-primary" href="{%url 'restaurant:booking_delete' object.pk%}"
+                               role="button">Удалить</a>
+
+                    <a class="btn btn-primary" href="{%url 'restaurant:booking_list'%}"
+                               role="button">Отмена</a>
+
+
+
+                    </tr>
+
+                </table>
+
+                </p>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+</div>
+
+{% endblock %}

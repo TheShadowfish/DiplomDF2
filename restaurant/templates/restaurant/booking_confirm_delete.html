@@ -11,7 +11,8 @@
             </div>
 
             <div class="card-body">
-                <div class="card-text">Вы действительно хотите удалить бронирование {{object.title}} (пользователь: {{object.user}}) ?</div>
+                <div class="card-text">Вы действительно хотите удалить бронирование (имя: {{object.user}},
+                    {{object.table}}, на {{object.date_field}}, время: {{object.time_start}} - {{object.time_end}}?</div>
                 <form method="post" action="" class="form-floating" enctype="multipart/form-data">
                     <div class="mb-3">
 
@@ -27,7 +28,7 @@
                         Удалить
                     </button>
 
-                    <a class="btn btn-lg btn-block btn-outline-primary" href="{% url 'mailapp:mailing_list' %}">Отмена</a>
+                    <a class="btn btn-lg btn-block btn-outline-primary" href="{% url 'restaurant:booking_list' %}">Отмена</a>
 
                 </form>
             </div>

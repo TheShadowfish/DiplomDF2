@@ -2,8 +2,8 @@ import os
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import render
-from django.urls import reverse_lazy
+from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse_lazy, reverse
 from django.views.generic import TemplateView, ListView, CreateView, UpdateView, DeleteView, DetailView
 
 from restaurant.forms import BookingForm
@@ -101,6 +101,7 @@ class BookingCreateView(LoginRequiredMixin, BookingCreateUpdateMixin, CreateView
     success_url = reverse_lazy('restaurant:booking_list')  # object.pk
 
 
+
 class BookingUpdateView(LoginRequiredMixin, BookingCreateUpdateMixin, UpdateView):
     model = Booking
     form_class = BookingForm
@@ -138,7 +139,7 @@ class BookingDetailView(LoginRequiredMixin, DetailView):
 
     def form_valid(self, form):
         user = self.request.user
-        if user == self.object.user or user.has_perm("mailapp.view_mailing"):
+        if user == self.object.user or user.is_moderator:
             return
         else:
             raise PermissionDenied
@@ -160,3 +161,21 @@ class BookingDetailView(LoginRequiredMixin, DetailView):
 #         context = super().get_context_data(**kwargs)
 #         context['only_send'] = True
 #         return context
+
+def toggle_activity_booking(request, pk):
+    booking_item = get_object_or_404(Booking, pk=pk)
+    if booking_item.active:
+        booking_item.active = False
+    else:
+        booking_item.active = True
+
+    booking_item.save()
+
+    # <a class ="p-2 btn btn-outline-primary" href="{% url 'users:user_detail' user.pk%}" > История бронирований < / a >
+    user_pk = booking_item.user.pk
+    #
+    # 'user_detail/<int:pk>/'
+    # url(r'test_suite/(?P<test_name>\w+)/(?P<test_id>\d+)$', 'test', name='test')
+    # reverse('test', kwargs={'test_name': 'haha', 'test_id': 1})
+
+    return redirect(reverse('users:user_detail', kwargs={'pk': user_pk}))

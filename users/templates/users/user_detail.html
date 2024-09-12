@@ -24,9 +24,7 @@
                     <b>Имя:</b> {{object.name}} <br>
                     <b>Email:</b> {{object.email}} <br>
                     <b>Телефон:</b> {{object.phone_number}} <br>
-                    <b>Суперпользователь:</b> {{object.is_superuser}} <br>
-                    <b>Персонал:</b> {{object.is_staff}} <br>
-                    <b>Комментарий:</b> {{object.description}} <br>
+                    <b>Телеграм:</b> {{object.tg_nick}} {{object.tg_chat_id}}<br>
 
                 <hr>
                 <h5 class="card-title">
@@ -38,46 +36,56 @@
 
                         <th>Пользователь</th>
                         <th>Столик</th>
-                        <th>Число мест</th>
-                        <th>Оповещение за</th>
+
                         <th>Дата</th>
-                        <th>Забронирован с</th>
-                        <th>Забронирован до</th>
-                        <th>Активно</th>
+                        <th>Время</th>
+
+                        <th>Напомнить за</th>
                         <th>Дата создания</th>
 
+                        <th>Активно</th>
                         <th>Информация</th>
-                        <th>Управление</th>
+                        <th>Изменить</th>
+                        <th>Удалить</th>
 
 
                     </tr>
 
-                    {% for mailing_item in mailing_list %}
+                    {% for object in booking_list %}
                     <tr>
 
                         <td>{{object.user}}</td>
-                        <td>{{object.table}}</td>
-                        <td>{{object.places}}</td>
-                        <td>{{object.notification}}</td>
+                        <td>{{object.table}}, {{object.places}} места</td>
+
                         <td>{{object.date_field}}</td>
-                        <td>{{object.time_start}}</td>
-                        <td>{{object.time_end}}</td>
-                        <td>{{object.active}}</td>
+                        <td>{{object.time_start}} - {{object.time_end}}</td>
+
+                        <td>{{object.notification}} часа</td>
                         <td>{{object.created_at}}</td>
 
 
-                                            <td>
-                            <a class="btn btn-primary" href="{%url 'mailapp:mailing_detail' object.pk%}" role="button">Информация</a>
-                        </td>
+
                         <td>
-                            {%if object.active %}
-                            <a class="btn btn-success" href="{%url 'mailapp:mailing_activity' object.pk%}"
+                        {%if object.active %}
+                            <a class="btn btn-success" href="{%url 'restaurant:booking_activity' object.pk%}"
                                role="button">Деактивировать</a>
                             {% else %}
-                            <a class="btn btn-danger" href="{%url 'mailapp:mailing_activity' object.pk%}"
+                            <a class="btn btn-danger" href="{%url 'restaurant:booking_activity' object.pk%}"
                                role="button">&nbsp;&nbsp;Активировать&nbsp;&nbsp;</a>
                             {%endif%}
                         </td>
+                                                <td>
+                            <a class="btn btn-primary" href="{%url 'restaurant:booking_detail' object.pk%}" role="button">Информация</a>
+                        </td>
+                        <td>
+                            <a class="btn btn-primary" href="{%url 'restaurant:booking_update' object.pk%}"
+                               role="button">Изменить</a>
+                        </td>
+                        <td>
+                            <a class="btn btn-primary" href="{%url 'restaurant:booking_delete' object.pk%}"
+                               role="button">Удалить</a>
+                        </td>
+
 
                     {% endfor %}
 
@@ -86,8 +94,9 @@
 
                 </p>
                 <div class="btn-group">
-                    <a class="btn btn-primary" href="{% url 'users:user_list' %}" role="button">Вернуться к
-                        каталогу</a>
+                    <a class="btn btn-primary" href="{% url 'restaurant:main' %}" role="button">На главную страницу</a>
+                    &nbsp;
+                    <a class="btn btn-primary" href="{% url 'restaurant:booking_create' %}" role="button">Добавить бронирование</a>
 
 
                 </div>
