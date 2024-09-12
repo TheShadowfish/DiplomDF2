@@ -22,6 +22,10 @@ urlpatterns = [
     path('booking_detail/<int:pk>/', BookingDetailView.as_view(), name='booking_detail'),
 
     path('booking_activity/<int:pk>/', toggle_activity_booking, name='booking_activity'),
+
+    # path('table_list_update/<datatime:start>/<datatime:end>', table_list_update, name='table_list_update'),
+
+
     #
     # path('mailing_activity/<int:pk>/', toggle_activity_mailing, name='mailing_activity'),
 

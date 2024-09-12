@@ -20,7 +20,7 @@
                 <p class="card-text">
 
                     <img src="{{ object.avatar|user_media_filter }}" width="100"
-                                            alt={{object.avatar|user_media_filter}}> <br>
+                         alt={{object.avatar|user_media_filter}}> <br>
                     <b>Имя:</b> {{object.name}} <br>
                     <b>Email:</b> {{object.email}} <br>
                     <b>Телефон:</b> {{object.phone_number}} <br>
@@ -60,13 +60,24 @@
                         <td>{{object.date_field}}</td>
                         <td>{{object.time_start}} - {{object.time_end}}</td>
 
-                        <td>{{object.notification}} часа</td>
+                        <td>
+                            {% if object.notification == 0 %}
+                            ---
+                            {% else %}
+                            {% if object.notification == 1 %}
+                            {{object.notification}} час
+                            {% else %}
+                            {{object.notification}} часа
+                            {% endif %}
+                            {%endif%}
+
+
+                        </td>
                         <td>{{object.created_at}}</td>
 
 
-
                         <td>
-                        {%if object.active %}
+                            {%if object.active %}
                             <a class="btn btn-success" href="{%url 'restaurant:booking_activity' object.pk%}"
                                role="button">Деактивировать</a>
                             {% else %}
@@ -74,8 +85,9 @@
                                role="button">&nbsp;&nbsp;Активировать&nbsp;&nbsp;</a>
                             {%endif%}
                         </td>
-                                                <td>
-                            <a class="btn btn-primary" href="{%url 'restaurant:booking_detail' object.pk%}" role="button">Информация</a>
+                        <td>
+                            <a class="btn btn-primary" href="{%url 'restaurant:booking_detail' object.pk%}"
+                               role="button">Информация</a>
                         </td>
                         <td>
                             <a class="btn btn-primary" href="{%url 'restaurant:booking_update' object.pk%}"
@@ -87,16 +99,18 @@
                         </td>
 
 
-                    {% endfor %}
+                        {% endfor %}
 
                 </table>
 
 
                 </p>
                 <div class="btn-group">
-                    <a class="btn btn-primary" href="{% url 'restaurant:main' %}" role="button">На главную страницу</a>
+                    <a class="p-2 btn btn-outline-primary" href="{% url 'restaurant:main' %}" role="button">На главную
+                        страницу</a>
                     &nbsp;
-                    <a class="btn btn-primary" href="{% url 'restaurant:booking_create' %}" role="button">Добавить бронирование</a>
+                    <a class="p-2 btn btn-outline-primary" href="{% url 'restaurant:booking_create' %}" role="button">Добавить
+                        бронирование</a>
 
 
                 </div>

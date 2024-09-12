@@ -7,7 +7,7 @@ from django.urls import reverse_lazy, reverse
 from django.views.generic import TemplateView, ListView, CreateView, UpdateView, DeleteView, DetailView
 
 from restaurant.forms import BookingForm
-from restaurant.models import Booking
+from restaurant.models import Booking, Table
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -84,28 +84,48 @@ class BookingCreateUpdateMixin:
         # Что же я его owner не назвал сразу... теперь поздняк метаться.
         booking.user = user
         booking.save()
-
-
-
-        # redirect_url = reverse('mailapp:message_settings_update', args=[message.id])
-
-        self.success_url = reverse_lazy('restaurant:booking_list')
-
         return super().form_valid(form)
+
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # context['mailing_list'] = Mailing.objects.all()
+        # как пустые столики выкинуть?
+        Tables = Table.objects.all()
+        Bookings = Booking.objects.all()
+
+        TBList = []
+
+        for t in Tables:
+            for b in Bookings:
+                if b.table == t and t not in TBList:
+                    TBList.append(t)
+
+        context['tables_list'] = TBList
+        # context['tables_list'] = Table.objects.all()
+        context['booking_list'] = Booking.objects.all()
+        return context
+
+
+
 
 
 class BookingCreateView(LoginRequiredMixin, BookingCreateUpdateMixin, CreateView):
     model = Booking
     form_class = BookingForm
 
-    success_url = reverse_lazy('restaurant:booking_list')  # object.pk
+    # success_url = reverse_lazy('restaurant:booking_list')  # object.pk
+
+    def get_success_url(self):
+        user_pk = self.request.user.pk
+        return reverse('users:user_detail', kwargs={'pk': user_pk})
 
 
 
 class BookingUpdateView(LoginRequiredMixin, BookingCreateUpdateMixin, UpdateView):
     model = Booking
     form_class = BookingForm
-    success_url = reverse_lazy('restaurant:booking_list')
+    # success_url = reverse_lazy('restaurant:booking_list')
 
     def get_form_class(self):
         user = self.request.user
@@ -113,10 +133,18 @@ class BookingUpdateView(LoginRequiredMixin, BookingCreateUpdateMixin, UpdateView
             return BookingForm
         raise PermissionDenied
 
+    def get_success_url(self):
+        user_pk = self.request.user.pk
+        return reverse('users:user_detail', kwargs={'pk': user_pk})
+
 
 class BookingDeleteView(LoginRequiredMixin, DeleteView):
     model = Booking
-    success_url = reverse_lazy('restaurant:booking_list')
+    # success_url = reverse_lazy('restaurant:booking_list')
+    def get_success_url(self):
+        user_pk = self.request.user.pk
+        return reverse('users:user_detail', kwargs={'pk': user_pk})
+
 
     def form_valid(self, form):
         user = self.request.user
