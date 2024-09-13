@@ -40,6 +40,9 @@ class Booking(models.Model):
     places = models.SmallIntegerField(verbose_name='Число бронируемых мест',
                                       help_text="Введите число бронируемых мест", default=2)
 
+    description = models.TextField(verbose_name='Примечания',
+                                      help_text="Введите примечания к бронированию", **NULLABLE)
+
     notification = models.SmallIntegerField(
         default=0, verbose_name="Оповещение", choices=NOTIFICATION_HOURS
     )
@@ -51,6 +54,7 @@ class Booking(models.Model):
 
     active = models.BooleanField(verbose_name='активно ли бронирование', default=True, help_text='введите активно ли бронирование')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='дата создания', help_text = 'введите дату создания бронирования')
+
 
     class Meta:
         verbose_name = 'бронирование'
@@ -94,6 +98,33 @@ class ContentImage(models.Model):
     def __str__(self):
         return f"{self.title}: {self.description}"
 
+class ContentParameters(models.Model):
+    title = models.CharField(max_length=50, verbose_name='название параметра',
+                             help_text="введите название параметра", unique=True)
+    body = models.CharField(max_length=150, verbose_name='значение параметра', help_text='введите значение параметра')
+    description = models.TextField(verbose_name='описание параметра', help_text='введите описание параметра')
+
+    class Meta:
+        verbose_name = 'параметр'
+        verbose_name_plural = 'параметры'
+
+    def __str__(self):
+        return f"{self.body}"
+
+class Contentlink(models.Model):
+    title = models.CharField(max_length=50, verbose_name='название ссылки',
+                             help_text="введите название ссылки", unique=True)
+    text = models.CharField(max_length=50, verbose_name='текст ссылки',
+                             help_text="введите текст ссылки", unique=True)
+    link = models.CharField(max_length=150, verbose_name='адрес ссылки', help_text='введите адрес ссылки')
+    description = models.TextField(verbose_name='описание ссылки', help_text='введите описание ссылки')
+
+    class Meta:
+        verbose_name = 'ссылка'
+        verbose_name_plural = 'ссылки'
+
+    def __str__(self):
+        return f"{self.link}"
 
 class BookingToken(models.Model):
     booking = models.ForeignKey(Booking, on_delete=models.CASCADE, verbose_name='токен для подтверждения бронирования',

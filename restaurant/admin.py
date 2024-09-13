@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from restaurant.models import Table, Booking, ContentText, ContentImage
+from restaurant.models import Table, Booking, ContentText, ContentImage, ContentParameters, Contentlink
 
 
 @admin.register(Table)
@@ -27,4 +27,17 @@ class ContentTextAdmin(admin.ModelAdmin):
     list_display = ("title", "body",)
     list_filter = ("title",)
     search_fields = ("title", "body",)
+
+@admin.register(ContentParameters)
+class ContentParametersAdmin(admin.ModelAdmin):
+    list_display = ("title", "body","description")
+    list_filter = ("title",)
+    search_fields = ("title", "body",)
+
+@admin.register(Contentlink)
+class ContentlinkAdmin(admin.ModelAdmin):
+    list_display = ("title", "text", "link", "description",)
+    list_filter = ("title",)
+    search_fields = ("title", "text", "link",)
+
 

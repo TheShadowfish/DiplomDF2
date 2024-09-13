@@ -24,17 +24,35 @@
                 Дата:&nbsp; {{object.date_field}} <br>
                 Время:&nbsp; {{object.time_start}} - {{object.time_end}} <br>
                 Активно:&nbsp; {{object.active}} <br>
-                Напомнить за:&nbsp; {{object.notification}} часа <br>
 
-                            <a class="btn btn-primary" href="{%url 'restaurant:booking_update' object.pk%}"
+                            {% if object.notification != 0 %}
+                            {% if object.notification == 1 %}
+                            Напомнить за:&nbsp; {{object.notification}} час <br>
+                            {% else %}
+                            Напомнить за:&nbsp; {{object.notification}} часа <br>
+                            {% endif %}
+                            {% endif %}
+                {% if object.description != None %}
+                    Примечания: &nbsp; {{object.description}} <br>
+                    {% endif %}
+                    <br><br>
+
+                            <a class="p-2 btn btn-outline-primary" href="{%url 'restaurant:booking_update' object.pk%}"
                                role="button">Изменить</a>
 
 
-                            <a class="btn btn-primary" href="{%url 'restaurant:booking_delete' object.pk%}"
+                            <a class="p-2 btn btn-outline-primary" href="{%url 'restaurant:booking_delete' object.pk%}"
                                role="button">Удалить</a>
 
-                    <a class="btn btn-primary" href="{%url 'restaurant:booking_list'%}"
-                               role="button">Отмена</a>
+                            {%if object.active %}
+                            <a class="btn btn-success" href="{%url 'restaurant:booking_activity' object.pk%}"
+                               role="button">Деактивировать</a>
+                            {% else %}
+                            <a class="btn btn-danger" href="{%url 'restaurant:booking_activity' object.pk%}"
+                               role="button">&nbsp;&nbsp;Активировать&nbsp;&nbsp;</a>
+                            {%endif%}
+
+                    <a class="p-2 btn btn-outline-primary" href="{% url 'users:user_detail' user.pk%}">История бронирований</a>
 
 
 

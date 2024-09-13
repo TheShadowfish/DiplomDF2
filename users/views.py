@@ -11,7 +11,7 @@ from django.utils import timezone
 from django.views.generic import CreateView, ListView, UpdateView, DetailView, DeleteView
 
 from config.settings import EMAIL_HOST_USER
-from restaurant.models import Booking
+from restaurant.models import Booking, ContentText, ContentParameters
 # from mailapp.models import Mailing
 from users.forms import UserRegisterForm, UserProfileForm
 from users.models import User, UserToken
@@ -92,7 +92,13 @@ def email_verification(request, token):
     this_user_token = get_object_or_404(UserToken, token=token)
     user = this_user_token.user
 
-    if this_user_token.created_at < timezone.now() - timezone.timedelta(minutes=45):
+    try:
+        confirm_timedelta = timezone.timedelta(minutes=ContentParameters.objects.get(title='confirm_timedelta'))
+    except:
+        confirm_timedelta = timezone.timedelta(minutes=45)
+        print(f"confirm_timedelta - установлено по умолчаеию (45 минут)")
+
+    if this_user_token.created_at < timezone.now() - confirm_timedelta:
         user.delete()
         this_user_token.delete()
         return render(request, 'users/token_expired.html')
@@ -118,8 +124,14 @@ def email_confirmed(request):
 
 
 def confirm_email(request, email):
+    try:
+        confirm_timedelta =ContentParameters.objects.get(title='confirm_timedelta')
+    except:
+        confirm_timedelta = 45
+        print(f"confirm_timedelta - установлено по умолчаеию (45 минут)")
+
     context = {
-        'email': email,
+        'email': email, 'confirm_timedelta': confirm_timedelta
     }
 
     return render(request, 'users/confirm_email.html', context)

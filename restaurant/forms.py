@@ -3,7 +3,7 @@ import datetime
 from django import forms
 from django.forms import BooleanField, TimeField, TimeInput, SelectDateWidget, DateField, NumberInput
 
-from restaurant.models import Table, Booking, ContentText, ContentImage
+from restaurant.models import Table, Booking, ContentText, ContentImage, ContentParameters
 
 
 class StyleFormMixin:
@@ -53,23 +53,35 @@ class BookingForm(StyleFormMixin, forms.ModelForm):
 
         try:
             # время работы хранится в базе данных, период бронирования там же
-            period_of_booking = int(ContentText.objects.get(title='period_of_booking').body)
-            work_start = datetime.time.fromisoformat(ContentText.objects.get(title='work_start').body)
-            work_end = datetime.time.fromisoformat(ContentText.objects.get(title='work_end').body)
+            # period_of_booking = int(ContentText.objects.get(title='period_of_booking').body)
+            # work_start = datetime.time.fromisoformat(ContentText.objects.get(title='work_start').body)
+            # work_end = datetime.time.fromisoformat(ContentText.objects.get(title='work_end').body)
+
+            period_of_booking = int(ContentParameters.objects.get(title='period_of_booking').body)
+            work_start = datetime.time.fromisoformat(ContentParameters.objects.get(title='work_start').body)
+            work_end = datetime.time.fromisoformat(ContentParameters.objects.get(title='work_end').body)
+
         except:
             print(
                 f"{ContentText.objects.get(title='work_start')} || {ContentText.objects.get(title='work_end')} || {ContentText.objects.get(title='period_of_booking')}")
             raise forms.ValidationError(
                 f'В базу данных не внесено время работы ресторана: work_start=<время открытия>, work_end=<время закрытия>, period_of_booking=<период предварительного бронирования>')
+                # work_start = datetime.time(8, 0, 0)
+                # work_end = datetime.time(23, 0, 0)
+                # period_of_booking = 14
 
         date = datetime.date.today()
-        time = datetime.datetime.now().time()
+        # time = datetime.datetime.now().time()
 
         # print(f"{self.cleaned_data}")
 
         cleaned_data_date_field = self.cleaned_data['date_field']
         cleaned_data_time_start = self.cleaned_data['time_start']
         cleaned_data_time_end = self.cleaned_data['time_end']
+        cleaned_data_places = self.cleaned_data['places']
+
+
+
 
 
 
@@ -115,6 +127,13 @@ class BookingForm(StyleFormMixin, forms.ModelForm):
         table = self.cleaned_data['table']
         bookings = Booking.objects.filter(table=table)
 
+        if cleaned_data_places > table.places:
+            raise forms.ValidationError(f'За данным столиком всего {table.places} мест. Выберете столик с большим количеством мест или позже забронируйте соседний столик')
+        elif cleaned_data_places < 1:
+            raise forms.ValidationError(
+                f'Должно быть занято хотя бы одно место за столиком')
+
+
 
         for b in bookings:
             b_start = datetime.datetime(year=b.date_field.year, month=b.date_field.month,
@@ -126,19 +145,34 @@ class BookingForm(StyleFormMixin, forms.ModelForm):
             if b.time_start > b.time_end:
                 b_end += datetime.timedelta(days=1)
 
-            if b_start <= t_start < b_end:
+
+
+            booking_id = self.instance
+            # .kwargs['pk']
+
+            if object:
+                print(f"ИЗМЕНЕНИЕ {booking_id.pk}, {b.pk}")
+
+
+
+            if b_start <= t_start < b_end and booking_id.pk != b.pk:
                 raise forms.ValidationError(f'В указанное время выбранный столик занят {b_start} <= {t_start} < {b_end} ')
-            if b_start < t_end <= b_end:
+            if b_start < t_end <= b_end and booking_id.pk != b.pk:
                 raise forms.ValidationError(f'В указанное время выбранный столик еще не освободился')
 
-            if t_start <= b_start < t_end:
+            if t_start <= b_start < t_end and booking_id.pk != b.pk:
                 raise forms.ValidationError(f'В указанный период времени столик забронирован')
 
 
         return self.cleaned_data
 
 
-
     def has_changed(self):
         print("ФОРМА ИЗМЕНЕНА")
+
+
+    #
+    # def has_changed(self):
+    #     print("ФОРМА ИЗМЕНЕНА")
+
 

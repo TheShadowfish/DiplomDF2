@@ -12,7 +12,7 @@ from django.views.generic import TemplateView, ListView, CreateView, UpdateView,
 
 from config.settings import EMAIL_HOST_USER
 from restaurant.forms import BookingForm
-from restaurant.models import Booking, Table, BookingToken
+from restaurant.models import Booking, Table, BookingToken, ContentText, ContentParameters
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -108,12 +108,8 @@ class BookingCreateUpdateMixin:
             recipient_list=[email]
         )
 
-        # redirect_url = reverse('restaurant:booking_verification', args=[email])
-        # self.success_url = redirect_url
-
-        # print(f'Отправлено {EMAIL_HOST_USER} to {user.email}')
-
         return super().form_valid(form)
+
     def get_success_url(self):
         user = self.request.user
         email = user.email
@@ -143,22 +139,32 @@ class BookingCreateUpdateMixin:
 
 
 def confirm_booking(request, email):
+
+    try:
+        confirm_timedelta = ContentParameters.objects.get(title='confirm_timedelta')
+    except Exception as e:
+        confirm_timedelta = 45
+        print(f"confirm_timedelta - установлено по умолчаеию (45 минут) {e}")
+
     context = {
-        'email': email,
+        'email': email, 'confirm_timedelta': confirm_timedelta
     }
     return render(request, 'restaurant/confirm_booking.html', context)
 
 def booking_verification(request, token):
-    # user = get_object_or_404(User)
-    # message = Message.objects.get(pk=mailing_item.message_id)
-    # mail_title = mailing_item.message.title
-    # mail_body = mailing_item.message.body
-    # mail_list = Client.objects.filter(mailing=mailing_item)
+
 
     this_booking_token = get_object_or_404(BookingToken, token=token)
     booking = this_booking_token.booking
 
-    if this_booking_token.created_at < timezone.now() - timezone.timedelta(minutes=45):
+    try:
+        confirm_timedelta = timezone.timedelta(minutes=ContentParameters.objects.get(title='confirm_timedelta'))
+    except:
+        confirm_timedelta = timezone.timedelta(minutes=45)
+        print(f"confirm_timedelta - установлено по умолчаеию (45 минут)")
+
+
+    if this_booking_token.created_at < timezone.now() - confirm_timedelta:
         booking.delete()
         this_booking_token.delete()
         return render(request, 'restaurant/token_expired.html')
@@ -167,12 +173,6 @@ def booking_verification(request, token):
         booking.active = True
         booking.save()
         return render(request, 'restaurant/booking_confirmed.html')
-
-    #
-    # user = get_object_or_404(User, token=token)
-    # user.is_active = True
-    # user.save()
-    # return redirect(reverse('users:login'))
 
 
 def token_expired(request):
@@ -230,13 +230,6 @@ class BookingDeleteView(LoginRequiredMixin, DeleteView):
 class BookingDetailView(LoginRequiredMixin, DetailView):
     model = Booking
 
-    # def get_context_data(self, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-    #     context['logs'] = MailingLog.objects.filter(mailing=self.object)
-    #     context['clients'] = Client.objects.filter(mailing=self.object)
-    #     context['message'] = Message.objects.get(id=self.object.message_id)
-    #     context['settings'] = MailingSettings.objects.get(id=self.object.settings_id)
-    #     return context
 
     def form_valid(self, form):
         user = self.request.user
@@ -245,23 +238,6 @@ class BookingDetailView(LoginRequiredMixin, DetailView):
         else:
             raise PermissionDenied
 
-
-
-# class MailingListView(LoginRequiredMixin, ListView):
-#     model = Mailing
-#
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         context['only_send'] = False
-#         return context
-#
-# class MailingListViewSend(LoginRequiredMixin, ListView):
-#     model = Mailing
-#
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         context['only_send'] = True
-#         return context
 
 def toggle_activity_booking(request, pk):
     booking_item = get_object_or_404(Booking, pk=pk)
