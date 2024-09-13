@@ -64,14 +64,6 @@
                         <br>
                         {% endfor %}
 
-                        {%if object.active %}
-                        <a class="btn btn-success" href="{%url 'restaurant:booking_activity' object.pk%}"
-                        role="button">Обновить схему столиков</a>
-                        {% else %}
-                        <a class="btn btn-danger" href="{%url 'restaurant:booking_activity' object.pk%}"
-                        role="button">&nbsp;&nbsp;Обновить схему столиков&nbsp;&nbsp;</a>
-                        {%endif%}
-
 
 
                     </div>

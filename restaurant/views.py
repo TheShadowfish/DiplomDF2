@@ -1,13 +1,18 @@
 import os
+import secrets
+
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
+from django.core.mail import send_mail
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
+from django.utils import timezone
 from django.views.generic import TemplateView, ListView, CreateView, UpdateView, DeleteView, DetailView
 
+from config.settings import EMAIL_HOST_USER
 from restaurant.forms import BookingForm
-from restaurant.models import Booking, Table
+from restaurant.models import Booking, Table, BookingToken
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -81,10 +86,39 @@ class BookingCreateUpdateMixin:
         # Xозяином рассылки автоматически становится тот, кто её создал
         booking = form.save()
         user = self.request.user
-        # Что же я его owner не назвал сразу... теперь поздняк метаться.
         booking.user = user
+        booking.active = False
+
+
+        token = secrets.token_hex(16)
+        email = user.email
+
         booking.save()
+
+        booking_token = BookingToken.objects.create(token=token, booking=booking)
+        booking_token.save()
+
+        host = self.request.get_host()
+        url = f'http://{host}/booking_verification/{token}/'
+        # print(url)
+        send_mail(
+            subject='Подтверждение бронирования',
+            message=f'Привет, перейди по ссылке для подтверждения бронирования: {url}',
+            from_email=EMAIL_HOST_USER,
+            recipient_list=[email]
+        )
+
+        # redirect_url = reverse('restaurant:booking_verification', args=[email])
+        # self.success_url = redirect_url
+
+        # print(f'Отправлено {EMAIL_HOST_USER} to {user.email}')
+
         return super().form_valid(form)
+    def get_success_url(self):
+        user = self.request.user
+        email = user.email
+        return reverse('restaurant:confirm_booking', args=[email])
+
 
 
     def get_context_data(self, **kwargs):
@@ -108,6 +142,45 @@ class BookingCreateUpdateMixin:
 
 
 
+def confirm_booking(request, email):
+    context = {
+        'email': email,
+    }
+    return render(request, 'restaurant/confirm_booking.html', context)
+
+def booking_verification(request, token):
+    # user = get_object_or_404(User)
+    # message = Message.objects.get(pk=mailing_item.message_id)
+    # mail_title = mailing_item.message.title
+    # mail_body = mailing_item.message.body
+    # mail_list = Client.objects.filter(mailing=mailing_item)
+
+    this_booking_token = get_object_or_404(BookingToken, token=token)
+    booking = this_booking_token.booking
+
+    if this_booking_token.created_at < timezone.now() - timezone.timedelta(minutes=45):
+        booking.delete()
+        this_booking_token.delete()
+        return render(request, 'restaurant/token_expired.html')
+    else:
+        this_booking_token.delete()
+        booking.active = True
+        booking.save()
+        return render(request, 'restaurant/booking_confirmed.html')
+
+    #
+    # user = get_object_or_404(User, token=token)
+    # user.is_active = True
+    # user.save()
+    # return redirect(reverse('users:login'))
+
+
+def token_expired(request):
+    return render(request, 'restaurant/token_expired.html')
+
+
+def email_confirmed(request):
+    return render(request, 'restaurant/booking_confirmed.html')
 
 
 class BookingCreateView(LoginRequiredMixin, BookingCreateUpdateMixin, CreateView):
@@ -116,9 +189,9 @@ class BookingCreateView(LoginRequiredMixin, BookingCreateUpdateMixin, CreateView
 
     # success_url = reverse_lazy('restaurant:booking_list')  # object.pk
 
-    def get_success_url(self):
-        user_pk = self.request.user.pk
-        return reverse('users:user_detail', kwargs={'pk': user_pk})
+    # def get_success_url(self):
+    #     user_pk = self.request.user.pk
+    #     return reverse('users:user_detail', kwargs={'pk': user_pk})
 
 
 
@@ -133,9 +206,9 @@ class BookingUpdateView(LoginRequiredMixin, BookingCreateUpdateMixin, UpdateView
             return BookingForm
         raise PermissionDenied
 
-    def get_success_url(self):
-        user_pk = self.request.user.pk
-        return reverse('users:user_detail', kwargs={'pk': user_pk})
+    # def get_success_url(self):
+    #     user_pk = self.request.user.pk
+    #     return reverse('users:user_detail', kwargs={'pk': user_pk})
 
 
 class BookingDeleteView(LoginRequiredMixin, DeleteView):

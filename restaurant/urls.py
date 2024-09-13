@@ -2,7 +2,7 @@ from django.urls import path
 from django.views.decorators.cache import cache_page
 
 from .views import HomePageView, AboutUsPageView, BookingListView, BookingCreateView, BookingUpdateView, \
-    BookingDeleteView, BookingDetailView, toggle_activity_booking
+    BookingDeleteView, BookingDetailView, toggle_activity_booking, confirm_booking, booking_verification
 
 # MessageCreateView,
 
@@ -22,6 +22,13 @@ urlpatterns = [
     path('booking_detail/<int:pk>/', BookingDetailView.as_view(), name='booking_detail'),
 
     path('booking_activity/<int:pk>/', toggle_activity_booking, name='booking_activity'),
+
+
+    path("confirm_booking/<str:email>/", confirm_booking, name='confirm_booking'),
+    path("booking_verification/<str:token>/", booking_verification, name='booking_verification'),
+
+    path("token_expired/", booking_verification, name='token_expired'),
+    path("booking_confirmed/", booking_verification, name='booking_confirmed'),
 
     # path('table_list_update/<datatime:start>/<datatime:end>', table_list_update, name='table_list_update'),
 

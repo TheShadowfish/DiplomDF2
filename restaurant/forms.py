@@ -9,6 +9,8 @@ from restaurant.models import Table, Booking, ContentText, ContentImage
 class StyleFormMixin:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        time_append = 0
+
         for field_name, field in self.fields.items():
 
             # if isinstance(field, DateField):
@@ -21,7 +23,8 @@ class StyleFormMixin:
 
             if isinstance(field, TimeField):
                 field.widget=NumberInput(attrs={'type': 'time'})
-                field.initial = datetime.time(18, 0)
+                field.initial = datetime.time(18 + time_append, 0)
+                time_append += 2
 
 
             if isinstance(field, BooleanField):
@@ -68,14 +71,6 @@ class BookingForm(StyleFormMixin, forms.ModelForm):
         cleaned_data_time_start = self.cleaned_data['time_start']
         cleaned_data_time_end = self.cleaned_data['time_end']
 
-        # time1 = datetime.strptime("10:30", "%H:%M")
-        # time2 = datetime.strptime("01:45", "%H:%M")
-        # sum_time = time1 + timedelta(hours=time2.hour, minutes=time2.minute)
-
-        # true_datetime = datetime.datetime(year=cleaned_data_date_field.year, month=cleaned_data_date_field.month,
-        #                                   day=cleaned_data_date_field.day, hour=cleaned_data_time_start.hour,
-        #                                   minute=cleaned_data_time_start.minute)
-
 
 
         t_start = datetime.datetime(year=cleaned_data_date_field.year, month=cleaned_data_date_field.month,
@@ -98,8 +93,10 @@ class BookingForm(StyleFormMixin, forms.ModelForm):
 
         if cleaned_data_time_end < cleaned_data_time_start:
             t_end += datetime.timedelta(days=1)
+            # print("cleaned_data_time_end < cleaned_data_time_start")
         if work_end < work_start:
             t_work_end += datetime.timedelta(days=1)
+            # print("work_end < work_start")
 
         if date > cleaned_data_date_field:
             raise forms.ValidationError('Нельзя забронировать место на прошедшую дату')
@@ -126,11 +123,11 @@ class BookingForm(StyleFormMixin, forms.ModelForm):
             b_end = datetime.datetime(year=b.date_field.year, month=b.date_field.month,
                                       day=b.date_field.day, hour=b.time_start.hour,
                                       minute=b.time_start.minute)
-            if b.time_start < b.time_end:
+            if b.time_start > b.time_end:
                 b_end += datetime.timedelta(days=1)
 
             if b_start <= t_start < b_end:
-                raise forms.ValidationError(f'В указанное время выбранный столик занят')
+                raise forms.ValidationError(f'В указанное время выбранный столик занят {b_start} <= {t_start} < {b_end} ')
             if b_start < t_end <= b_end:
                 raise forms.ValidationError(f'В указанное время выбранный столик еще не освободился')
 
@@ -138,116 +135,10 @@ class BookingForm(StyleFormMixin, forms.ModelForm):
                 raise forms.ValidationError(f'В указанный период времени столик забронирован')
 
 
-
-
-        # zero_time = datetime.time(0,0)
-        #
-        # if work_end > work_start:
-        #     print('рабочее время в пределах одних суток (до 00:00)')
-        #
-        #
-        #
-        #     # если рабочее время в пределах одних суток (до 00:00)
-        #     # и работа не круглосуточна
-        #     if cleaned_data_time_start < work_start:
-        #         raise forms.ValidationError(f'В это время ({cleaned_data_time_start}) ресторан ещё не открылся')
-        #     if cleaned_data_time_end > work_end:
-        #         raise forms.ValidationError(f'В это время ({cleaned_data_time_end}) ресторан уже закрыт')
-        #     if cleaned_data_time_end <= cleaned_data_time_start:
-        #         raise forms.ValidationError(f'Время начала периода бронирования должно быть раньше чем время конца периода')
-        #     if cleaned_data_time_start < time and date == cleaned_data_date_field:
-        #         raise forms.ValidationError(f'Сегодня это время уже прошло {cleaned_data_time_start}')
-        #
-        #     # Здесь проверка столика свободен ли он.
-        #     table = self.cleaned_data['table']
-        #     bookings = Booking.objects.filter(table=table)
-        #
-        #
-        #     # habits = Habits.objects.filter(owner__isnull=False, utc_time=habit_time)
-        #     # tables = Table.objects.filter(table=table)
-        #
-        #     for b in bookings:
-        #         if b.date_field == cleaned_data_date_field:
-        #             if b.time_start  <= cleaned_data_time_start < b.time_end:
-        #                 raise forms.ValidationError(f'В указанное время выбранный столик занят')
-        #             if b.time_start < cleaned_data_time_end <= b.time_end:
-        #                 raise forms.ValidationError(f'В указанное время выбранный столик еще не освободился')
-        #
-        #             if cleaned_data_time_start <=  b.time_start < cleaned_data_time_end:
-        #                 raise forms.ValidationError(f'В указанный период времени столик забронирован')
-        #
-        #
-        # # рабочий день падает на несколько суток
-        # elif work_end == zero_time:
-        #     print('рабочий день кончается в 00:00')
-        #
-        #     if cleaned_data_time_start < work_start:
-        #         raise forms.ValidationError(f'В это время ({cleaned_data_time_start}) ресторан ещё не открылся')
-        #     if cleaned_data_time_end <= cleaned_data_time_start and cleaned_data_time_end != zero_time:
-        #         raise forms.ValidationError(
-        #             f'Время начала периода бронирования должно быть раньше чем время конца периода')
-        #     if cleaned_data_time_start < time and date == cleaned_data_date_field:
-        #         raise forms.ValidationError(f'Сегодня это время уже прошло {cleaned_data_time_start}')
-        #
-        #     # Здесь проверка столика свободен ли он.
-        #     table = self.cleaned_data['table']
-        #     bookings = Booking.objects.filter(table=table)
-        #
-        #     for b in bookings:
-        #         if b.date_field == cleaned_data_date_field:
-        #             if b.time_start <= cleaned_data_time_start and (cleaned_data_time_start <= b.time_end or b.time_end == zero_time):
-        #                 raise forms.ValidationError(f'В указанное время выбранный столик занят')
-        #             if b.time_start <= cleaned_data_time_end and (cleaned_data_time_end <= b.time_end or b.time_end == zero_time):
-        #                 raise forms.ValidationError(f'В указанное время выбранный столик еще не освободился')
-        #
-        #             if cleaned_data_time_start <= b.time_start and (b.time_start <= cleaned_data_time_end or cleaned_data_time_end==zero_time):
-        #                 raise forms.ValidationError(f'В указанный период времени столик забронирован')
-        #
-        #
-        # # если рабочий день падает на несколько суток то надо менять модель: Time на DateTime
-        # # иначе это вывих мозга - или делать из всех Time Datetime ориентируясь на дату бронирования
-
         return self.cleaned_data
 
-#
-# class ContactForm(StyleFormMixin, forms.ModelForm):
-#     class Meta:
-#         model = Contact
-#         fields = (
-#             "name",
-#             "phone",
-#             "message",
-#         )
-#
-#
-# class VersionForm(StyleFormMixin, forms.ModelForm):
-#     class Meta:
-#         model = Version
-#         fields = "__all__"
-#
-#         """    product, number, name, sign """
-#
-#         """# Дополнительное задание
-# В один момент может быть только одна активная версия продукта, поэтому при изменении версий необходимо проверять,
-# что пользователь в качестве активной версии указал только одну.
-# В случае возникновения ошибки вернуть сообщение пользователю и попросить выбрать только одну активную версию.
-#
-# Дополнительное задание, помеченное звездочкой, желательно, но не обязательно выполнять."""
-#     def clean(self):
-#
-#
-#         cleaned_data = self.cleaned_data
-#         version_list = Version.objects.all()
-#
-#         one_is_yet = False
-#         for version in version_list:
-#
-#             if version.product == cleaned_data['product'] and version.sign and cleaned_data['sign']:
-#                 if one_is_yet:
-#                     raise forms.ValidationError(
-#                     f'Нельзя иметь две активных версии продукта одновременно. Измените версию {version}')
-#                 else:
-#                     one_is_yet = True
-#
-#         else:
-#             return self.cleaned_data
+
+
+    def has_changed(self):
+        print("ФОРМА ИЗМЕНЕНА")
+
