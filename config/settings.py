@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "phonenumber_field",
     "users",
+    "restaurant",
 
 ]
 
@@ -142,7 +143,9 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
-STATIC_ROOT = BASE_DIR / "static"
+# STATIC_ROOT = BASE_DIR / "static"
+
+STATICFILES_DIRS = (BASE_DIR / 'static',)
 
 # ENV_TYPE = os.getenv("ENV_TYPE")
 
@@ -154,7 +157,7 @@ STATIC_ROOT = BASE_DIR / "static"
 #     STATIC_ROOT = BASE_DIR / "static"
 
 
-MEDIA_URL = "media/"
+MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 EMAIL_HOST="smtp.yandex.ru"

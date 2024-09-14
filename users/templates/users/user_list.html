@@ -1,4 +1,4 @@
-{% extends 'mailapp/base.html'%}
+{% extends 'restaurant/base.html'%}
 {% load static %}
 {% load my_tags %}
 {% block content %}
@@ -50,8 +50,8 @@
                     <b>Имя:</b> {{object.name}} <br>
                     <b>Email:</b> {{object.email}} <br>
                     <b>Телефон:</b> {{object.phone_number}} <br>
-                    <b>Должность == Модератор:</b> {{object.is_moderator}} <br>
-                    <b>Должность == Контент-менеджер:</b> {{object.is_content_manager}} <br>
+                    <b>Суперпользователь:</b> {{object.is_superuser}} <br>
+                    <b>Персонал:</b> {{object.is_staff}} <br>
                     <b>Комментарий:</b> {{object.description}} <br>
 
 

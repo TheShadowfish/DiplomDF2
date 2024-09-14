@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+{% extends 'restaurant/base.html'%}
+{% load static %}
+{% load my_tags %}
+{% block content %}
+
+
+<div class="row text-right">
+<div class="col-12">
+
+    <div class="card mb-3 box-shadow">
+
+
+        <div class="card-body">
+
+            <p class="card-text">
+
+                <h1 class="card-title  text-center">
+                        <img
+                src="{% static 'image/shark.svg' %}"
+                alt="Hungry Shark. Feed The Shark inside you!"
+                height="100px"
+                width="100px"/>
+        <br>
+
+                <div style="color: blue ">Hungry Shark</div>
+            </h1></p>
+            <div class="d-flex align-items-stretch">
+                <div class="col-sm-6">
+                    <div class="card">
+                        <img src="{% static 'image/main/inside2.png' %}" alt="Интерьер ресторана 1" class="img-fluid">
+                    </div>
+                    </div>
+                <div class="col-sm-6">
+                    <div class="card">
+                        <img src="{% static 'image/main/inside3.png' %}" alt="Интерьер ресторана 2" class="img-fluid">
+                    </div>
+                    </div>
+
+
+                </div>
+
+
+            <p class="lead"> {{home_about|comment_markdown}} </p><br>
+
+            </p>
+        </div>
+    </div>
+</div>
+<div class="col-12">
+
+    <div class="card mb-3 box-shadow">
+
+
+        <div class="card-body">
+
+            <p class="card-text">
+
+            <p class="card-text">
+
+                <h1 class="card-title  text-center">
+                        <img
+                src="{% static 'image/honey-svgrepo-com.svg' %}"
+                alt="Feel our service!"
+                height="100px"
+                width="100px">
+        <br>
+
+                <div style="color: blue ">Предложения</div>
+            </h1></p>
+                            <div class="d-flex align-items-stretch">
+                <div class="col-sm-4">
+                    <div class="card">
+                        <img src="{% static 'image/main/fugu.png' %}" class="img-fluid" alt="Рыба фугу - путь самурая">
+                    </div>
+                    </div>
+                <div class="col-sm-4">
+                    <div class="card">
+                        <img src="{% static 'image/main/osetr.png' %}" class="img-fluid" alt="Осетрина! Как в давние времена.">
+                    </div>
+                    </div>
+                <div class="col-sm-4">
+                    <div class="card">
+                        <img src="{% static 'image/main/shrimp.png' %}" class="img-fluid" alt="Креветки тигровые, аж рычат!">
+
+                    </div>
+                    </div>
+
+
+                </div>
+
+            <p class="lead"> {{home_offer|comment_markdown}}</p> <br>
+
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="col-6">
+    <div class="card mb-3 box-shadow">
+
+
+        <div class="card-body">
+
+            <p class="card-text">
+
+                <h1 class="card-title  text-center">
+                        <img
+                src="{% static 'image/at-email-svgrepo-com.svg' %}"
+                alt="Contact us"
+                height="100px"
+                width="100px">
+        <br>
+
+                <div style="color: blue ">Контакты</div>
+            </h1></p>
+
+            <p class="lead">
+                {{home_adress|comment_markdown}}
+                <li><a href="https://t.me/TheShadowfish">наш Telegram </a></li>
+                <li><a href="https://wa.me/79115604350">наш Whatsapp</a></li>
+                <li><a href="https://vk.com/shadowfish ">Мы в контакте </a></li>
+
+            </p> <br>
+
+            </p>
+        </div>
+    </div>
+
+</div>
+    <div class="col-6">
+    <div class="card mb-3 box-shadow">
+
+
+        <div class="card-body">
+
+            <p class="card-text">
+
+                <h1 class="card-title  text-center">
+                        <img
+                src="{% static 'image/cha-bubbles-two-svgrepo-com (2).svg' %}"
+                alt="Reflexion"
+                height="100px"
+                width="100px">
+        <br>
+
+                <div style="color: blue ">Обратная связь</div>
+            </h1></p>
+
+            <p class="lead">
+                <br>
+                <b>Задайте нам вопрос</b> (ссылка на страницу, где вопрос + обратный адрес)<br>
+                <b>Оставьте отзыв о посещении ресторана</b> (страница отзывов - необходима регистрация) <br>
+
+            </p> <br>
+
+            </p>
+        </div>
+    </div>
+
+</div>
+
+
+</div>
+
+
+{% comment "Можно всобачить примеры блюд" %}
+<div class="row text-right">
+{% for article in random_articles %}
+
+    <div class="col-4">
+
+        <div class="card mb-3 box-shadow">
+            <img src="{{ article.image | media_filter }}" class="card-img-top" alt={{article.image|media_filter}}>
+
+
+            <div class="card-body">
+                <h5 class="card-title">
+                    <div style="color: orange"><b> {{article.title}}</b></div>
+                </h5>
+                <p class="card-text">
+                  {% if article.body|comment_markdown|length >= 300 %}
+                    {{ article.body|comment_markdown|slice:":300"}} ...
+                    {% else %}
+                    {{ article.body}}
+                    {% endif %}
+                </p>
+                <br>
+                <p class="card-text">
+                    <b>Опубликовано</b> {{article.created_at}}<br>
+                    <b>Просмотров</b>{{article.views_count}}<br>
+                   </p>
+
+
+                <div class="btn-group">
+                    <a class="btn btn-success" href="{% url 'blogapp:article_detail' article.pk%}" role="button">Посмотреть</a>
+
+                </div>
+
+            </div>
+
+    </div>
+
+
+    </div>
+    {% endfor %}
+</div>
+{% endcomment %}
+
+
+{% comment "Этот HTML код пока не нужен, но вдруг пригодится потом" %}
+<div class="col-4">
+
+    <div class="card mb-3 box-shadow">
+
+
+        <div class="card-body">
+            <h5 class="card-title">
+                <div style="color: orange"><b>Список уникальных клиентов</b></div>
+            </h5>
+            <p class="card-text">
+
+                {% for client in emails_unique%}
+
+                {{client.email}} <br>
+
+                {% endfor %}
+                <br><br>
+                <b>Количество статей в блоге: </b> {{article_list_len}}
+
+
+
+
+            </p>
+        </div>
+    </div>
+
+</div>
+{% endcomment%}
+</div>
+
+
+</div>
+</div>
+{% endblock %}

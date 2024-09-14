@@ -6,9 +6,8 @@ authors = ["Эдуард Кусков <shadowfish@yandex.ru>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.11"
 django = "^5.1.1"
-psycopg2 = "^2.9.9"
 pillow = "^10.4.0"
 flake8 = "^7.1.1"
 python-dotenv = "^1.0.1"
@@ -17,6 +16,9 @@ pytils = "^0.4.1"
 redis = "^5.0.8"
 django-phonenumber-field = {extras = ["phonenumbers"], version = "^8.0.0"}
 django-cors-headers = "^4.4.0"
+psycopg2-binary = "^2.9.9"
+bleach = "^6.1.0"
+markdown = "^3.7"
 
 
 [tool.poetry.group.dev.dependencies]

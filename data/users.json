@@ -1,0 +1,50 @@
+[
+  {
+    "model": "users.user",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$870000$HnyxQNE2odMFs8ABUZMTlJ$GKqvA6hDL9Hhz3yOLlJ/W0rOKYp2p3qmXMddkm1O05I=",
+      "last_login": "2024-09-11T11:16:24.221Z",
+      "is_superuser": true,
+      "first_name": "Admin",
+      "last_name": "SkyPro",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2024-09-11T07:16:32.373Z",
+      "email": "admin@sky.pro",
+      "name": "Суперадмин-КОТ",
+      "description": "Админ, великий и ужасный, админить может все ився, имеет при себе банхаммер, но банить некого пока.",
+      "phone_number": null,
+      "avatar": "users/avatars/free-icon-hacker-924915.png",
+      "is_content_manager": false,
+      "is_moderator": false,
+      "is_banned": false,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 2,
+    "fields": {
+      "password": "pbkdf2_sha256$870000$nNqaqZqntHXN2GGuF5Pq1A$EGPCsV/STKqeRtRrlDy15+7sjoz0D/znmSVMVkYH+v4=",
+      "last_login": "2024-09-11T11:08:24.311Z",
+      "is_superuser": false,
+      "first_name": "Content-manager",
+      "last_name": "SkyPro",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2024-09-11T07:16:33.706Z",
+      "email": "content-manager@sky.pro",
+      "name": null,
+      "description": null,
+      "phone_number": null,
+      "avatar": "",
+      "is_content_manager": false,
+      "is_moderator": false,
+      "is_banned": false,
+      "groups": [],
+      "user_permissions": []
+    }
+  }
+]

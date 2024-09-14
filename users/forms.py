@@ -23,12 +23,21 @@ class UserRegisterForm(StyleFormMixin, UserCreationForm):
 class UserProfileForm(StyleFormMixin, UserChangeForm):
     class Meta:
         model = User
-        fields = ('email', 'name', 'first_name', 'last_name', 'description', 'phone_number', 'avatar')
+        fields = ('email', 'name', 'first_name', 'last_name', 'description', 'phone_number', 'avatar', 'tg_nick', 'tg_chat_id', 'time_offset', )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.fields['password'].widget = forms.HiddenInput()
+
+    def clean(self):
+        cleaned_data = int(self.cleaned_data['time_offset'])
+        if -12 > cleaned_data or cleaned_data > 14:
+            raise forms.ValidationError(f'Невозможное смещение часового пояса: {cleaned_data} часа>')
+        else:
+            return self.cleaned_data
+
+
 
 
 class UserList(StyleFormMixin, ListView):

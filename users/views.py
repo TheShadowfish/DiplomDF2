@@ -3,6 +3,7 @@ import string
 
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
@@ -10,9 +11,30 @@ from django.utils import timezone
 from django.views.generic import CreateView, ListView, UpdateView, DetailView, DeleteView
 
 from config.settings import EMAIL_HOST_USER
+from restaurant.models import Booking, ContentText, ContentParameters
 # from mailapp.models import Mailing
 from users.forms import UserRegisterForm, UserProfileForm
 from users.models import User, UserToken
+
+
+
+
+class GetFormKwargsGetUserMixin:
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+class GetFormClassUserIsOwnerMixin:
+    def get_form_class(self):
+        user = self.request.user
+        pk = self.kwargs.get("pk")
+
+        print(f"{user.pk} =user.pk == self.kwargs.get('pk')= {object.pk}")
+
+        if user.pk == self.kwargs.get("pk"):
+            return UserProfileForm
+        raise PermissionDenied
 
 
 class RegisterView(CreateView):
@@ -70,7 +92,13 @@ def email_verification(request, token):
     this_user_token = get_object_or_404(UserToken, token=token)
     user = this_user_token.user
 
-    if this_user_token.created_at < timezone.now() - timezone.timedelta(minutes=45):
+    try:
+        confirm_timedelta = timezone.timedelta(minutes=ContentParameters.objects.get(title='confirm_timedelta'))
+    except:
+        confirm_timedelta = timezone.timedelta(minutes=45)
+        print(f"confirm_timedelta - установлено по умолчаеию (45 минут)")
+
+    if this_user_token.created_at < timezone.now() - confirm_timedelta:
         user.delete()
         this_user_token.delete()
         return render(request, 'users/token_expired.html')
@@ -96,8 +124,14 @@ def email_confirmed(request):
 
 
 def confirm_email(request, email):
+    try:
+        confirm_timedelta =ContentParameters.objects.get(title='confirm_timedelta')
+    except:
+        confirm_timedelta = 45
+        print(f"confirm_timedelta - установлено по умолчаеию (45 минут)")
+
     context = {
-        'email': email,
+        'email': email, 'confirm_timedelta': confirm_timedelta
     }
 
     return render(request, 'users/confirm_email.html', context)
@@ -108,26 +142,79 @@ class UserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     permission_required = "users.view_user"
 
 
+
 class ProfileView(LoginRequiredMixin, UpdateView):
     model = User
     form_class = UserProfileForm
 
-    success_url = reverse_lazy('users:profile')
+
+
+
+    # success_url = reverse_lazy('users:profile')
+
+
+    # def get_object(self, queryset=None):
+    #     return self.request.user
+
+    def get_success_url(self):
+
+        user_pk = self.request.user.pk
+        return reverse('users:user_detail', kwargs={'pk': user_pk})
+
+        # return reverse('users:user_detail', args=[self.kwargs.get("pk")])
+
+    # ['users/user_detail/(?P<pk>[0-9]+)/\\Z']
+    # success_url = reverse_lazy('users:user_list')
+    # success_url = reverse_lazy('users:user_detail', kwargs={'pk': get_object().pk})
+    # success_url =  reverse_lazy('company', kwargs={'farm_id': farmid})
+    # "{% url 'catalog:product_update' object.pk%}"
+    # 'users/user_detail/(?P<pk>[0-9]+)/\\Z'
+
+
 
     def get_object(self, queryset=None):
         return self.request.user
 
 
-class UserDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
+class UserDetailView(LoginRequiredMixin, GetFormClassUserIsOwnerMixin, DetailView):
     model = User
-    permission_required = "users.view_user"
+    # permission_required = ""
+    # permission_required()
+    #
+    # permission_required = "users.view_user"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # context['mailing_list'] = Mailing.objects.all()
 
-        context['mailing_list'] = Mailing.objects.filter(user=self.object)
-        return context
+        unfiltered_booking = Booking.objects.filter(user=self.object)
+        context['booking_list'] = unfiltered_booking.order_by("date_field", "time_start")
+
+
+        user = self.request.user
+        pk = self.kwargs.get("pk")
+
+        # print(f"{user.pk} =user.pk == self.kwargs.get('pk')= {pk}")
+        if user.is_moderator or user.pk == pk:
+            return context
+        else:
+            raise PermissionDenied
+
+
+
+
+
+    # def get_form_class(self):
+    #     user = self.request.user
+    #     pk = self.kwargs.get("pk")
+    #
+    #     print(f"{user.pk} =user.pk == self.kwargs.get('pk')= {object.pk}")
+    #
+    #     if user.pk == self.kwargs.get("pk"):
+    #         return UserProfileForm
+    #     raise PermissionDenied
+
+
 
 
 class UserDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):

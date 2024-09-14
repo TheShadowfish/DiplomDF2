@@ -1,0 +1,119 @@
+{% extends 'restaurant/base.html'%}
+{% load static %}
+{% block content %}
+
+
+{% comment 'бронирования' %}
+user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='пользователь', help_text='пользователь', related_name='user')
+    table = models.ForeignKey(Table, on_delete=models.CASCADE, verbose_name='столик', help_text='столик', related_name = 'table')
+    places = models.SmallIntegerField(verbose_name='Число бронируемых мест',
+                                      help_text="Введите число бронируемых мест", default=2)
+
+    notification = models.SmallIntegerField(
+        default=0, verbose_name="Оповещение", choices=NOTIFICATION_HOURS
+    )
+
+    date_field = models.DateField(verbose_name='дата бронирования', help_text='введите дата бронирования')
+    time_start = models.TimeField(verbose_name='начало бронирования', help_text='введите начало бронирования')
+    time_end = models.TimeField(verbose_name='конец бронирования', help_text='введите конец бронирования')
+
+    active = models.BooleanField(verbose_name='активно ли бронирование', default=True, help_text='введите активно ли бронирование')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='дата создания', help_text = 'введите дату создания бронирования')
+{% endcomment %}
+
+
+
+<div class="row text-right">
+    <div class="col-12 mb-3">
+        <div class="card mb-3 box-shadow">
+            <br>
+            <div class="btn-group">
+
+                     &nbsp; &nbsp; &nbsp; <a class="p-2 btn btn-outline-primary btn-lg btn-block"
+                                        href="{%url 'restaurant:booking_create' %}">Добавить бронирование</a> &nbsp; &nbsp;
+                &nbsp;
+            </div>
+            <br>
+        </div>
+    </div>
+
+
+    <div class="col-12">
+
+        <div class="card mb-3 box-shadow">
+
+
+
+            <div class="card-body">
+                <h5 class="card-title">
+
+                    <div style="color: orange"><b> Рассылки: &nbsp; режим владельца</b></div>
+
+                </h5>
+                <p class="card-text">
+
+
+
+
+                <table class="table table-stripped">
+                    <tr>
+                        <th>Пользователь</th>
+                        <th>Столик</th>
+
+                        <th>Дата</th>
+                        <th>Время</th>
+                        <th>Активно</th>
+                        <th>Напомнить за</th>
+                        <th>Дата создания</th>
+
+                    </tr>
+
+
+                    {% for object in object_list %}
+
+                    <tr>
+                        {% if user == object.user %}
+
+                        <td>{{object.user}}</td>
+                        <td>{{object.table}}, {{object.places}} места</td>
+
+                        <td>{{object.date_field}}</td>
+                        <td>{{object.time_start}} - {{object.time_end}}</td>
+                        <td>{{object.active}}</td>
+                        <td>{{object.notification}} часа</td>
+                        <td>{{object.created_at}}</td>
+                        <td>{{object.pk}}</td>
+
+                        <td>
+                            <a class="btn btn-primary" href="{%url 'restaurant:booking_detail' object.pk%}" role="button">Информация</a>
+                        </td>
+                        <td>
+                            <a class="btn btn-primary" href="{%url 'restaurant:booking_update' object.pk%}"
+                               role="button">Изменить</a>
+                        </td>
+                        <td>
+                            <a class="btn btn-primary" href="{%url 'restaurant:booking_delete' object.pk%}"
+                               role="button">Удалить</a>
+                        </td>
+                        {% endif %}
+
+                    </tr>
+
+                    {% endfor %}
+
+                </table>
+
+
+                </p>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+</div>
+
+{% endblock %}

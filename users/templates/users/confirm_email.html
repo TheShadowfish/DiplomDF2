@@ -1,4 +1,4 @@
-{% extends 'mailapp/base.html'%}
+{% extends 'restaurant/base.html'%}
 {% load my_tags %}
 {% block content %}
 <div class="container">
@@ -11,6 +11,8 @@
                             Для входа на сайт подтвердите email-адрес, перейдя по ссылке в письме, отправленном на ваш email:
                             <br>
                             {{email}}
+                            <br>
+                            Внимание! Ссылка действительна в течение {{confirm_timedelta}} минут.
                         </p>
                     </div>
                 </div>
