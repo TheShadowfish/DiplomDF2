@@ -3,25 +3,6 @@
 {% block content %}
 
 
-{% comment 'бронирования' %}
-user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='пользователь', help_text='пользователь', related_name='user')
-    table = models.ForeignKey(Table, on_delete=models.CASCADE, verbose_name='столик', help_text='столик', related_name = 'table')
-    places = models.SmallIntegerField(verbose_name='Число бронируемых мест',
-                                      help_text="Введите число бронируемых мест", default=2)
-
-    notification = models.SmallIntegerField(
-        default=0, verbose_name="Оповещение", choices=NOTIFICATION_HOURS
-    )
-
-    date_field = models.DateField(verbose_name='дата бронирования', help_text='введите дата бронирования')
-    time_start = models.TimeField(verbose_name='начало бронирования', help_text='введите начало бронирования')
-    time_end = models.TimeField(verbose_name='конец бронирования', help_text='введите конец бронирования')
-
-    active = models.BooleanField(verbose_name='активно ли бронирование', default=True, help_text='введите активно ли бронирование')
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name='дата создания', help_text = 'введите дату создания бронирования')
-{% endcomment %}
-
-
 
 <div class="row text-right">
     <div class="col-12 mb-3">

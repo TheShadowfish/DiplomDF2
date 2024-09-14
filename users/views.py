@@ -137,9 +137,9 @@ def confirm_email(request, email):
     return render(request, 'users/confirm_email.html', context)
 
 
-class UserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
-    model = User
-    permission_required = "users.view_user"
+# class UserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+#     model = User
+#     permission_required = "users.view_user"
 
 
 

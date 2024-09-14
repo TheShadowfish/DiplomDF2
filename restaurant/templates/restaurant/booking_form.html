@@ -45,8 +45,6 @@
 
 
                 <p class="lead">{{booking_create|comment_markdown}}
-
-                    В нашем ресторане вы можете забронировать столик на удобное для вас время.
                     <br>
                     Бронирование осуществляется за {{period_of_booking}} дней. <br>
                     Расписание работы ресторана с {{work_start}} по {{work_end}}. <br><br>
@@ -140,18 +138,25 @@
                     <br>
                     {% for t in tables_list %}
 
-                        <b>Столик &nbsp; {{t.number}}, &nbsp;мест: &nbsp;{{t.places}}, &nbsp;этаж &nbsp;{{t.flour}}</b>&nbsp;<br>
+                    <b>Столик &nbsp; {{t.number}}, &nbsp;мест: &nbsp;{{t.places}}, &nbsp;этаж &nbsp;{{t.flour}}</b>&nbsp;<br>
 
-                        {% for b in booking_list %}
+                    {% for b in booking_list %}
 
-                        {% if b.table == t %}
-                        {{b.date_field}}, &nbsp; {{b.time_start}} - {{b.time_end}}, &nbsp; Active={{b.active}} <br>
-                        {% endif %}
+                    {% if b.table == t %}
+                    {{b.date_field}}, &nbsp; {{b.time_start}} - {{b.time_end}}, &nbsp;
+                    {% if b.active %}
+                    <b>Подтверждено</b>
+                    {%else%}
+                    <b>Ожидает подтверждения</b>
+                    {% endif %}
+                    <br>
 
-                        {% endfor %}
-                        <br>
-                        {% endfor %}
+                    {% endif %}
 
+
+                    {% endfor %}
+                    <br>
+                    {% endfor %}
 
 
                 </p>
@@ -162,7 +167,6 @@
 
 
 </div>
-
 
 
 {% endblock %}

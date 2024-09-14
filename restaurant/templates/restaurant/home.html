@@ -28,12 +28,13 @@
             <div class="d-flex align-items-stretch">
                 <div class="col-sm-6">
                     <div class="card">
-                        <img src="{% static 'image/main/inside2.png' %}" alt="Интерьер ресторана 1" class="img-fluid">
+                        <img src="{{home_about_inside1.image|media_filter}}" alt="{{home_about_inside1.descrirtion}}" class="img-fluid">
                     </div>
                     </div>
                 <div class="col-sm-6">
                     <div class="card">
-                        <img src="{% static 'image/main/inside3.png' %}" alt="Интерьер ресторана 2" class="img-fluid">
+                        <img src="{{home_about_inside2.image|media_filter}}" alt="{{home_about_inside2.descrirtion}}" class="img-fluid">
+
                     </div>
                     </div>
 
@@ -71,17 +72,17 @@
                             <div class="d-flex align-items-stretch">
                 <div class="col-sm-4">
                     <div class="card">
-                        <img src="{% static 'image/main/fugu.png' %}" class="img-fluid" alt="Рыба фугу - путь самурая">
+                        <img src="{{home_food1.image|media_filter}}" alt="{{home_food1.descrirtion}}" class="img-fluid">
                     </div>
                     </div>
                 <div class="col-sm-4">
                     <div class="card">
-                        <img src="{% static 'image/main/osetr.png' %}" class="img-fluid" alt="Осетрина! Как в давние времена.">
+                        <img src="{{home_food2.image|media_filter}}" alt="{{home_food2.descrirtion}}" class="img-fluid">
                     </div>
                     </div>
                 <div class="col-sm-4">
                     <div class="card">
-                        <img src="{% static 'image/main/shrimp.png' %}" class="img-fluid" alt="Креветки тигровые, аж рычат!">
+                        <img src="{{home_food3.image|media_filter}}" alt="{{home_food3.descrirtion}}" class="img-fluid">
 
                     </div>
                     </div>
@@ -117,9 +118,11 @@
 
             <p class="lead">
                 {{home_adress|comment_markdown}}
-                <li><a href="https://t.me/TheShadowfish">наш Telegram </a></li>
-                <li><a href="https://wa.me/79115604350">наш Whatsapp</a></li>
-                <li><a href="https://vk.com/shadowfish ">Мы в контакте </a></li>
+
+                <br>
+                <li><a href={{ telegram.link }}>{{telegram.text}}</a></li>
+                <li><a href="{{ whatsup.link }}">{{whatsup.text}}</a></li>
+                <li><a href="{{ vkontakte.link }}">{{vkontakte.text}} </a></li>
 
             </p> <br>
 
