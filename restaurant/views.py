@@ -19,7 +19,8 @@ from restaurant.models import Booking, Table, BookingToken, ContentText, Content
 
 from dotenv import load_dotenv
 
-from restaurant.templates.restaurant.utils import when_not_found_content_text, get_content_text_from_postgre
+from restaurant.templates.restaurant.utils import when_not_found_content_text, get_content_text_from_postgre, \
+    get_content_image_from_postgre, get_content_link_from_postgre
 
 load_dotenv()
 
@@ -38,6 +39,36 @@ class HomePageView(TemplateView):
         context[CONST2.replace('-', '_')] = get_content_text_from_postgre(CONST2)
         context[CONST3.replace('-', '_')] = get_content_text_from_postgre(CONST3)
 
+        IMGCONST1 = "home-about-inside1"
+        IMGCONST2 = "home-about-inside2"
+        IMGCONST3 = "home-food1"
+        IMGCONST4 = "home-food2"
+        IMGCONST5 = "home-food3"
+
+
+        context[IMGCONST1.replace('-','_')] = get_content_image_from_postgre(IMGCONST1)
+        context[IMGCONST2.replace('-', '_')] = get_content_image_from_postgre(IMGCONST2)
+        context[IMGCONST3.replace('-', '_')] = get_content_image_from_postgre(IMGCONST3)
+        context[IMGCONST4.replace('-', '_')] = get_content_image_from_postgre(IMGCONST4)
+        context[IMGCONST5.replace('-', '_')] = get_content_image_from_postgre(IMGCONST5)
+
+
+        LINKCONST1 = "vkontakte"
+        LINKCONST2 = "whatsup"
+        LINKCONST3 = "telegram"
+
+        LINKCONST4 = "zero"
+
+
+        context[LINKCONST1.replace('-','_')] = get_content_link_from_postgre(LINKCONST1)
+        context[LINKCONST2.replace('-', '_')] = get_content_link_from_postgre(LINKCONST2)
+        context[LINKCONST3.replace('-', '_')] = get_content_link_from_postgre(LINKCONST3)
+        context[LINKCONST4.replace('-', '_')] = get_content_link_from_postgre(LINKCONST4)
+
+
+
+
+        # context['Not_found'] = get_content_image_from_postgre('Not_found')
 
         # try:
         #     context[CONST1.replace('-','_')] = ContentText.objects.get(title=CONST1).body
@@ -98,6 +129,24 @@ class AboutUsPageView(TemplateView):
         context[CONST3.replace('-', '_')] = get_content_text_from_postgre(CONST3)
         context[CONST4.replace('-', '_')] = get_content_text_from_postgre(CONST4)
         context[CONST5.replace('-', '_')] = get_content_text_from_postgre(CONST5)
+
+
+        IMGCONST1 = "about_us-inside3"
+        IMGCONST2 = "about_us-inside4"
+        IMGCONST3 = "about_us-team1"
+        IMGCONST4 = "about_us-team2"
+        IMGCONST5 = "about_us-team3"
+
+
+        context[IMGCONST1.replace('-','_')] = get_content_image_from_postgre(IMGCONST1)
+        context[IMGCONST2.replace('-', '_')] = get_content_image_from_postgre(IMGCONST2)
+        context[IMGCONST3.replace('-', '_')] = get_content_image_from_postgre(IMGCONST3)
+        context[IMGCONST4.replace('-', '_')] = get_content_image_from_postgre(IMGCONST4)
+        context[IMGCONST5.replace('-', '_')] = get_content_image_from_postgre(IMGCONST5)
+
+
+
+
 
         #
         #
