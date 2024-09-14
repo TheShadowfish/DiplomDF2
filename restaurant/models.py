@@ -13,7 +13,7 @@ class Table(models.Model):
     flour = models.SmallIntegerField(verbose_name='Этаж нахождения столика',
                                      help_text="Введите этаж нахождения столика", default=1)
     description = models.TextField(verbose_name='Описание столика', help_text='Введите описание столика',
-                                   default='обычный столик')
+                                   default='обычный столик', )
 
     class Meta:
         verbose_name = 'столик'

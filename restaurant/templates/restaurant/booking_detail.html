@@ -1,6 +1,6 @@
 {% extends 'restaurant/base.html'%}
 {% load static %}
-<!--{% load tz %}-->
+{% load my_tags %}
 
 {% block content %}
 
@@ -19,46 +19,78 @@
                     <div style="color: orange"><b>{{object.user}} - {{object.table}}</b></div>
                 </h5>
                 <p class="card-text">
-                Пользователь: &nbsp; {{object.user}} <br>
-                Столик:&nbsp; {{object.table}}, число мест {{object.places}}<br>
-                Дата:&nbsp; {{object.date_field}} <br>
-                Время:&nbsp; {{object.time_start}} - {{object.time_end}} <br>
-                Активно:&nbsp; {{object.active}} <br>
+                    {%if object.created_at|has_been:object.time_start %}
 
-                            {% if object.notification != 0 %}
-                            {% if object.notification == 1 %}
-                            Напомнить за:&nbsp; {{object.notification}} час <br>
-                            {% else %}
-                            Напомнить за:&nbsp; {{object.notification}} часа <br>
-                            {% endif %}
-                            {% endif %}
-                {% if object.description != None %}
+                    <b>Время бронирования уже прошло.</b>
+                    <br><br>
+                    {%endif%}
+
+
+                    Пользователь: &nbsp; {{object.user}} <br>
+                    Столик:&nbsp; {{object.table}}, число мест {{object.places}}<br>
+                    Дата:&nbsp; {{object.date_field}} <br>
+                    Время:&nbsp; {{object.time_start}} - {{object.time_end}} <br>
+                    Активно:&nbsp; {{object.active}} <br>
+
+                    {% if object.notification != 0 %}
+                    {% if object.notification == 1 %}
+                    Напомнить за:&nbsp; {{object.notification}} час <br>
+                    {% else %}
+                    Напомнить за:&nbsp; {{object.notification}} часа <br>
+                    {% endif %}
+                    {% endif %}
+                    {% if object.description != None %}
                     Примечания: &nbsp; {{object.description}} <br>
                     {% endif %}
+
+                    Дата создания:&nbsp; {{ object.created_at|time_to_local:object.user.time_offset }} <br>
+
+
                     <br><br>
+                    {%if object.created_at|has_been:object.time_start %}
 
-                            <a class="p-2 btn btn-outline-primary" href="{%url 'restaurant:booking_update' object.pk%}"
-                               role="button">Изменить</a>
+                    <a class="p-2 btn btn-secondary disabled" href="#"
+                       role="button" aria-disabled="true">Изменить</a>
 
 
-                            <a class="p-2 btn btn-outline-primary" href="{%url 'restaurant:booking_delete' object.pk%}"
-                               role="button">Удалить</a>
+                    <a class="p-2 btn btn-outline-primary" href="{%url 'restaurant:booking_delete' object.pk%}"
+                       role="button">Удалить</a>
 
-                            {%if object.active %}
-                            <a class="btn btn-success" href="{%url 'restaurant:booking_activity' object.pk%}"
-                               role="button">Деактивировать</a>
-                            {% else %}
-                            <a class="btn btn-danger" href="{%url 'restaurant:booking_activity' object.pk%}"
-                               role="button">&nbsp;&nbsp;Активировать&nbsp;&nbsp;</a>
-                            {%endif%}
+                    {%if object.active %}
+                    <a class="p-2 btn btn-secondary disabled" href="#"
+                       role="button">Отменить</a>
+                    {% else %}
+                    <a class="p-2 btn btn-secondary disabled" href="#"
+                       role="button">Неактивно</a>
+                    &nbsp;&nbsp;
+                    {%endif%}
 
-                    <a class="p-2 btn btn-outline-primary" href="{% url 'users:user_detail' user.pk%}">История бронирований</a>
 
+                    {%else%}
+
+                    <a class="p-2 btn btn-outline-primary" href="{%url 'restaurant:booking_update' object.pk%}"
+                       role="button">Изменить</a>
+
+
+                    <a class="p-2 btn btn-outline-primary" href="{%url 'restaurant:booking_delete' object.pk%}"
+                       role="button">Удалить</a>
+
+                    {%if object.active %}
+                    <a class="p-2 btn  btn-success" href="{%url 'restaurant:booking_activity' object.pk%}"
+                       role="button">Отменить</a>
+                    {% else %}
+                    <a class="p-2 btn btn-secondary disabled" href="#" role="button">Неактивно</a>
+
+                    {%endif%}
+                    {%endif%}
+
+                    <a class="p-2 btn btn-outline-primary" href="{% url 'users:user_detail' user.pk%}">История
+                        бронирований</a>
 
 
                     </tr>
 
-                </table>
+                    </table>
 
                 </p>
 

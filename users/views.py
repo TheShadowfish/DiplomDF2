@@ -150,21 +150,26 @@ class ProfileView(LoginRequiredMixin, UpdateView):
 
 
 
-    success_url = reverse_lazy('users:profile')
+    # success_url = reverse_lazy('users:profile')
 
 
     # def get_object(self, queryset=None):
     #     return self.request.user
 
     def get_success_url(self):
-        return reverse('users:user_detail', args=[self.kwargs.get("pk")])
 
+        user_pk = self.request.user.pk
+        return reverse('users:user_detail', kwargs={'pk': user_pk})
 
+        # return reverse('users:user_detail', args=[self.kwargs.get("pk")])
+
+    # ['users/user_detail/(?P<pk>[0-9]+)/\\Z']
     # success_url = reverse_lazy('users:user_list')
     # success_url = reverse_lazy('users:user_detail', kwargs={'pk': get_object().pk})
     # success_url =  reverse_lazy('company', kwargs={'farm_id': farmid})
     # "{% url 'catalog:product_update' object.pk%}"
     # 'users/user_detail/(?P<pk>[0-9]+)/\\Z'
+
 
 
     def get_object(self, queryset=None):
@@ -182,7 +187,9 @@ class UserDetailView(LoginRequiredMixin, GetFormClassUserIsOwnerMixin, DetailVie
         context = super().get_context_data(**kwargs)
         # context['mailing_list'] = Mailing.objects.all()
 
-        context['booking_list'] = Booking.objects.filter(user=self.object)
+        unfiltered_booking = Booking.objects.filter(user=self.object)
+        context['booking_list'] = unfiltered_booking.order_by("date_field", "time_start")
+
 
         user = self.request.user
         pk = self.kwargs.get("pk")

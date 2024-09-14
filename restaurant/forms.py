@@ -1,9 +1,11 @@
 import datetime
 
 from django import forms
+from django.db.models import TextField, Q
 from django.forms import BooleanField, TimeField, TimeInput, SelectDateWidget, DateField, NumberInput
+from django.utils import timezone
 
-from restaurant.models import Table, Booking, ContentText, ContentImage, ContentParameters
+from restaurant.models import Table, Booking, ContentText, ContentImage, ContentParameters, BookingToken
 
 
 class StyleFormMixin:
@@ -25,6 +27,10 @@ class StyleFormMixin:
                 field.widget=NumberInput(attrs={'type': 'time'})
                 field.initial = datetime.time(18 + time_append, 0)
                 time_append += 2
+
+            # if isinstance(field, TextField):
+            #     field.widget=TextField(attrs={'rows': 5})
+
 
 
             if isinstance(field, BooleanField):
@@ -125,7 +131,27 @@ class BookingForm(StyleFormMixin, forms.ModelForm):
             raise forms.ValidationError(f'Сегодня это время уже прошло {cleaned_data_time_start}')
 
         table = self.cleaned_data['table']
-        bookings = Booking.objects.filter(table=table)
+
+        # получение времени подтверждения бронирования, получение времени, которое определяет границу регистрации
+        try:
+            confirm_timedelta = timezone.timedelta(
+                minutes=ContentParameters.objects.get(title='confirm_timedelta'))
+        except:
+            confirm_timedelta = timezone.timedelta(minutes=45)
+            # print(f"confirm_timedelta - установлено по умолчаеию (45 минут)")
+        time_border = timezone.now() - confirm_timedelta
+
+        # список pk бронирований, которые могут быть подтверждены
+        booking_tokens = [token.booking.pk for token in  BookingToken.objects.filter(created_at__gt=time_border)]
+
+        # получение списка актуальных бронирований
+        # bookings = Booking.objects.filter(table=table).filter(Q(active=True) | Q(pk__in=booking_tokens)).order_by("date_field", "time_start")
+        # получение уменьшенного списка бронирований
+        date_now = datetime.now()
+        bookings = (Booking.objects.filter(table=table).filter(Q(active=True) | Q(pk__in=booking_tokens)).
+               filter(date_field__year__gte=date_now.year, date_field__month__gte=date_now.month,
+                      date_field__day__gte=(date_now - datetime.timedelta(days=1)).day).order_by("date_field", "time_start"))
+
 
         if cleaned_data_places > table.places:
             raise forms.ValidationError(f'За данным столиком всего {table.places} мест. Выберете столик с большим количеством мест или позже забронируйте соседний столик')
@@ -140,20 +166,13 @@ class BookingForm(StyleFormMixin, forms.ModelForm):
                                         day=b.date_field.day, hour=b.time_start.hour,
                                         minute=b.time_start.minute)
             b_end = datetime.datetime(year=b.date_field.year, month=b.date_field.month,
-                                      day=b.date_field.day, hour=b.time_start.hour,
-                                      minute=b.time_start.minute)
+                                      day=b.date_field.day, hour=b.time_end.hour,
+                                      minute=b.time_end.minute)
             if b.time_start > b.time_end:
                 b_end += datetime.timedelta(days=1)
 
-
-
+            # если это обновление то будет объект, иначе None
             booking_id = self.instance
-            # .kwargs['pk']
-
-            if object:
-                print(f"ИЗМЕНЕНИЕ {booking_id.pk}, {b.pk}")
-
-
 
             if b_start <= t_start < b_end and booking_id.pk != b.pk:
                 raise forms.ValidationError(f'В указанное время выбранный столик занят {b_start} <= {t_start} < {b_end} ')
@@ -167,8 +186,8 @@ class BookingForm(StyleFormMixin, forms.ModelForm):
         return self.cleaned_data
 
 
-    def has_changed(self):
-        print("ФОРМА ИЗМЕНЕНА")
+    # def has_changed(self):
+    #     print("ФОРМА ИЗМЕНЕНА")
 
 
     #

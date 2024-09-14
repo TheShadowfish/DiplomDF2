@@ -1,4 +1,7 @@
 import datetime
+
+import bleach
+import markdown
 from django import template
 
 import random
@@ -16,6 +19,29 @@ register = template.Library()
 @register.simple_tag
 def current_time(format_string):
     return datetime.datetime.now().strftime(format_string)
+
+
+@register.filter
+def time_to_local(value, arg):
+    # меняет время на локальное получив разницу часовых поясов в часах
+    created_at_local = value + datetime.timedelta(hours=arg)
+    return created_at_local
+
+@register.filter
+def has_been(value, arg):
+    now = datetime.datetime.now()
+
+
+    booking_datetime = datetime.datetime(year=value.year, month=value.month,
+                                      day=value.day, hour=arg.hour,
+                                      minute=arg.minute)
+
+    if booking_datetime > now:
+        return False
+    return True
+
+
+
 
 
 @register.simple_tag
@@ -84,14 +110,13 @@ def user_media_filter(path):
 
     return '/static/image/no_avatar.png'
 
-#
-# def markdown_comment(value):
-#     return bleach.clean(
-#         markdown.markdown(value, extensions=['nl2br']),
-#         strip=True,
-#         tags=['strong', 'p', 'b', 'li', 'blockquote', 'br'])
+def markdown_comment(value):
+    return bleach.clean(
+        markdown.markdown(value, extensions=['nl2br']),
+        strip=True,
+        tags=['strong', 'b', 'li', 'u', 'blockquote', 'br'])
 
-#
-# @register.filter
-# def comment_markdown(value):
-#     return mark_safe(markdown_comment(value))
+
+@register.filter
+def comment_markdown(value):
+    return mark_safe(markdown_comment(value))
