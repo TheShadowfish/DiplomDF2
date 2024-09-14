@@ -85,3 +85,5 @@ class UserToken(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='дата создания',
                                       help_text='введите дату создания токена')
     token = models.CharField(max_length=100, verbose_name='Token', **NULLABLE)
+
+

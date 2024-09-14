@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Hungry Shark
-    {% if title %}
+        {% if title %}
         - {{title}}
         {% endif %}
 
@@ -28,7 +28,8 @@
         <br>
         <div style="color: blue">Ресторан "Hungry Shark"</div>
     </h1>
-    <p class="lead">Hungry Shark - ресторан кухни рыбных блюд. У нас есть всё - от миноги до осьминога! Hungry Shark - разбуди в себе акулу - и накорми её!* **
+    <p class="lead">Hungry Shark - ресторан кухни рыбных блюд. У нас есть всё - от миноги до осьминога! Hungry Shark -
+        разбуди в себе акулу - и накорми её!* **
         <br>
 
         <small class="text-body-secondary">
@@ -38,13 +39,15 @@
                     <br>
 
                      </span>
+            </small>
             <br>
             <div style="color: blue">
-               <label>Сегодня &nbsp;{%  current_time '%Y-%m-%d' %}  </label>
+                <label>Сегодня &nbsp;{% current_time '%Y-%m-%d' %} </label>
 
 
-     {% if user.is_authenticated %}
-     <label>, &nbsp; Добро пожаловать, пользователь <b>{{user.email}}</b>.
+
+        {% if user.is_authenticated %}
+        <label>, &nbsp; Добро пожаловать, пользователь <b>{{user.email}}</b>.
             &nbsp; Ваши полномочия:
             {% if user.is_superuser %}
             <b>суперпользователь</b>.
@@ -52,22 +55,21 @@
             {% if user.is_staff and user.is_superuser == False%}
             <b>персонал сайта (is staff)</b>.
             {% endif %}
-            {% if user.is_staff == False and user.is_superuser == False  %}
+            {% if user.is_staff == False and user.is_superuser == False %}
             <b>пользователь</b>.
             {% endif %}
-         </label>
+        </label>
 
-     {% else %}
-    <label>, &nbsp;Вы находитесь на сайте как <b>анонимный пользователь</b>. </label>
-     {% endif %}
-                </div>
+        {% else %}
+        <label>, &nbsp;Вы находитесь на сайте как <b>анонимный пользователь</b>. </label>
+        {% endif %}
+</div>
 
 
-        </small>
-    </p>
-    <p class="lead">
+</p>
+<p class="lead">
 
-    </p>
+</p>
 
 
 </div>
@@ -91,8 +93,6 @@
             <div class="col-4 col-md">
                 <p class="float-end"><a href="#">Наверх</a></p>
             </div>
-
-
 
 
         </div>

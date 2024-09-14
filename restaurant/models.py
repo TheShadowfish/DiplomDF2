@@ -133,3 +133,47 @@ class BookingToken(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='дата создания',
                                       help_text='введите дату создания токена')
     token = models.CharField(max_length=100, verbose_name='Token', **NULLABLE)
+
+
+
+class Questions(models.Model):
+    question_text =  models.TextField(verbose_name='Текст вопроса', help_text='Введите текст вопроса')
+    sign = models.CharField(max_length=50, verbose_name='Подпись', help_text='Введите подпись под вопросом')
+    moderated = models.BooleanField(default=False, verbose_name='Проверен', help_text='Введите признак проверки')
+    answer_text = models.TextField(verbose_name='Ответ на вопрос', help_text='Введите ответ на вопрос', **NULLABLE)
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='дата создания',
+                                      help_text='введите дату создания')
+    class Meta:
+        verbose_name = 'вопрос'
+        verbose_name_plural = 'вопросы'
+
+    def __str__(self):
+        return f"{self.question_text}"
+
+class Review(models.Model):
+    GRADE_POINTS = (
+        (0, "Не оповещать"),
+        (1, "За час"),
+        (2, "За два часа"),
+        (3, "За три часа"),
+    )
+
+
+    review_text =  models.TextField(verbose_name='Текст отзыва', help_text='Введите текст отзыва')
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, verbose_name='пользователь', help_text='пользователь', related_name='author', **NULLABLE)
+    sign = models.CharField(max_length=50, verbose_name='Подпись', help_text='Введите подпись под отзывом')
+    grade = models.SmallIntegerField(
+        default=5, verbose_name="Оповещение", choices=GRADE_POINTS)
+
+    moderated = models.BooleanField(default=False, verbose_name='Проверен', help_text='Введите признак проверки')
+    answer_text = models.TextField(verbose_name='Ответ на вопрос', help_text='Введите ответ на вопрос', **NULLABLE)
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='дата создания',
+                                      help_text='введите дату создания')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='дата изменения',
+                                      help_text='введите дату изменения')
+    class Meta:
+        verbose_name = 'отзыв'
+        verbose_name_plural = 'отзывы'
+
+    def __str__(self):
+        return f"{self.grade} - {self.sign}"

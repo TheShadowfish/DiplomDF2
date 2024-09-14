@@ -2,7 +2,7 @@ from django.contrib.auth.views import LoginView, LogoutView, PasswordResetView, 
 from django.urls import path, reverse_lazy
 
 from users.apps import UsersConfig
-from users.views import RegisterView, email_verification, UserDetailView, UserDeleteView, UserListView, \
+from users.views import RegisterView, email_verification, UserDetailView, UserDeleteView, \
     confirm_email, ProfileView, password_recovery, toggle_activity_user
 
 app_name = UsersConfig.name
@@ -16,7 +16,7 @@ urlpatterns = [
     path("users/email_confirmed.html/", email_verification, name='email_confirmed'),
     path("users/confirm_email.html/<str:email>/", confirm_email, name='confirm_email'),
     path('profile/', ProfileView.as_view(), name='profile'),
-    path('user_list/', UserListView.as_view(), name='user_list'),
+    # path('user_list/', UserListView.as_view(), name='user_list'),
     path('user_detail/<int:pk>/', UserDetailView.as_view(), name='user_detail'),
 
 

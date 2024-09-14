@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from restaurant.models import Table, Booking, ContentText, ContentImage, ContentParameters, Contentlink
+from restaurant.models import Table, Booking, ContentText, ContentImage, ContentParameters, Contentlink, Questions, \
+    Review
 
 
 @admin.register(Table)
@@ -39,5 +40,18 @@ class ContentlinkAdmin(admin.ModelAdmin):
     list_display = ("title", "text", "link", "description",)
     list_filter = ("title",)
     search_fields = ("title", "text", "link",)
+
+@admin.register(Questions)
+class QuestionsAdmin(admin.ModelAdmin):
+    list_display = ("sign", "question_text", "moderated", "answer_text", "created_at",)
+    list_filter = ("created_at",)
+    search_fields = ("sign", "moderated", "question_text",)
+
+@admin.register(Review)
+class ReviewAmin(admin.ModelAdmin):
+    list_display = ("author", "review_text", "moderated", "grade", "moderated", "answer_text", "created_at",)
+    list_filter = ("created_at",)
+    search_fields = ("author", "grade", "moderated",)
+
 
 

@@ -41,18 +41,26 @@
                 &nbsp;
                 {% endif %}
 
-                <a class="p-2 btn btn-outline-primary" href="#">Наши блюда</a>
+                <a class="p-2 btn btn-outline-primary" href="{% url 'restaurant:question_list' %}">Вопросы и ответы</a>
                 &nbsp;
+<!--                path("question_list/", QuestionListView.as_view(), name='question_list'),-->
+
+
                 <a class="p-2 btn btn-outline-primary" href="#">Наш блог</a>
                 &nbsp;
-                {% if perms.users.can_set_user_inactive or user.is_superuser %}
+
+                {% comment "Это и из админки хорошо делается" %}
+                {% if user.is_staff or user.is_superuser %}
                 <a class="p-2 btn btn-outline-primary" href="{%url 'users:user_list' %}">Список
                     зарегистрированных
                     пользователей</a>
                 &nbsp;
 
                 {% endif %}
-                                <a class="p-2 btn btn-outline-primary" href="{%url 'restaurant:booking_list' %}">Бронирования</a>
+                {% endcomment %}
+
+
+                 <a class="p-2 btn btn-outline-primary" href="{%url 'restaurant:booking_list' %}">Бронирования</a>
                 &nbsp;
             </ul>
 

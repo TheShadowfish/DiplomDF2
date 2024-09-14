@@ -5,7 +5,7 @@ from django.db.models import TextField, Q
 from django.forms import BooleanField, TimeField, TimeInput, SelectDateWidget, DateField, NumberInput
 from django.utils import timezone
 
-from restaurant.models import Table, Booking, ContentText, ContentImage, ContentParameters, BookingToken
+from restaurant.models import Table, Booking, ContentText, ContentImage, ContentParameters, BookingToken, Questions
 
 
 class StyleFormMixin:
@@ -15,9 +15,7 @@ class StyleFormMixin:
 
         for field_name, field in self.fields.items():
 
-            # if isinstance(field, DateField):
-            #     field.widget=SelectDateWidget()
-            time = datetime.datetime.now().time()
+            # time = datetime.datetime.now().time()
 
             if isinstance(field, DateField):
                 field.widget=NumberInput(attrs={'type': 'date'})
@@ -28,19 +26,11 @@ class StyleFormMixin:
                 field.initial = datetime.time(18 + time_append, 0)
                 time_append += 2
 
-            # if isinstance(field, TextField):
-            #     field.widget=TextField(attrs={'rows': 5})
-
-
-
             if isinstance(field, BooleanField):
                 field.widget.attrs['class'] = 'form-check-input'
             else:
                 field.widget.attrs['class'] = 'form-control'
 
-
-            # else:
-            #     field.widget.attrs['class'] = 'form-control'
 
 
 class BookingForm(StyleFormMixin, forms.ModelForm):
@@ -53,23 +43,22 @@ class BookingForm(StyleFormMixin, forms.ModelForm):
 
 
     def clean(self):
+        # а может в Validators затолкаем?
+        # TimeValidations(cleaned_data)
+        # TableValidations(cleaned_data)
+
         work_start = datetime.time(8, 0, 0)
         work_end = datetime.time(23, 0, 0)
         period_of_booking = 14
 
         try:
-            # время работы хранится в базе данных, период бронирования там же
-            # period_of_booking = int(ContentText.objects.get(title='period_of_booking').body)
-            # work_start = datetime.time.fromisoformat(ContentText.objects.get(title='work_start').body)
-            # work_end = datetime.time.fromisoformat(ContentText.objects.get(title='work_end').body)
-
             period_of_booking = int(ContentParameters.objects.get(title='period_of_booking').body)
             work_start = datetime.time.fromisoformat(ContentParameters.objects.get(title='work_start').body)
             work_end = datetime.time.fromisoformat(ContentParameters.objects.get(title='work_end').body)
 
         except:
             print(
-                f"{ContentText.objects.get(title='work_start')} || {ContentText.objects.get(title='work_end')} || {ContentText.objects.get(title='period_of_booking')}")
+                f"{ContentParameters.objects.get(title='work_start')} || {ContentParameters.objects.get(title='work_end')} || {ContentParameters.objects.get(title='period_of_booking')}")
             raise forms.ValidationError(
                 f'В базу данных не внесено время работы ресторана: work_start=<время открытия>, work_end=<время закрытия>, period_of_booking=<период предварительного бронирования>')
                 # work_start = datetime.time(8, 0, 0)
@@ -78,18 +67,12 @@ class BookingForm(StyleFormMixin, forms.ModelForm):
 
         date = datetime.date.today()
         # time = datetime.datetime.now().time()
-
         # print(f"{self.cleaned_data}")
 
         cleaned_data_date_field = self.cleaned_data['date_field']
         cleaned_data_time_start = self.cleaned_data['time_start']
         cleaned_data_time_end = self.cleaned_data['time_end']
         cleaned_data_places = self.cleaned_data['places']
-
-
-
-
-
 
         t_start = datetime.datetime(year=cleaned_data_date_field.year, month=cleaned_data_date_field.month,
                                           day=cleaned_data_date_field.day, hour=cleaned_data_time_start.hour,
@@ -101,13 +84,13 @@ class BookingForm(StyleFormMixin, forms.ModelForm):
         t_work_start = datetime.datetime(year=cleaned_data_date_field.year, month=cleaned_data_date_field.month,
                                           day=cleaned_data_date_field.day, hour=work_start.hour,
                                           minute=work_start.minute)
-        # datetime.time.fromisoformat(ContentText.objects.get(title='work_start').body)
+        # datetime.time.fromisoformat(ContentParameters.objects.get(title='work_start').body)
         t_work_end = datetime.datetime(year=cleaned_data_date_field.year, month=cleaned_data_date_field.month,
                                           day=cleaned_data_date_field.day, hour=work_end.hour,
                                           minute=work_end.minute)
 
         t_now = datetime.datetime.now()
-        # datetime.time.fromisoformat(ContentText.objects.get(title='work_end').body)
+        # datetime.time.fromisoformat(ContentParameters.objects.get(title='work_end').body)
 
         if cleaned_data_time_end < cleaned_data_time_start:
             t_end += datetime.timedelta(days=1)
@@ -186,12 +169,25 @@ class BookingForm(StyleFormMixin, forms.ModelForm):
         return self.cleaned_data
 
 
-    # def has_changed(self):
-    #     print("ФОРМА ИЗМЕНЕНА")
+class QuestionsForm(StyleFormMixin, forms.ModelForm):
+    class Meta:
+        model = Questions
+        fields = "__all__"
+        exclude = (
+            "created_at",
+        )
 
+        # question_text = models.TextField(verbose_name='Текст вопроса', help_text='Введите текст вопроса')
+        # sign = models.CharField(max_length=50, verbose_name='Подпись', help_text='Введите подпись под вопросом')
+        # moderated = models.BooleanField(default=False, verbose_name='Проверен',
+        #                                 help_text='Введите признак проверки')
+        # answer_text = models.TextField(verbose_name='Ответ на вопрос', help_text='Введите ответ на вопрос',
+        #                                **NULLABLE)
+        # created_at = models.DateTimeField(auto_now_add=True, verbose_name='дата создания',
+class LimitedQuestionsForm(StyleFormMixin, forms.ModelForm):
+    class Meta:
+        model = Questions
+        fields = ('question_text','sign')
 
-    #
-    # def has_changed(self):
-    #     print("ФОРМА ИЗМЕНЕНА")
 
 
