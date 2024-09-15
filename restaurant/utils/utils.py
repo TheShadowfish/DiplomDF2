@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
 
-from restaurant.models import ContentText, ContentImage, Contentlink
+from django.utils import timezone
+
+from restaurant.models import ContentText, ContentImage, Contentlink, ContentParameters
 
 
 # def when_not_found_content_text(title):
@@ -40,6 +42,33 @@ def time_segment(date: datetime.date, start: datetime.time, end: datetime.time) 
         t_end += timedelta(days=1)
 
     return t_start, t_end
+
+
+def get_content_parameters(ignored_error):
+    # выдернуть из базы данных параметры работы, бронирования и т.д.
+    try:
+        period_of_booking = int(ContentParameters.objects.get(title='period_of_booking').body)
+        work_start = datetime.time.fromisoformat(ContentParameters.objects.get(title='work_start').body)
+        work_end = datetime.time.fromisoformat(ContentParameters.objects.get(title='work_end').body)
+        confirm_timedelta = timezone.timedelta(minutes=ContentParameters.objects.get(title='confirm_timedelta'))
+        time_border = timezone.now() - confirm_timedelta
+
+        return {'period_of_booking': period_of_booking, 'work_start': work_start, 'work_end': work_end,'time_border': time_border}
+    except:
+        if ignored_error:
+            work_start = datetime.time(8, 0, 0)
+            work_end = datetime.time(23, 0, 0)
+            period_of_booking = 14
+            confirm_timedelta = timezone.timedelta(minutes=45)
+            # print(f"confirm_timedelta - установлено по умолчаеию (45 минут)")
+            time_border = timezone.now() - confirm_timedelta
+            return {'period_of_booking': period_of_booking, 'work_start': work_start, 'work_end': work_end,
+                        'time_border': time_border}
+        return False
+
+
+
+
 
 
 
