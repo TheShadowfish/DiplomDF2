@@ -327,11 +327,22 @@ class QuestionListView(ListView):
 
 
         user=self.request.user
-        if not user:
-            context['time_offset'] = 0
-        else:
+        try:
             context['time_offset'] = user.time_offset
+        except:
+            context['time_offset'] = 0
+        # if user.time_offset:
+        #     context['time_offset'] = 0
+        # else:
+        #     context['time_offset'] = user.time_offset
         return context
+        #
+        # model = Article
+        #
+        # def get_context_data(self, **kwargs):
+        #     context_data = super().get_context_data(**kwargs)
+        #     context_data["object_list"] = get_cached_article_list()
+        #     return context_data
 
 
 
