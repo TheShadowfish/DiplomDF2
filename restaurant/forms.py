@@ -50,6 +50,7 @@ class BookingStyleFormMixin:
             if isinstance(field, TimeField):
                 field.widget=NumberInput(attrs={'type': 'time'})
                 field.initial = datetime.time(18 + time_append, 0)
+                time_append += 2
 
             if isinstance(field, CharField):
                 field.widget = Textarea(attrs={'rows': 5})
@@ -95,13 +96,18 @@ class BookingForm(BookingStyleFormMixin, forms.ModelForm):
         # time_border = timezone.now() - confirm_timedelta
 
 
-        parameters_dict = get_content_parameters(ignored_errors=False)
+        parameters_dict = get_content_parameters(False)
 
         if parameters_dict:
             period_of_booking = parameters_dict.get('period_of_booking')
             work_start = parameters_dict.get('work_start')
             work_end = parameters_dict.get('work_end')
-            time_border = parameters_dict.get('time_border')
+            confirm_timedelta = parameters_dict.get('confirm_timedelta')
+
+            time_border = timezone.now() - timezone.timedelta(minutes=confirm_timedelta)
+
+
+            # time_border = parameters_dict.get('time_border')
         else:
             message = """Не удалось извлечь корректные значения работы ресторана из база данных:
                         таблица ContentParameters, данные 
