@@ -70,33 +70,47 @@ class BookingForm(BookingStyleFormMixin, forms.ModelForm):
         fields = '__all__'
         exclude = ('user','active','created_at')
 
+    def validate_date_time(self, parametr_dict):
+        # отдеьная проверка допустимости параметров времени бронирования
+
+        data = self.cleaned_data['date_field']
+        time_start = self.cleaned_data['time_start']
+        time_end = self.cleaned_data['time_end']
+
+        period_of_booking = parametr_dict['period_of_booking']
+
+        t_now = datetime.datetime.now()
+        t_start, t_end = time_segment(data, time_start, time_end)
+        t_work_start, t_work_end = time_segment(data, parametr_dict['work_start'], parametr_dict['work_end'])
+
+        if t_now > t_start:
+            raise forms.ValidationError('Нельзя забронировать место на прошедшее время')
+
+        # # честно, такого быть не может, функция time_segment не позволит
+        # if t_end <= t_start:
+        #     raise forms.ValidationError(f'Время начала периода бронирования должно быть раньше чем время конца периода')
+
+        if t_start > t_now + datetime.timedelta(days=period_of_booking):
+            raise forms.ValidationError(f'Бронировать места можно не ранее чем за {period_of_booking} дней')
+
+        # не позволить перекрывать перерыв - сделать
+
+        if t_start < t_work_start:
+            raise forms.ValidationError(f'В это время ({t_start.hour}:{t_start.minute}) ресторан ещё не открылся')
+        if t_end > t_work_end:
+            raise forms.ValidationError(f'В это время ({t_end.hour}:{t_end.minute}) ресторан уже закрыт')
+
+        # # Всегда надо возвращать очищенные данные.
+        # return data
+            # если ошибки не случилось
+        return self.cleaned_data
+
+
     def clean(self):
 
-        # все параметры надо запихнуть в одну функцию и тащить их оттуда
-
-        # try:
-        #     period_of_booking = int(ContentParameters.objects.get(title='period_of_booking').body)
-        #     work_start = datetime.time.fromisoformat(ContentParameters.objects.get(title='work_start').body)
-        #     work_end = datetime.time.fromisoformat(ContentParameters.objects.get(title='work_end').body)
-        # except:
-        #     print(
-        #         f"{ContentParameters.objects.get(title='work_start')} || {ContentParameters.objects.get(title='work_end')} || {ContentParameters.objects.get(title='period_of_booking')}")
-        #     raise forms.ValidationError(
-        #         f'В базу данных не внесено время работы ресторана: work_start=<время открытия>, work_end=<время закрытия>, period_of_booking=<период предварительного бронирования>')
-        #         # work_start = datetime.time(8, 0, 0)
-        #         # work_end = datetime.time(23, 0, 0)
-        #         # period_of_booking = 14
-        # # получение времени подтверждения бронирования, получение времени, которое определяет границу регистрации
-        # try:
-        #     confirm_timedelta = timezone.timedelta(
-        #         minutes=ContentParameters.objects.get(title='confirm_timedelta'))
-        # except:
-        #     confirm_timedelta = timezone.timedelta(minutes=45)
-        #     # print(f"confirm_timedelta - установлено по умолчаеию (45 минут)")
-        # time_border = timezone.now() - confirm_timedelta
-
-
         parameters_dict = get_content_parameters(False)
+
+
 
         if parameters_dict:
             period_of_booking = parameters_dict.get('period_of_booking')
@@ -106,8 +120,6 @@ class BookingForm(BookingStyleFormMixin, forms.ModelForm):
 
             time_border = timezone.now() - timezone.timedelta(minutes=confirm_timedelta)
 
-
-            # time_border = parameters_dict.get('time_border')
         else:
             message = """Не удалось извлечь корректные значения работы ресторана из база данных:
                         таблица ContentParameters, данные 
@@ -118,30 +130,38 @@ class BookingForm(BookingStyleFormMixin, forms.ModelForm):
             raise forms.ValidationError(message)
 
 
-        cleaned_data_date_field = self.cleaned_data['date_field']
-        cleaned_data_time_start = self.cleaned_data['time_start']
-        cleaned_data_time_end = self.cleaned_data['time_end']
-        cleaned_data_places = self.cleaned_data['places']
+        self.validate_date_time(parameters_dict)
 
-        t_now = datetime.datetime.now()
+        # cleaned_data_date_field = self.cleaned_data['date_field']
+        # cleaned_data_time_start = self.cleaned_data['time_start']
+        # cleaned_data_time_end = self.cleaned_data['time_end']
+        # cleaned_data_places = self.cleaned_data['places']
 
-        t_start, t_end = time_segment(cleaned_data_date_field, cleaned_data_time_start, cleaned_data_time_end)
-        t_work_start, t_work_end = time_segment(cleaned_data_date_field, work_start, work_end)
+        # t_now = datetime.datetime.now()
+        #
+        # t_start, t_end = time_segment(cleaned_data_date_field, cleaned_data_time_start, cleaned_data_time_end)
+        # t_work_start, t_work_end = time_segment(cleaned_data_date_field, work_start, work_end)
 
 
         # попытаюсь запихнуть в валидатор
-        if t_now > t_start:
-            raise forms.ValidationError('Нельзя забронировать место на прошедшее время')
-        if t_end <= t_start:
-            raise forms.ValidationError(f'Время начала периода бронирования должно быть раньше чем время конца периода')
+        # if t_now > t_start:
+        #     raise forms.ValidationError('Нельзя забронировать место на прошедшее время')
+        #     # return False
+        # if t_end <= t_start:
+        #     raise forms.ValidationError(f'Время начала периода бронирования должно быть раньше чем время конца периода')
+        #
+        # if t_start > t_now + datetime.timedelta(days=period_of_booking):
+        #     raise forms.ValidationError(f'Бронировать места можно не ранее чем за {period_of_booking} дней')
+        #
+        # if t_start <= t_work_start < t_end:
+        #     raise forms.ValidationError(f'В указанный период времени ресторан закрывается на перерыв')
+        #
+        # if t_start < t_work_start:
+        #     raise forms.ValidationError(f'В это время ({cleaned_data_time_start}) ресторан ещё не открылся')
+        # if t_end > t_work_end:
+        #     raise forms.ValidationError(f'В это время ({cleaned_data_time_end}) ресторан уже закрыт')
 
-        if t_start > t_now + datetime.timedelta(days=period_of_booking):
-            raise forms.ValidationError(f'Бронировать места можно не ранее чем за {period_of_booking} дней')
 
-        if t_start < t_work_start:
-            raise forms.ValidationError(f'В это время ({cleaned_data_time_start}) ресторан ещё не открылся')
-        if t_end > t_work_end:
-            raise forms.ValidationError(f'В это время ({cleaned_data_time_end}) ресторан уже закрыт')
 
 
 
@@ -149,6 +169,9 @@ class BookingForm(BookingStyleFormMixin, forms.ModelForm):
         # а можно это сделать методом модели?
 
         table = self.cleaned_data['table']
+
+
+        t_now = datetime.datetime.now()
 
 
         # список pk бронирований, которые могут быть подтверждены
@@ -164,8 +187,7 @@ class BookingForm(BookingStyleFormMixin, forms.ModelForm):
 
         # а можно это сделать методом модели?
 
-
-
+        cleaned_data_places = self.cleaned_data['places']
 
         # можно ли это запихнуть в валидатор?
         if cleaned_data_places > table.places:
@@ -202,13 +224,6 @@ class QuestionsForm(StyleFormMixin, forms.ModelForm):
             "created_at",
         )
 
-        # question_text = models.TextField(verbose_name='Текст вопроса', help_text='Введите текст вопроса')
-        # sign = models.CharField(max_length=50, verbose_name='Подпись', help_text='Введите подпись под вопросом')
-        # moderated = models.BooleanField(default=False, verbose_name='Проверен',
-        #                                 help_text='Введите признак проверки')
-        # answer_text = models.TextField(verbose_name='Ответ на вопрос', help_text='Введите ответ на вопрос',
-        #                                **NULLABLE)
-        # created_at = models.DateTimeField(auto_now_add=True, verbose_name='дата создания',
 class LimitedQuestionsForm(StyleFormMixin, forms.ModelForm):
     class Meta:
         model = Questions

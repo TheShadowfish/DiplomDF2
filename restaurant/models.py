@@ -36,7 +36,7 @@ class Booking(models.Model):
 
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='пользователь', help_text='пользователь', related_name='user', **NULLABLE)
-    table = models.ForeignKey(Table, on_delete=models.CASCADE, verbose_name='столик', help_text='столик', related_name = 'table')
+    table = models.ForeignKey(Table, on_delete=models.CASCADE, verbose_name='столик', help_text='выберите столик', related_name = 'table')
     places = models.SmallIntegerField(verbose_name='Число бронируемых мест',
                                       help_text="Введите число бронируемых мест", default=2)
 
