@@ -31,7 +31,10 @@ def get_content_link_from_postgre(title):
     try:
         return Contentlink.objects.get(title=title)
     except:
-        return f"Для создания ссылки создайте запись '{title}' в таблице ContentLink (необходимы полномочия администратора)"
+        text = f"Для создания ссылки создайте запись '{title}' в таблице ContentLink (необходимы полномочия администратора)"
+
+        return Contentlink.objects.create(title='not_found', text='ссылка не найдена', link='#', description=text)
+
 
 def time_segment(date: datetime.date, start: datetime.time, end: datetime.time) -> tuple[datetime, datetime]:
     # делает из даты, начального и конечного времени 2 значения datetime

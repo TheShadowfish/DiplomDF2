@@ -29,8 +29,12 @@ def get_content_link_from_postgre(title):
 from datetime import datetime, time, date
 from unittest import TestCase
 
-from restaurant.models import ContentParameters
-from restaurant.utils.utils import time_segment, get_content_parameters, get_content_text_from_postgre
+from restaurant.models import ContentParameters, ContentText, ContentImage, Contentlink
+from restaurant.utils.utils import time_segment, get_content_parameters, get_content_text_from_postgre, \
+    get_content_image_from_postgre, get_content_link_from_postgre
+
+
+
 
 
 class UtilsTest(TestCase):
@@ -77,7 +81,6 @@ class UtilsTest(TestCase):
                         'confirm_timedelta': 50}
 
         dictionary_3 = get_content_parameters(ignored_error=False)
-        print(dictionary_3)
 
 
         self.assertEquals(dictionary_1, dict_1_eq)
@@ -89,33 +92,36 @@ class UtilsTest(TestCase):
 
     def test_get_content_text_from_postgre(self):
         text_error = get_content_text_from_postgre('test')
-        text_e = f"Для изменения текста создайте запись 'test' в таблице ContentText (необходимы полномочия администратора)"
+        text_e = "Для изменения текста создайте запись 'test' в таблице ContentText (необходимы полномочия администратора)"
 
-        ContentParameters.objects.create(title='test', body='test')
+        ContentText.objects.create(title='test', body='test')
         text_success=get_content_text_from_postgre('test')
 
 
         self.assertEquals(text_error, text_e)
         self.assertEquals(text_success, 'test')
 
-"""
-def get_content_text_from_postgre(title):
-    try:
-        return ContentText.objects.get(title=title).body
-    except:
-        return f"Для изменения текста создайте запись '{title}' в таблице ContentText (необходимы полномочия администратора)"
+    def test_get_content_image_from_postgre(self):
+        text_error = get_content_image_from_postgre('test')
+        text_e = "Для изменения изображения создайте запись 'test' в таблице ContentImage и загрузите изображение (необходимы полномочия администратора)"
 
-def get_content_image_from_postgre(title):
-    try:
-        return ContentImage.objects.get(title=title)
-    except:
-        description = f"Для изменения изображения создайте запись '{title}' в таблице ContentImage и загрузите изображение (необходимы полномочия администратора)"
-        return ContentImage.objects.create(title='not_found', description=description, image = None)
+        test_image=ContentImage.objects.create(title='test', description='test', image = None)
+        text_success=get_content_image_from_postgre('test')
 
-def get_content_link_from_postgre(title):
-    try:
-        return Contentlink.objects.get(title=title)
-    except:
-        return f"Для создания ссылки создайте запись '{title}' в таблице ContentLink (необходимы полномочия администратора)"
-"""
+        self.assertEquals(text_error.description, text_e)
+        self.assertEquals(text_success.title, test_image.title)
+
+
+    def test_get_content_link_from_postgre(self):
+        text_error = get_content_link_from_postgre('test')
+        text_e = "Для создания ссылки создайте запись 'test' в таблице ContentLink (необходимы полномочия администратора)"
+
+        test_link = Contentlink.objects.create(title='test', text='test', link = '#', description='test')
+        text_success=get_content_link_from_postgre('test')
+
+
+        self.assertEquals(text_error.description, text_e)
+        self.assertEquals(text_success.text, test_link.text)
+
+
 
