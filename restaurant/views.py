@@ -206,7 +206,7 @@ def confirm_booking(request, email):
         confirm_timedelta = ContentParameters.objects.get(title='confirm_timedelta')
     except Exception as e:
         confirm_timedelta = 45
-        print(f"confirm_timedelta - установлено по умолчаеию (45 минут) {e}")
+        print(f"confirm_timedelta - установлено по умолчанию (45 минут) {e}")
 
     context = {
         'email': email, 'confirm_timedelta': confirm_timedelta

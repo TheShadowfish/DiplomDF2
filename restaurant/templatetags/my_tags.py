@@ -52,7 +52,7 @@ def initial_letter_filter(text, autoescape=True):
 
 # Создание тега
 @register.simple_tag
-def generate_fake_mail(length: int = '10'):
+def generate_fake_mail(length: int = '10') -> object:
     # length = int(s_length)
     letters = string.ascii_letters + string.digits  # + string.punctuation
     mail = ''.join(random.choice(letters) for _ in range(length))
