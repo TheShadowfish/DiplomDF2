@@ -74,9 +74,7 @@ from restaurant.templatetags.my_tags import generate_fake_mail
 #     #     self.assertTrue( len(resp.context['author_list']) == 3)
 
 
-class HomeAboutListViewTest(TestCase):
-    #     # path('', HomePageView.as_view(), name='main'),
-    #     # path('about_us/', AboutUsPageView.as_view(), name='about_us'),
+class HomeListViewTest(TestCase):
     fixtures = ['test_data.json']
 
     # @classmethod
@@ -99,4 +97,31 @@ class HomeAboutListViewTest(TestCase):
         self.assertEqual(resp.status_code, 200)
 
         self.assertTemplateUsed(resp, 'restaurant/home.html')
+
+
+class AboutListViewTest(TestCase):
+
+    #     # path('about_us/', AboutUsPageView.as_view(), name='about_us'),
+    fixtures = ['test_data.json']
+
+    # @classmethod
+    # def setUpTestData(cls):
+    #     # #Create 13 authors for pagination tests
+    #     # number_of_authors = 13
+    #     # for author_num in range(number_of_authors):
+    #     #     Author.objects.create(first_name='Christian %s' % author_num, last_name = 'Surname %s' % author_num,)
+
+    def test_home_url_exists_at_desired_location(self):
+        resp = self.client.get('/about_us/')
+        self.assertEqual(resp.status_code, 200)
+
+    def test_home_url_accessible_by_name(self):
+        resp = self.client.get(reverse('restaurant:about_us'))
+        self.assertEqual(resp.status_code, 200)
+
+    def test_home_uses_correct_template(self):
+        resp = self.client.get(reverse('restaurant:about_us'))
+        self.assertEqual(resp.status_code, 200)
+
+        self.assertTemplateUsed(resp, 'restaurant/about_us.html')
 
