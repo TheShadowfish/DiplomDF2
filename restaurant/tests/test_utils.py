@@ -1,31 +1,3 @@
-"""
-
-from datetime import datetime, timedelta
-
-from django.utils import timezone
-
-from restaurant.models import ContentText, ContentImage, Contentlink, ContentParameters
-
-def get_content_text_from_postgre(title):
-    try:
-        return ContentText.objects.get(title=title).body
-    except:
-        return f"Для изменения текста создайте запись '{title}' в таблице ContentText (необходимы полномочия администратора)"
-
-def get_content_image_from_postgre(title):
-    try:
-        return ContentImage.objects.get(title=title)
-    except:
-        description = f"Для изменения изображения создайте запись '{title}' в таблице ContentImage и загрузите изображение (необходимы полномочия администратора)"
-        return ContentImage.objects.create(title='not_found', description=description, image = None)
-
-def get_content_link_from_postgre(title):
-    try:
-        return Contentlink.objects.get(title=title)
-    except:
-        return f"Для создания ссылки создайте запись '{title}' в таблице ContentLink (необходимы полномочия администратора)"
-
-"""
 from datetime import datetime, time, date
 from unittest import TestCase
 

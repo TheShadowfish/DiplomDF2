@@ -30,35 +30,12 @@ def time_to_local(value, arg):
 @register.filter
 def has_been(value, arg):
     now = datetime.datetime.now()
-
-
     booking_datetime = datetime.datetime(year=value.year, month=value.month,
                                       day=value.day, hour=arg.hour,
                                       minute=arg.minute)
-
     if booking_datetime > now:
         return False
     return True
-
-
-
-
-
-@register.simple_tag
-def time_until_11_nov():
-    now = datetime.datetime.today()
-    present_year = now.year
-
-    if now > datetime.datetime(present_year, 11, 11):
-        present_year += 1
-
-    eleven_eleven = datetime.datetime(present_year, 11, 11)
-    d = eleven_eleven - now  # str(d)  '83 days, 2:43:10.517807'
-    mm, ss = divmod(d.seconds, 60)
-    hh, mm = divmod(mm, 60)
-
-    return 'До распродажи 11.11 осталось: {} дней'.format(d.days)
-    # return 'До распродажи 11.11 осталось: {} дней {} часа {} мин {} сек.'.format(d.days, hh, mm, ss)
 
 
 # Создание фильтра

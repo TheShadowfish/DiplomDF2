@@ -1,127 +1,44 @@
-
-"""
-import datetime
-
-import bleach
-import markdown
-from django import template
-
-import random
-import string
-# import bleach
-# import markdown
+from datetime import datetime, timedelta, time
 
 
-from django.utils.html import conditional_escape
-from django.utils.safestring import mark_safe
+from unittest import TestCase
 
-register = template.Library()
-
-# Создание тега
-@register.simple_tag
-def current_time(format_string):
-    return datetime.datetime.now().strftime(format_string)
+from restaurant.templatetags.my_tags import current_time, time_to_local, has_been, initial_letter_filter, \
+    generate_fake_mail, last_five_contacts, media_filter, user_media_filter
 
 
-@register.filter
-def time_to_local(value, arg):
-    # меняет время на локальное получив разницу часовых поясов в часах
-    created_at_local = value + datetime.timedelta(hours=arg)
-    return created_at_local
+class UtilsTest(TestCase):
+    def test_current_time(self):
+        string_time = datetime.now().strftime("%d/%m/%Y, %H:%M:%S")
+        self.assertEqual(current_time("%d/%m/%Y, %H:%M:%S"), string_time)
 
-@register.filter
-def has_been(value, arg):
-    now = datetime.datetime.now()
+    def test_time_to_local(self):
+        dt = datetime.now()
+        self.assertEqual(time_to_local(dt,3), dt + timedelta(hours=3))
 
+    def test_has_been(self):
+        dt_past = (datetime.now() - timedelta(days=3))
+        dt_next = (datetime.now() + timedelta(days=3))
 
-    booking_datetime = datetime.datetime(year=value.year, month=value.month,
-                                      day=value.day, hour=arg.hour,
-                                      minute=arg.minute)
+        simple_time = time(9,0,0)
 
-    if booking_datetime > now:
-        return False
-    return True
+        self.assertTrue(has_been(dt_past, simple_time))
+        self.assertFalse(has_been(dt_next, simple_time))
 
+    def test_initial_letter_filter(self):
+        self.assertEqual(initial_letter_filter('test', True), "<strong>t</strong>est")
 
-
-
-
-@register.simple_tag
-def time_until_11_nov():
-    now = datetime.datetime.today()
-    present_year = now.year
-
-    if now > datetime.datetime(present_year, 11, 11):
-        present_year += 1
-
-    eleven_eleven = datetime.datetime(present_year, 11, 11)
-    d = eleven_eleven - now  # str(d)  '83 days, 2:43:10.517807'
-    mm, ss = divmod(d.seconds, 60)
-    hh, mm = divmod(mm, 60)
-
-    return 'До распродажи 11.11 осталось: {} дней'.format(d.days)
-    # return 'До распродажи 11.11 осталось: {} дней {} часа {} мин {} сек.'.format(d.days, hh, mm, ss)
+    def test_generate_fake_mail(self):
+        self.assertTrue('@' in generate_fake_mail(10))
 
 
-# Создание фильтра
-@register.filter(needs_autoescape=True)
-def initial_letter_filter(text, autoescape=True):
-    first, other = text[0], text[1:]
-    if autoescape:
-        esc = conditional_escape
-    else:
-        esc = lambda x: x
-    result = "<strong>%s</strong>%s" % (esc(first), esc(other))
-    return mark_safe(result)
+    def test_last_five_contacts(self):
+        self.assertEqual(last_five_contacts([1,2,3,4,5,6,7]), [3,4,5,6,7])
 
+    def test_media_filter(self):
+        self.assertEqual(media_filter(None), '/static/image/no_image.png')
+        self.assertEqual(media_filter('test.png'), '/media/test.png')
 
-# Создание тега
-@register.simple_tag
-def generate_fake_mail(length: int = '10'):
-    # length = int(s_length)
-    letters = string.ascii_letters + string.digits  # + string.punctuation
-    mail = ''.join(random.choice(letters) for _ in range(length))
-
-    letters2 = string.ascii_lowercase
-    mail2 = ''.join(random.choice(letters2) for _ in range(length // 2))
-    return f"{mail}@{mail2}.com"
-
-
-# Создание фильтра
-@register.filter
-def last_five_contacts(query_set):
-    number = len(query_set)
-    if number <= 5:
-        return query_set
-    else:
-        return query_set[number - 5: number + 1]
-
-
-@register.filter()
-def media_filter(path):
-    if path:
-        return f'/media/{path}'
-
-    return '/static/image/no_image.png'
-
-
-@register.filter()
-def user_media_filter(path):
-    if path:
-        return f'/media/{path}'
-
-    return '/static/image/no_avatar.png'
-
-def markdown_comment(value):
-    return bleach.clean(
-        markdown.markdown(value, extensions=['nl2br']),
-        strip=True,
-        tags=['strong', 'b', 'li', 'u', 'blockquote', 'br'])
-
-
-@register.filter
-def comment_markdown(value):
-    return mark_safe(markdown_comment(value))
-
-
-"""
+    def test_user_media_filter(self):
+        self.assertEqual(user_media_filter(None), '/static/image/no_avatar.png')
+        self.assertEqual(user_media_filter('test.png'), '/media/test.png')
