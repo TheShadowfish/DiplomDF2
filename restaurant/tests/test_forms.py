@@ -10,7 +10,7 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 
 from restaurant.forms import BookingForm, QuestionsForm, LimitedQuestionsForm
-from restaurant.models import Table, Booking, BookingToken
+from restaurant.models import Table, Booking, BookingToken, ContentParameters
 from users.models import User
 
 
@@ -247,19 +247,20 @@ class TestBookingForm(TestCase):
         form_incorect_3.cleaned_data = incorrect_data_3
         text_err3 = 'В указанное время выбранный столик еще не освободился'
 
-        self.assertTrue(form_correct.clean_table(time_border))
+        self.assertTrue(form_correct.clean_my_table(time_border))
 
         with self.assertRaises(ValidationError) as e_1:
-            form_incorect.clean_table(time_border)
+            form_incorect.clean_my_table(time_border)
         self.assertEqual(e_1.exception.message, text_err1)
 
         with self.assertRaises(ValidationError) as e_2:
-            form_incorect_2.clean_table(time_border)
+            form_incorect_2.clean_my_table(time_border)
         self.assertEqual(e_2.exception.message, text_err2)
 
         with self.assertRaises(ValidationError) as e_3:
-            form_incorect_3.clean_table(time_border)
+            form_incorect_3.clean_my_table(time_border)
         self.assertEqual(e_3.exception.message, text_err3)
+
 
     def test_clean_table_wait_confirm_table(self):
         user = User.objects.create_user(email='test2@test.ru', password='test')
@@ -308,20 +309,20 @@ class TestBookingForm(TestCase):
         form_incorect_3.cleaned_data = incorrect_data_3
         text_err3 = 'В указанное время выбранный столик еще не освободился'
 
-        self.assertTrue(form_correct.clean_table(time_border))
+        self.assertTrue(form_correct.clean_my_table(time_border))
 
         with self.assertRaises(ValidationError) as e_1:
-            form_incorect.clean_table(time_border)
+            form_incorect.clean_my_table(time_border)
         self.assertEqual(e_1.exception.message, text_err1)
 
         with self.assertRaises(ValidationError) as e_2:
-            form_incorect_2.clean_table(time_border)
+            form_incorect_2.clean_my_table(time_border)
         self.assertEqual(e_2.exception.message, text_err2)
 
         with self.assertRaises(ValidationError) as e_3:
-            form_incorect_3.clean_table(time_border)
+            form_incorect_3.clean_my_table(time_border)
         self.assertEqual(e_3.exception.message, text_err3)
-
+    #
     def test_clean_table_deactivated_table(self):
         user = User.objects.create_user(email='test3@test.ru', password='test')
 
@@ -367,10 +368,58 @@ class TestBookingForm(TestCase):
         form_incorect_3.cleaned_data = incorrect_data_3
         text_err3 = 'В указанное время выбранный столик еще не освободился'
 
-        self.assertTrue(form_correct.clean_table(time_border))
-        self.assertTrue(form_incorect.clean_table(time_border))
-        self.assertTrue(form_incorect_2.clean_table(time_border))
-        self.assertTrue(form_incorect_3.clean_table(time_border))
+        self.assertTrue(form_correct.clean_my_table(time_border))
+        self.assertTrue(form_incorect.clean_my_table(time_border))
+        self.assertTrue(form_incorect_2.clean_my_table(time_border))
+        self.assertTrue(form_incorect_3.clean_my_table(time_border))
+
+    #
+    def test_clean_total(self):
+        user = User.objects.create_user(email='test4@test.ru', password='test')
+        table = Table.objects.create(number=5, places=2, flour=1, description='test')
+
+        date_next = datetime.date.today() + datetime.timedelta(days=2)
+        time_next_1h = datetime.time(9, 0, 0)
+        time_next_2h = datetime.time(12, 0, 0)
+
+        booking = Booking.objects.create(user=user, table=table, places=4, description='test', notification=0,
+                                                  date_field=date_next, time_start=time_next_1h, time_end=time_next_2h,
+                                                  active=True)
+        booking.save()
+
+        time_border = timezone.now() - timezone.timedelta(minutes=1800)
+
+        correct_data = {'date_field': date_next, 'time_start': datetime.time(14, 50, 0),
+                        'time_end': datetime.time(16, 50, 0), 'table': table}
+
+        # content = ContentParameters.objects.all().delete()
+        # # content.save()
+
+
+
+        form_correct = BookingForm()
+        form_correct.cleaned_data = correct_data
+
+        text_err1 = ""
+
+        content = ContentParameters.objects.all().delete()
+        # нет параметров работы ресторана в БД, выбросит исключение
+        with self.assertRaises(ValidationError) as e_1:
+            content = ContentParameters.objects.all().delete()
+            form_correct.clean()
+        self.assertTrue(e_1.exception.message)
+
+        # # а теперь не выбросит
+        # ContentParameters.objects.create(title='period_of_booking', body=10)
+        # ContentParameters.objects.create(title='work_start', body='12:00')
+        # ContentParameters.objects.create(title='work_end', body='16:00')
+        # ContentParameters.objects.create(title='confirm_timedelta', body=50)
+        # self.assertTrue(form_correct.clean())
+
+
+
+
+
 
 
 

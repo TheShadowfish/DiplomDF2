@@ -51,9 +51,13 @@ def get_content_parameters(ignored_error):
     # выдернуть из базы данных параметры работы, бронирования и т.д.
     try:
         period_of_booking = int(ContentParameters.objects.get(title='period_of_booking').body)
+        # print(f"period_of_booking {period_of_booking}")
         work_start = time.fromisoformat(ContentParameters.objects.get(title='work_start').body)
+        # print(f"work_start  {work_start}")
         work_end = time.fromisoformat(ContentParameters.objects.get(title='work_end').body)
+        # print(f"work_end  {work_end}")
         confirm_timedelta = int(str(ContentParameters.objects.get(title='confirm_timedelta')))
+        # print(f"confirm_timedelta {confirm_timedelta}")
         # time_border = timezone.now() - confirm_timedelta
 
 

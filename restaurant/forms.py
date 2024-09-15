@@ -80,6 +80,15 @@ class BookingForm(BookingStyleFormMixin, forms.ModelForm):
 
         period_of_booking = parametr_dict['period_of_booking']
 
+        # period_of_booking
+        # 10
+        # work_start
+        # 12: 00:00
+        # work_end
+        # 16: 00:00
+        # confirm_timedelta
+        # 50
+
         t_now = datetime.datetime.now()
         t_start, t_end = time_segment(data, time_start, time_end)
         t_work_start, t_work_end = time_segment(data, parametr_dict['work_start'], parametr_dict['work_end'])
@@ -104,19 +113,24 @@ class BookingForm(BookingStyleFormMixin, forms.ModelForm):
 
     def clean_place(self):
         # проверка допустимого количества мест за бронируемым столиком
-        data = self.cleaned_data['places']
+        data = self.cleaned_data
+        # print(f"clean_place {data}")
+
+        place = self.cleaned_data['places']
         table = self.cleaned_data['table']
-        if data > table.places:
+        if place > table.places:
             raise forms.ValidationError(
                 f'За данным столиком всего {table.places} мест. Выберете столик с большим количеством мест или позже забронируйте соседний столик')
-        elif data < 1:
+        elif place < 1:
             raise forms.ValidationError(
                 f'Должно быть занято хотя бы одно место за столиком')
         return data
 
-    def clean_table(self, time_border):
+    def clean_my_table(self, time_border):
         # проверка того, что столик свободен
         data = self.cleaned_data
+        # print(f"clean_table {data}")
+
         t_start, t_end = time_segment(data['date_field'], data['time_start'], data['time_end'])
 
         table = data['table']
@@ -158,10 +172,22 @@ class BookingForm(BookingStyleFormMixin, forms.ModelForm):
     def clean(self):
 
         parameters_dict = get_content_parameters(False)
+        # print(parameters_dict)
 
         if parameters_dict:
+            # period_of_booking
+            # 10
+            # work_start
+            # 12: 00:00
+            # work_end
+            # 16: 00:00
+            # confirm_timedelta
+            # 50
+
             confirm_timedelta = parameters_dict.get('confirm_timedelta')
             time_border = timezone.now() - timezone.timedelta(minutes=confirm_timedelta)
+
+            # print(f"self.cleaned_data 1 {self.cleaned_data}")
 
             # проверка допустимости бронирования с учетом времени работы и срока предварительного бронирования
             self.validate_date_time(parameters_dict)
@@ -170,7 +196,9 @@ class BookingForm(BookingStyleFormMixin, forms.ModelForm):
             self.clean_place()
 
             # проверка перекрытия времени бронирования
-            self.clean_table(time_border)
+            self.clean_my_table(time_border)
+
+            # print(f"self.cleaned_data 2 {self.cleaned_data}")
 
 
 
@@ -182,36 +210,6 @@ class BookingForm(BookingStyleFormMixin, forms.ModelForm):
                         period_of_booking=<int> - период предварительного бронирования,
                         confirm_timedelta=<int> - время на подтверждение бронирования (в минутах)"""
             raise forms.ValidationError(message)
-
-
-        # t_start, t_end = time_segment(self.cleaned_data['date_field'], self.cleaned_data['time_start'], self.cleaned_data['time_end'])
-        # table = self.cleaned_data['table']
-        # t_now = datetime.datetime.now()
-        #
-        # # список pk бронирований, которые могут быть подтверждены
-        # booking_tokens = [token.booking.pk for token in  BookingToken.objects.filter(created_at__gt=time_border)]
-        #
-        # # получение списка актуальных бронирований
-        # # bookings = Booking.objects.filter(table=table).filter(Q(active=True) | Q(pk__in=booking_tokens)).order_by("date_field", "time_start")
-        # # получение уменьшенного списка бронирований
-        # # date_now = datetime.now()
-        # bookings = (Booking.objects.filter(table=table).filter(Q(active=True) | Q(pk__in=booking_tokens)).
-        #        filter(date_field__year__gte=t_now.year, date_field__month__gte=t_now.month,
-        #               date_field__day__gte=(t_now - datetime.timedelta(days=1)).day).order_by("date_field", "time_start"))
-        #
-        # for b in bookings:
-        #     b_start, b_end = time_segment(b.date_field, b.time_start, b.time_end)
-        #
-        #     # если это обновление то будет объект, иначе None
-        #     booking_id = self.instance
-        #
-        #     if b_start <= t_start < b_end and booking_id.pk != b.pk:
-        #         raise forms.ValidationError(f'В указанное время выбранный столик занят {b_start} <= {t_start} < {b_end} ')
-        #     if b_start < t_end <= b_end and booking_id.pk != b.pk:
-        #         raise forms.ValidationError(f'В указанное время выбранный столик еще не освободился')
-        #
-        #     if t_start <= b_start < t_end and booking_id.pk != b.pk:
-        #         raise forms.ValidationError(f'В указанный период времени столик забронирован')
 
         return self.cleaned_data
 
