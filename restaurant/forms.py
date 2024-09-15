@@ -71,11 +71,12 @@ class BookingForm(BookingStyleFormMixin, forms.ModelForm):
         exclude = ('user','active','created_at')
 
     def validate_date_time(self, parametr_dict):
-        # отдеьная проверка допустимости параметров времени бронирования
+        # проверка допустимости бронирования с учетом времени работы и срока предварительного бронирования
+        cleaned_data_date_time = self.cleaned_data
 
-        data = self.cleaned_data['date_field']
-        time_start = self.cleaned_data['time_start']
-        time_end = self.cleaned_data['time_end']
+        data = cleaned_data_date_time['date_field']
+        time_start = cleaned_data_date_time['time_start']
+        time_end = cleaned_data_date_time['time_end']
 
         period_of_booking = parametr_dict['period_of_booking']
 
@@ -93,32 +94,85 @@ class BookingForm(BookingStyleFormMixin, forms.ModelForm):
         if t_start > t_now + datetime.timedelta(days=period_of_booking):
             raise forms.ValidationError(f'Бронировать места можно не ранее чем за {period_of_booking} дней')
 
-        # не позволить перекрывать перерыв - сделать
 
         if t_start < t_work_start:
             raise forms.ValidationError(f'В это время ({t_start.hour}:{t_start.minute}) ресторан ещё не открылся')
         if t_end > t_work_end:
             raise forms.ValidationError(f'В это время ({t_end.hour}:{t_end.minute}) ресторан уже закрыт')
 
-        # # Всегда надо возвращать очищенные данные.
-        # return data
-            # если ошибки не случилось
-        return self.cleaned_data
+        return cleaned_data_date_time
+
+    def clean_place(self):
+        # проверка допустимого количества мест за бронируемым столиком
+        data = self.cleaned_data['places']
+        table = self.cleaned_data['table']
+        if data > table.places:
+            raise forms.ValidationError(
+                f'За данным столиком всего {table.places} мест. Выберете столик с большим количеством мест или позже забронируйте соседний столик')
+        elif data < 1:
+            raise forms.ValidationError(
+                f'Должно быть занято хотя бы одно место за столиком')
+        return data
+
+    def clean_table(self, time_border):
+        # проверка того, что столик свободен
+        data = self.cleaned_data
+        t_start, t_end = time_segment(data['date_field'], data['time_start'], data['time_end'])
+
+        table = data['table']
+        t_now = datetime.datetime.now()
+
+        # список pk бронирований, которые могут быть подтверждены
+        booking_tokens = [token.booking.pk for token in BookingToken.objects.filter(created_at__gt=time_border)]
+
+        # получение списка актуальных бронирований
+        # bookings = Booking.objects.filter(table=table).filter(Q(active=True) | Q(pk__in=booking_tokens)).order_by("date_field", "time_start")
+        # получение уменьшенного списка бронирований
+        bookings = (Booking.objects.filter(table=table).filter(Q(active=True) | Q(pk__in=booking_tokens)).
+                    filter(date_field__year__gte=t_now.year, date_field__month__gte=t_now.month,
+                           date_field__day__gte=(t_now - datetime.timedelta(days=1)).day).order_by("date_field",
+                                                                                                   "time_start"))
+
+        # проверка перекрытия времени бронирований
+        for b in bookings:
+            b_start, b_end = time_segment(b.date_field, b.time_start, b.time_end)
+
+            # если это обновление, то будет оюновляемый объект, иначе None
+            booking_id = self.instance
+
+            if b_start <= t_start < b_end and booking_id.pk != b.pk:
+                raise forms.ValidationError(
+                    f'В указанное время выбранный столик занят')
+            if b_start < t_end <= b_end and booking_id.pk != b.pk:
+                raise forms.ValidationError(f'В указанное время выбранный столик еще не освободился')
+
+            if t_start <= b_start < t_end and booking_id.pk != b.pk:
+                raise forms.ValidationError(f'В указанный период времени столик забронирован')
+
+
+        return data
+
+
 
 
     def clean(self):
 
         parameters_dict = get_content_parameters(False)
 
-
-
         if parameters_dict:
-            period_of_booking = parameters_dict.get('period_of_booking')
-            work_start = parameters_dict.get('work_start')
-            work_end = parameters_dict.get('work_end')
             confirm_timedelta = parameters_dict.get('confirm_timedelta')
-
             time_border = timezone.now() - timezone.timedelta(minutes=confirm_timedelta)
+
+            # проверка допустимости бронирования с учетом времени работы и срока предварительного бронирования
+            self.validate_date_time(parameters_dict)
+
+            # проверка допустимости бронирования по количеству мест
+            self.clean_place()
+
+            # проверка перекрытия времени бронирования
+            self.clean_table(time_border)
+
+
 
         else:
             message = """Не удалось извлечь корректные значения работы ресторана из база данных:
@@ -130,88 +184,34 @@ class BookingForm(BookingStyleFormMixin, forms.ModelForm):
             raise forms.ValidationError(message)
 
 
-        self.validate_date_time(parameters_dict)
-
-        # cleaned_data_date_field = self.cleaned_data['date_field']
-        # cleaned_data_time_start = self.cleaned_data['time_start']
-        # cleaned_data_time_end = self.cleaned_data['time_end']
-        # cleaned_data_places = self.cleaned_data['places']
-
+        # t_start, t_end = time_segment(self.cleaned_data['date_field'], self.cleaned_data['time_start'], self.cleaned_data['time_end'])
+        # table = self.cleaned_data['table']
         # t_now = datetime.datetime.now()
         #
-        # t_start, t_end = time_segment(cleaned_data_date_field, cleaned_data_time_start, cleaned_data_time_end)
-        # t_work_start, t_work_end = time_segment(cleaned_data_date_field, work_start, work_end)
-
-
-        # попытаюсь запихнуть в валидатор
-        # if t_now > t_start:
-        #     raise forms.ValidationError('Нельзя забронировать место на прошедшее время')
-        #     # return False
-        # if t_end <= t_start:
-        #     raise forms.ValidationError(f'Время начала периода бронирования должно быть раньше чем время конца периода')
+        # # список pk бронирований, которые могут быть подтверждены
+        # booking_tokens = [token.booking.pk for token in  BookingToken.objects.filter(created_at__gt=time_border)]
         #
-        # if t_start > t_now + datetime.timedelta(days=period_of_booking):
-        #     raise forms.ValidationError(f'Бронировать места можно не ранее чем за {period_of_booking} дней')
+        # # получение списка актуальных бронирований
+        # # bookings = Booking.objects.filter(table=table).filter(Q(active=True) | Q(pk__in=booking_tokens)).order_by("date_field", "time_start")
+        # # получение уменьшенного списка бронирований
+        # # date_now = datetime.now()
+        # bookings = (Booking.objects.filter(table=table).filter(Q(active=True) | Q(pk__in=booking_tokens)).
+        #        filter(date_field__year__gte=t_now.year, date_field__month__gte=t_now.month,
+        #               date_field__day__gte=(t_now - datetime.timedelta(days=1)).day).order_by("date_field", "time_start"))
         #
-        # if t_start <= t_work_start < t_end:
-        #     raise forms.ValidationError(f'В указанный период времени ресторан закрывается на перерыв')
+        # for b in bookings:
+        #     b_start, b_end = time_segment(b.date_field, b.time_start, b.time_end)
         #
-        # if t_start < t_work_start:
-        #     raise forms.ValidationError(f'В это время ({cleaned_data_time_start}) ресторан ещё не открылся')
-        # if t_end > t_work_end:
-        #     raise forms.ValidationError(f'В это время ({cleaned_data_time_end}) ресторан уже закрыт')
-
-
-
-
-
-
-        # а можно это сделать методом модели?
-
-        table = self.cleaned_data['table']
-
-
-        t_now = datetime.datetime.now()
-
-
-        # список pk бронирований, которые могут быть подтверждены
-        booking_tokens = [token.booking.pk for token in  BookingToken.objects.filter(created_at__gt=time_border)]
-
-        # получение списка актуальных бронирований
-        # bookings = Booking.objects.filter(table=table).filter(Q(active=True) | Q(pk__in=booking_tokens)).order_by("date_field", "time_start")
-        # получение уменьшенного списка бронирований
-        # date_now = datetime.now()
-        bookings = (Booking.objects.filter(table=table).filter(Q(active=True) | Q(pk__in=booking_tokens)).
-               filter(date_field__year__gte=t_now.year, date_field__month__gte=t_now.month,
-                      date_field__day__gte=(t_now - datetime.timedelta(days=1)).day).order_by("date_field", "time_start"))
-
-        # а можно это сделать методом модели?
-
-        cleaned_data_places = self.cleaned_data['places']
-
-        # можно ли это запихнуть в валидатор?
-        if cleaned_data_places > table.places:
-            raise forms.ValidationError(f'За данным столиком всего {table.places} мест. Выберете столик с большим количеством мест или позже забронируйте соседний столик')
-        elif cleaned_data_places < 1:
-            raise forms.ValidationError(
-                f'Должно быть занято хотя бы одно место за столиком')
-
-
-
-        for b in bookings:
-            b_start, b_end = time_segment(b.date_field, b.time_start, b.time_end)
-
-            # если это обновление то будет объект, иначе None
-            booking_id = self.instance
-
-            if b_start <= t_start < b_end and booking_id.pk != b.pk:
-                raise forms.ValidationError(f'В указанное время выбранный столик занят {b_start} <= {t_start} < {b_end} ')
-            if b_start < t_end <= b_end and booking_id.pk != b.pk:
-                raise forms.ValidationError(f'В указанное время выбранный столик еще не освободился')
-
-            if t_start <= b_start < t_end and booking_id.pk != b.pk:
-                raise forms.ValidationError(f'В указанный период времени столик забронирован')
-
+        #     # если это обновление то будет объект, иначе None
+        #     booking_id = self.instance
+        #
+        #     if b_start <= t_start < b_end and booking_id.pk != b.pk:
+        #         raise forms.ValidationError(f'В указанное время выбранный столик занят {b_start} <= {t_start} < {b_end} ')
+        #     if b_start < t_end <= b_end and booking_id.pk != b.pk:
+        #         raise forms.ValidationError(f'В указанное время выбранный столик еще не освободился')
+        #
+        #     if t_start <= b_start < t_end and booking_id.pk != b.pk:
+        #         raise forms.ValidationError(f'В указанный период времени столик забронирован')
 
         return self.cleaned_data
 
