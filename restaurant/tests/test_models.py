@@ -1,29 +1,87 @@
 from django.test import TestCase
 
 from restaurant.models import Questions, Table, Booking, BookingToken, Contentlink, ContentParameters, ContentImage, \
-    ContentText
+    ContentText, Review
+from users.models import User
 
 """
-class ContentText(models.Model):
-    title = models.CharField(max_length=150, verbose_name='контент-название', help_text="введите название текстового блока", unique=True)
-    body = models.TextField(verbose_name='тело текстового блока', help_text='введите тело текстового блока')
+  
 
-    class Meta:
-        verbose_name = 'контент'
-        verbose_name_plural = 'контент'
-
-
-    def __str__(self):
-        return f"{self.title}: {self.body}"
 
 
 """
+class RevewTest(TestCase):
+    fixtures = ['test_data.json']
+
+    @classmethod
+    def setUpTestData(cls):
+        user = User.objects.first()
+        #Set up non-modified objects used by all test methods
+        Review.objects.create(review_text='test', author=user,  sign=user.email, grade=5, moderated=True, answer_text='test')
+
+    def test_review_review_text_label(self):
+        review = Review.objects.first()
+        field_label = review._meta.get_field('author').verbose_name
+        self.assertEquals(field_label, 'пользователь')
+
+    def test_review_review_text_label(self):
+        review = Review.objects.first()
+        field_label = review._meta.get_field('review_text').verbose_name
+        self.assertEquals(field_label, 'Текст отзыва')
+
+    def test_review_sign_label(self):
+        review = Review.objects.first()
+        field_label = review._meta.get_field('sign').verbose_name
+        self.assertEquals(field_label, 'Подпись')
+
+    def test_review_sign_max_length(self):
+        review = Review.objects.first()
+        max_length = review._meta.get_field('sign').max_length
+        self.assertEquals(max_length, 50)
+
+    def test_review_grade_label(self):
+        review = Review.objects.first()
+        field_label = review._meta.get_field('grade').verbose_name
+        self.assertEquals(field_label, 'Оценка')
+
+    def test_review_moderated_label(self):
+        review = Review.objects.first()
+        field_label = review._meta.get_field('moderated').verbose_name
+        self.assertEquals(field_label, 'Проверен')
+
+    def test_review_answer_text_label(self):
+        review = Review.objects.first()
+        field_label = review._meta.get_field('answer_text').verbose_name
+        self.assertEquals(field_label, 'Ответ на отзыв')
+
+    def test_review_created_at_label(self):
+        review = Review.objects.first()
+        field_label = review._meta.get_field('created_at').verbose_name
+        self.assertEquals(field_label, 'дата создания')
+
+    def test_review_updated_at_label(self):
+        review = Review.objects.first()
+        field_label = review._meta.get_field('updated_at').verbose_name
+        self.assertEquals(field_label, 'дата изменения')
+
+    def test_review_str(self):
+        review = Review.objects.first()
+        expected_object_name = f"{review.grade} - {review.sign}"
+        self.assertEquals(expected_object_name, str(review))
+
+
 class ContentTextTest(TestCase):
     fixtures = ['test_data.json']
     def test_content_text_title_label(self):
         content_text = ContentText.objects.first()
         field_label = content_text._meta.get_field('title').verbose_name
         self.assertEquals(field_label, 'контент-название')
+
+    def test_content_text_title_help_text(self):
+        content_text = ContentText.objects.first()
+        field_label = content_text._meta.get_field('title').help_text
+        self.assertEquals(field_label, 'введите название текстового блока')
+
 
     def test_content_text_title_max_length(self):
         content_text = ContentText.objects.first()
@@ -34,6 +92,11 @@ class ContentTextTest(TestCase):
         content_text = ContentText.objects.first()
         field_label = content_text._meta.get_field('body').verbose_name
         self.assertEquals(field_label, 'тело текстового блока')
+
+    def test_content_text_body_help_text(self):
+        content_text = ContentText.objects.first()
+        field_label = content_text._meta.get_field('body').help_text
+        self.assertEquals(field_label, 'введите тело текстового блока')
 
 
     def test_content_text_str(self):

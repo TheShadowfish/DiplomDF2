@@ -163,10 +163,10 @@ class Review(models.Model):
     author = models.ForeignKey(User, on_delete=models.SET_NULL, verbose_name='пользователь', help_text='пользователь', related_name='author', **NULLABLE)
     sign = models.CharField(max_length=50, verbose_name='Подпись', help_text='Введите подпись под отзывом')
     grade = models.SmallIntegerField(
-        default=5, verbose_name="Оповещение", choices=GRADE_POINTS)
+        default=5, verbose_name="Оценка", choices=GRADE_POINTS)
 
     moderated = models.BooleanField(default=False, verbose_name='Проверен', help_text='Введите признак проверки')
-    answer_text = models.TextField(verbose_name='Ответ на вопрос', help_text='Введите ответ на вопрос', **NULLABLE)
+    answer_text = models.TextField(verbose_name='Ответ на отзыв', help_text='Введите ответ на отзыв', **NULLABLE)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='дата создания',
                                       help_text='введите дату создания')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='дата изменения',
