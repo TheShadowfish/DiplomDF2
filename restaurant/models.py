@@ -127,7 +127,7 @@ class Contentlink(models.Model):
         return f"{self.link}"
 
 class BookingToken(models.Model):
-    booking = models.ForeignKey(Booking, on_delete=models.CASCADE, verbose_name='токен для подтверждения бронирования',
+    booking = models.ForeignKey(Booking, on_delete=models.CASCADE, verbose_name='бронирование',
                              help_text='токен для восстановления пароля', related_name='user_token')
 
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='дата создания',

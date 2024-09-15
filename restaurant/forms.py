@@ -1,9 +1,10 @@
 import datetime
 
 from django import forms
-from django.db.models import TextField, Q
-from django.forms import BooleanField, TimeField, TimeInput, SelectDateWidget, DateField, NumberInput
+from django.db.models import Q
+from django.forms import BooleanField, TimeField, DateField, NumberInput, Textarea, TextInput, CharField
 from django.utils import timezone
+
 
 from restaurant.models import Table, Booking, ContentText, ContentImage, ContentParameters, BookingToken, Questions
 
@@ -32,8 +33,35 @@ class StyleFormMixin:
                 field.widget.attrs['class'] = 'form-control'
 
 
+class BookingStyleFormMixin:
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        time_append = 0
 
-class BookingForm(StyleFormMixin, forms.ModelForm):
+        for field_name, field in self.fields.items():
+
+            # time = datetime.datetime.now().time()
+
+            if isinstance(field, DateField):
+                field.widget=NumberInput(attrs={'type': 'date'})
+                field.initial = datetime.date.today
+
+            if isinstance(field, TimeField):
+                field.widget=NumberInput(attrs={'type': 'time'})
+                field.initial = datetime.time(18 + time_append, 0)
+
+            if isinstance(field, CharField):
+                field.widget = Textarea(attrs={'rows': 5})
+
+
+            if isinstance(field, BooleanField):
+                field.widget.attrs['class'] = 'form-check-input'
+            else:
+                field.widget.attrs['class'] = 'form-control'
+
+
+
+class BookingForm(BookingStyleFormMixin, forms.ModelForm):
 
     class Meta:
         model = Booking
