@@ -25,46 +25,13 @@ def get_content_link_from_postgre(title):
     except:
         return f"Для создания ссылки создайте запись '{title}' в таблице ContentLink (необходимы полномочия администратора)"
 
-
-
-
-def get_content_parameters(ignored_error):
-    # выдернуть из базы данных параметры работы, бронирования и т.д.
-    try:
-        period_of_booking = int(ContentParameters.objects.get(title='period_of_booking').body)
-        work_start = datetime.time.fromisoformat(ContentParameters.objects.get(title='work_start').body)
-        work_end = datetime.time.fromisoformat(ContentParameters.objects.get(title='work_end').body)
-        confirm_timedelta = timezone.timedelta(minutes=ContentParameters.objects.get(title='confirm_timedelta'))
-        time_border = timezone.now() - confirm_timedelta
-
-        return {'period_of_booking': period_of_booking, 'work_start': work_start, 'work_end': work_end,'time_border': time_border}
-    except:
-        if ignored_error:
-            work_start = datetime.time(8, 0, 0)
-            work_end = datetime.time(23, 0, 0)
-            period_of_booking = 14
-            confirm_timedelta = timezone.timedelta(minutes=45)
-            # print(f"confirm_timedelta - установлено по умолчаеию (45 минут)")
-            time_border = timezone.now() - confirm_timedelta
-            return {'period_of_booking': period_of_booking, 'work_start': work_start, 'work_end': work_end,
-                        'time_border': time_border}
-        return False
-
-
-
-
-
-
-
-
-
-
 """
 from datetime import datetime, time, date
 from unittest import TestCase
 
 from restaurant.models import ContentParameters
-from restaurant.utils.utils import time_segment, get_content_parameters
+from restaurant.utils.utils import time_segment, get_content_parameters, get_content_text_from_postgre
+
 
 class UtilsTest(TestCase):
     # fixtures = ['test_data.json']
@@ -118,4 +85,37 @@ class UtilsTest(TestCase):
         self.assertEquals(dictionary_3, dict_3_eg)
 
 
+
+
+    def test_get_content_text_from_postgre(self):
+        text_error = get_content_text_from_postgre('test')
+        text_e = f"Для изменения текста создайте запись 'test' в таблице ContentText (необходимы полномочия администратора)"
+
+        ContentParameters.objects.create(title='test', body='test')
+        text_success=get_content_text_from_postgre('test')
+
+
+        self.assertEquals(text_error, text_e)
+        self.assertEquals(text_success, 'test')
+
+"""
+def get_content_text_from_postgre(title):
+    try:
+        return ContentText.objects.get(title=title).body
+    except:
+        return f"Для изменения текста создайте запись '{title}' в таблице ContentText (необходимы полномочия администратора)"
+
+def get_content_image_from_postgre(title):
+    try:
+        return ContentImage.objects.get(title=title)
+    except:
+        description = f"Для изменения изображения создайте запись '{title}' в таблице ContentImage и загрузите изображение (необходимы полномочия администратора)"
+        return ContentImage.objects.create(title='not_found', description=description, image = None)
+
+def get_content_link_from_postgre(title):
+    try:
+        return Contentlink.objects.get(title=title)
+    except:
+        return f"Для создания ссылки создайте запись '{title}' в таблице ContentLink (необходимы полномочия администратора)"
+"""
 
