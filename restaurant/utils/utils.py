@@ -1,34 +1,50 @@
+from datetime import datetime, timedelta
+
 from restaurant.models import ContentText, ContentImage, Contentlink
 
 
-def when_not_found_content_text(title):
-    return f"Для изменения текста создайте запись '{title}' в таблице ContentText (необходимы полномочия администратора)"
+# def when_not_found_content_text(title):
+#     return f"Для изменения текста создайте запись '{title}' в таблице ContentText (необходимы полномочия администратора)"
 
-def when_not_found_content_image(title):
-    return ContentImage.objects.create(title='not_found', description=f"Для изменения изображения создайте запись '{title}' в таблице ContentImage и загрузите изображение (необходимы полномочия администратора)", image = None)
+# def when_not_found_content_image(title):
+#     return ContentImage.objects.create(title='not_found', description=f"Для изменения изображения создайте запись '{title}' в таблице ContentImage и загрузите изображение (необходимы полномочия администратора)", image = None)
 
-def when_not_found_link(title):
-    return f"Для создания ссылки создайте запись '{title}' в таблице ContentLink (необходимы полномочия администратора)"
+# def when_not_found_link(title):
+#     return f"Для создания ссылки создайте запись '{title}' в таблице ContentLink (необходимы полномочия администратора)"
 
 def get_content_text_from_postgre(title):
     try:
         return ContentText.objects.get(title=title).body
     except:
-        return when_not_found_content_text(title)
+        return f"Для изменения текста создайте запись '{title}' в таблице ContentText (необходимы полномочия администратора)"
 
 def get_content_image_from_postgre(title):
     try:
         return ContentImage.objects.get(title=title)
     except:
-        return when_not_found_content_image(title)
-
-
+        description = f"Для изменения изображения создайте запись '{title}' в таблице ContentImage и загрузите изображение (необходимы полномочия администратора)"
+        return ContentImage.objects.create(title='not_found', description=description, image = None)
 
 def get_content_link_from_postgre(title):
     try:
         return Contentlink.objects.get(title=title)
     except:
-        return when_not_found_link(title)
+        return f"Для создания ссылки создайте запись '{title}' в таблице ContentLink (необходимы полномочия администратора)"
+
+def time_segment(date: datetime.date, start: datetime.time, end: datetime.time) -> tuple[datetime, datetime]:
+    # делает из даты, начального и конечного времени 2 значения datetime
+
+    t_start = datetime(year=date.year, month=date.month, day=date.day, hour=start.hour, minute=start.minute)
+    t_end = datetime(year=date.year, month=date.month, day=date.day, hour=end.hour, minute=end.minute)
+    if end < start:
+        t_end += timedelta(days=1)
+
+    return t_start, t_end
+
+
+
+
+
 
 
 # from datetime import datetime

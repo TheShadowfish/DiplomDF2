@@ -7,6 +7,7 @@ from django.utils import timezone
 
 
 from restaurant.models import Table, Booking, ContentText, ContentImage, ContentParameters, BookingToken, Questions
+from restaurant.utils.utils import time_segment
 
 
 class StyleFormMixin:
@@ -102,33 +103,50 @@ class BookingForm(BookingStyleFormMixin, forms.ModelForm):
         cleaned_data_time_end = self.cleaned_data['time_end']
         cleaned_data_places = self.cleaned_data['places']
 
-        t_start = datetime.datetime(year=cleaned_data_date_field.year, month=cleaned_data_date_field.month,
-                                          day=cleaned_data_date_field.day, hour=cleaned_data_time_start.hour,
-                                          minute=cleaned_data_time_start.minute)
-        t_end = datetime.datetime(year=cleaned_data_date_field.year, month=cleaned_data_date_field.month,
-                                          day=cleaned_data_date_field.day, hour=cleaned_data_time_end.hour,
-                                          minute=cleaned_data_time_end.minute)
-
-        t_work_start = datetime.datetime(year=cleaned_data_date_field.year, month=cleaned_data_date_field.month,
-                                          day=cleaned_data_date_field.day, hour=work_start.hour,
-                                          minute=work_start.minute)
-        # datetime.time.fromisoformat(ContentParameters.objects.get(title='work_start').body)
-        t_work_end = datetime.datetime(year=cleaned_data_date_field.year, month=cleaned_data_date_field.month,
-                                          day=cleaned_data_date_field.day, hour=work_end.hour,
-                                          minute=work_end.minute)
+        #
+        # # можно сделать под это отдельную функцию utils.time_segment(date, start, end) -> t_start(dt), t_end(dt)
+        # # её проще тестировать и код не в одной куче
+        #
+        #
+        # t_start = datetime.datetime(year=cleaned_data_date_field.year, month=cleaned_data_date_field.month,
+        #                                   day=cleaned_data_date_field.day, hour=cleaned_data_time_start.hour,
+        #                                   minute=cleaned_data_time_start.minute)
+        # t_end = datetime.datetime(year=cleaned_data_date_field.year, month=cleaned_data_date_field.month,
+        #                                   day=cleaned_data_date_field.day, hour=cleaned_data_time_end.hour,
+        #                                   minute=cleaned_data_time_end.minute)
+        #
+        # t_work_start = datetime.datetime(year=cleaned_data_date_field.year, month=cleaned_data_date_field.month,
+        #                                   day=cleaned_data_date_field.day, hour=work_start.hour,
+        #                                   minute=work_start.minute)
+        # # datetime.time.fromisoformat(ContentParameters.objects.get(title='work_start').body)
+        # t_work_end = datetime.datetime(year=cleaned_data_date_field.year, month=cleaned_data_date_field.month,
+        #                                   day=cleaned_data_date_field.day, hour=work_end.hour,
+        #                                   minute=work_end.minute)
+        #
+        # t_now = datetime.datetime.now()
+        # # datetime.time.fromisoformat(ContentParameters.objects.get(title='work_end').body)
+        #
+        # if cleaned_data_time_end < cleaned_data_time_start:
+        #     t_end += datetime.timedelta(days=1)
+        #     # print("cleaned_data_time_end < cleaned_data_time_start")
+        # if work_end < work_start:
+        #     t_work_end += datetime.timedelta(days=1)
+        #     # print("work_end < work_start")
+        #
+        # # можно сделать под это отдельную функцию utils.time_segment(date, start, end) -> t_start(dt), t_end(dt)
+        # # её проще тестировать и код не в одной куче
 
         t_now = datetime.datetime.now()
-        # datetime.time.fromisoformat(ContentParameters.objects.get(title='work_end').body)
+        t_start, t_end = time_segment(cleaned_data_date_field, cleaned_data_time_start, cleaned_data_time_end)
+        t_work_start, t_work_end = time_segment(cleaned_data_date_field, work_start, work_end)
 
-        if cleaned_data_time_end < cleaned_data_time_start:
-            t_end += datetime.timedelta(days=1)
-            # print("cleaned_data_time_end < cleaned_data_time_start")
-        if work_end < work_start:
-            t_work_end += datetime.timedelta(days=1)
-            # print("work_end < work_start")
 
+
+        # это легко запихнуть в валидатор
         if date > cleaned_data_date_field:
             raise forms.ValidationError('Нельзя забронировать место на прошедшую дату')
+
+
         if cleaned_data_date_field > date + datetime.timedelta(days=period_of_booking):
             raise forms.ValidationError(f'Бронировать места можно не ранее чем за {period_of_booking} дней')
 
@@ -164,6 +182,7 @@ class BookingForm(BookingStyleFormMixin, forms.ModelForm):
                       date_field__day__gte=(date_now - datetime.timedelta(days=1)).day).order_by("date_field", "time_start"))
 
 
+        # можно ли это запихнуть в валидатор?
         if cleaned_data_places > table.places:
             raise forms.ValidationError(f'За данным столиком всего {table.places} мест. Выберете столик с большим количеством мест или позже забронируйте соседний столик')
         elif cleaned_data_places < 1:
@@ -173,14 +192,20 @@ class BookingForm(BookingStyleFormMixin, forms.ModelForm):
 
 
         for b in bookings:
-            b_start = datetime.datetime(year=b.date_field.year, month=b.date_field.month,
-                                        day=b.date_field.day, hour=b.time_start.hour,
-                                        minute=b.time_start.minute)
-            b_end = datetime.datetime(year=b.date_field.year, month=b.date_field.month,
-                                      day=b.date_field.day, hour=b.time_end.hour,
-                                      minute=b.time_end.minute)
-            if b.time_start > b.time_end:
-                b_end += datetime.timedelta(days=1)
+
+            b_start, b_end = time_segment(b.date_field, b.time_start, b.time_end)
+            # # можно сделать под это отдельную функцию utils.time_segment(date, start, end) -> t_start(dt), t_end(dt)
+            # # её проще тестировать и код не в одной куче
+            # # уже 3 одинаковых участка кода... Вот почему ты так долго пишешь работу.
+            #
+            # b_start = datetime.datetime(year=b.date_field.year, month=b.date_field.month,
+            #                             day=b.date_field.day, hour=b.time_start.hour,
+            #                             minute=b.time_start.minute)
+            # b_end = datetime.datetime(year=b.date_field.year, month=b.date_field.month,
+            #                           day=b.date_field.day, hour=b.time_end.hour,
+            #                           minute=b.time_end.minute)
+            # if b.time_start > b.time_end:
+            #     b_end += datetime.timedelta(days=1)
 
             # если это обновление то будет объект, иначе None
             booking_id = self.instance

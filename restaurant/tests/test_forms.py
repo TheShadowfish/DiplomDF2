@@ -41,19 +41,19 @@ class LimitedQuestionsForm(StyleFormMixin, forms.ModelForm):
         model = Questions
         fields = ('question_text','sign')
 """
-#
-# class QuestionsForm(TestCase):
-#
-#
-#     def test_question_form_question_text_label(self):
-#         form = QuestionsForm()
-#         # print(form.fields)
-#         self.assertTrue(form.fields['question_text'].label == None or form.fields['question_text'].label == 'question_text')
-#
-#     def test_question_form_question_text_help_text(self):
-#         form = QuestionsForm()
-#         self.assertEqual(form.fields['question_text'].help_text,'Введите текст вопроса')
-#
+
+class QuestionsForm(TestCase):
+
+
+    def test_question_form_question_text_label(self):
+        form = QuestionsForm()
+        # print(form.fields)
+        self.assertTrue(form.fields['question_text'].label == None or form.fields['question_text'].label == 'question_text')
+
+    def test_question_form_question_text_help_text(self):
+        form = QuestionsForm()
+        self.assertEqual(form.fields['question_text'].help_text,'Введите текст вопроса')
+
 # class LimitedQuestionsForm(TestCase):
 #
 #
