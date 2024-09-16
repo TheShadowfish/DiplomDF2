@@ -18,50 +18,26 @@
             <ul class="nav me-auto">
 
 
-                <a class="p-2 btn btn-outline-primary" href="/">Главная</a>
+                <a class="p-2 btn btn-outline-primary" href="{% url 'restaurant:main' %}">Главная</a>
                 &nbsp;
                 <a class="p-2 btn btn-outline-primary" href="{% url 'restaurant:about_us' %}">О ресторане</a>
                 &nbsp;
-
-                {% if user.is_authenticated %}
                 <a class="p-2 btn btn-outline-primary" href="{% url 'restaurant:booking_create' %}">Бронирование столика</a>
                 &nbsp;
-                <a class="p-2 btn btn-outline-primary" href="{% url 'users:user_detail' user.pk%}">История бронирований</a>
+                <a class="p-2 btn btn-outline-primary" href="{%url 'restaurant:booking_list' %}">История бронирований</a>
                 &nbsp;
-                <a class="p-2 btn btn-outline-primary" href="#">Оставить отзыв</a>
-                &nbsp;
-                {% else %}
-                <a class="p-2 btn btn-outline-primary" href="{% url 'users:login' %}">Бронирование столика
-                    (login)</a>
-                &nbsp;
-                <a class="p-2 btn btn-outline-primary" href="{% url 'users:login' %}">История бронирований
-                    (login)</a>
-                &nbsp;
-                <a class="p-2 btn btn-outline-primary" href="{% url 'users:login' %}">Оставить отзыв (login)</a>
-                &nbsp;
-                {% endif %}
-
                 <a class="p-2 btn btn-outline-primary" href="{% url 'restaurant:question_list' %}">Вопросы и ответы</a>
                 &nbsp;
 <!--                path("question_list/", QuestionListView.as_view(), name='question_list'),-->
 
-
-                <a class="p-2 btn btn-outline-primary" href="#">Наш блог</a>
+                {% comment "Задел на будущее" %}
+                <a class="p-2 btn btn-outline-primary" href="#">Наш блог NA-UC</a>
+                &nbsp;
+                <a class="p-2 btn btn-outline-primary" href="#">Оставить отзыв NA-UC</a>
                 &nbsp;
 
-                {% comment "Это и из админки хорошо делается" %}
-                {% if user.is_staff or user.is_superuser %}
-                <a class="p-2 btn btn-outline-primary" href="{%url 'users:user_list' %}">Список
-                    зарегистрированных
-                    пользователей</a>
-                &nbsp;
-
-                {% endif %}
                 {% endcomment %}
 
-
-                 <a class="p-2 btn btn-outline-primary" href="{%url 'restaurant:booking_list' %}">Бронирования</a>
-                &nbsp;
             </ul>
 
 
@@ -73,6 +49,8 @@
                 &nbsp;&nbsp;
 
                 <a class="p-2 btn btn-outline-primary" href="{% url 'users:profile' %}">Профиль</a>
+                &nbsp;
+                <a class="p-2 btn btn-outline-primary" href="{% url 'users:user_detail' user.pk%}">Инфо</a>
                 &nbsp;
 
                 {% comment "Выход зависит о версии Django %}

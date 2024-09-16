@@ -13,24 +13,18 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 
 import os
-from datetime import timedelta
 from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv()
 
-# SECRET_KEY = os.getenv("SECRET_KEY")
-SECRET_KEY = "django-insecure-3n!sjx3h4tbnt68^!-@ak9rw$-_=p)zd)hr_)t=*$94p*%8a2t"
+SECRET_KEY = os.getenv("SECRET_KEY")
 
-# SECURITY WARNING: don't run with debug turned on in production!
-
-# DEBUG = os.getenv('DEBUG') == 'True'
-DEBUG = True
+DEBUG = os.getenv("DEBUG") == "True"
 
 # change when hosting!
-ALLOWED_HOSTS = ["*"]
-
+ALLOWED_HOSTS = [os.getenv("ALLOWED_HOSTS")]
 
 # Application definition
 
@@ -58,6 +52,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "corsheaders.middleware.CorsMiddleware",
 ]
+
 # Чтобы кешировать весь сайт
 # MIDDLEWARE = [
 #     'django.middleware.cache.UpdateCacheMiddleware',
@@ -86,26 +81,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "pectopah",
-        "USER": "postgres",
-        "HOST": "localhost",
-        "PORT": 5432,
-        "PASSWORD": 12345,
-        # "NAME": os.getenv("DB_POSTRESQL_NAME"),
-        # "USER": os.getenv("DB_POSTRESQL_USER"),
-        # "HOST": os.getenv("DB_POSTRESQL_HOST"),
-        # "PORT": os.getenv("DB_POSTRESQL_PORT"),
-        # "PASSWORD": os.getenv("DB_POSTRESQL_PASSWORD"),
+        "NAME": os.getenv("DB_POSTRESQL_NAME"),
+        "USER": os.getenv("DB_POSTRESQL_USER"),
+        "HOST": os.getenv("DB_POSTRESQL_HOST"),
+        "PORT": os.getenv("DB_POSTRESQL_PORT"),
+        "PASSWORD": os.getenv("DB_POSTRESQL_PASSWORD"),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -125,7 +113,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
@@ -137,7 +124,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
@@ -145,42 +131,26 @@ STATIC_URL = "static/"
 
 # STATIC_ROOT = BASE_DIR / "static"
 
-STATICFILES_DIRS = (BASE_DIR / 'static',)
+# STATICFILES_DIRS = (BASE_DIR / 'static',)
 
-# ENV_TYPE = os.getenv("ENV_TYPE")
+ENV_TYPE = os.getenv("ENV_TYPE")
 
-# if ENV_TYPE == "local":
-#     STATICFILES_DIRS = (
-#         BASE_DIR / "static"
-#     )
-# else:
-#     STATIC_ROOT = BASE_DIR / "static"
-
+if ENV_TYPE == "local":
+    STATICFILES_DIRS = (BASE_DIR / "static",)
+else:
+    STATIC_ROOT = BASE_DIR / "static"
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
-EMAIL_HOST="smtp.yandex.ru"
-EMAIL_PORT=465
-EMAIL_HOST_USER = "waterbat@yandex.ru"
-EMAIL_HOST_PASSWORD="omgmxjebrljetcok"
-# EMAIL_TO=waterbat@mail.ru, shadowfish@yandex.ru, acc4androidIH@gmail.com
-EMAIL_USE_TLS = False
-EMAIL_USE_SSL = True
-#для яндекса
-#SERVER_EMAIL=EMAIL_HOST_USER
-#DEFAULT_FROM_EMAIL=EMAIL_HOST_USER
-SERVER_EMAIL="waterbat@yandex.ru"
-DEFAULT_FROM_EMAIL="waterbat@yandex.ru"
-
-# EMAIL_HOST = os.getenv('EMAIL_HOST')
-# EMAIL_PORT = os.getenv('EMAIL_PORT')
-# EMAIL_HOST_USER = os.getenv('EMAIL_USER')
-# EMAIL_HOST_PASSWORD = os.getenv('EMAIL_PASSWORD')
-# EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS') == 'True'
-# EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL') == 'True'
-
-
+EMAIL_HOST = os.getenv("EMAIL_HOST")
+EMAIL_PORT = os.getenv("EMAIL_PORT")
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS") == "True"
+EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL") == "True"
+SERVER_EMAIL = os.getenv("SERVER_EMAIL")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -191,23 +161,16 @@ AUTH_USER_MODEL = "users.User"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 
-LOGIN_URL = '/users/'
+LOGIN_URL = "/users/"
 
 REDIRECT_FIELD_NAME = "users/login.html"
 
+CORS_ALLOWED_ORIGINS = [os.getenv("CORS_ALLOWED_ORIGINS"), ]
 
+CSRF_TRUSTED_ORIGINS = [os.getenv("CSRF_TRUSTED_ORIGINS"), ]
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:8000",  # Замените на адрес вашего фронтенд-сервера
-]
+CORS_ALLOW_ALL_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS") == "True"
 
-CSRF_TRUSTED_ORIGINS = [
-    "https://read-and-write.example.com",
-    # Замените на адрес вашего фронтенд-сервера
-    # и добавьте адрес бэкенд-сервера
-]
-
-CORS_ALLOW_ALL_ORIGINS = False
 #
 # # Celery Configuration Options
 # CELERY_TIMEZONE = TIME_ZONE
@@ -233,16 +196,14 @@ CORS_ALLOW_ALL_ORIGINS = False
 # TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 
 
-# CACHE_ENABLED = os.getenv('CACHE_ENABLED') == 'True'
-
-CACHE_ENABLED = True
+CACHE_ENABLED = os.getenv("CACHE_ENABLED") == "True"
 
 if CACHE_ENABLED:
     CACHES = {
         "default": {
             "BACKEND": "django.core.cache.backends.redis.RedisCache",
-            # "LOCATION": os.getenv('LOCATION'),
+            # "LOCATION": os.getenv("LOCATION"),
             "LOCATION": "redis://127.0.0.1:6379",
-            "TIMEOUT": 1200  # Ручная регулировка времени жизни кеша в секундах, по умолчанию 300
+            "TIMEOUT": 300  # Ручная регулировка времени жизни кеша в секундах, по умолчанию 300
         }
     }
