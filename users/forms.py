@@ -38,10 +38,10 @@ class UserProfileForm(StyleFormMixin, UserChangeForm):
             return self.cleaned_data
 
 
-
-
-class UserList(StyleFormMixin, ListView):
-    class Meta:
-        model = User
-        fields = ('email', 'name', 'first_name', 'last_name', 'description', 'phone_number', 'avatar')
+#
+#
+# class UserList(StyleFormMixin, ListView):
+#     class Meta:
+#         model = User
+#         fields = ('email', 'name', 'first_name', 'last_name', 'description', 'phone_number', 'avatar')
 

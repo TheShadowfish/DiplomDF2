@@ -46,7 +46,7 @@ class User(AbstractUser):
     name = models.CharField(max_length=150, verbose_name='имя пользователя', help_text='Введите ваше имя', **NULLABLE)
     description = models.TextField(verbose_name='описание', help_text='Введите дополнительную информацию', **NULLABLE)
     phone_number = PhoneNumberField(**NULLABLE, verbose_name='телефон', help_text='Введите ваш номер телефона')
-    phone_number = PhoneNumberField(**NULLABLE, verbose_name='телефон', help_text='Введите ваш номер телефона')
+    # phone_number = PhoneNumberField(**NULLABLE, verbose_name='телефон', help_text='Введите ваш номер телефона')
     avatar = models.ImageField(upload_to='users/avatars', verbose_name='аватар', help_text='Выберите аватар',
                                **NULLABLE)
 
@@ -70,16 +70,13 @@ class User(AbstractUser):
     class Meta:
         verbose_name = 'пользователь'
         verbose_name_plural = 'пользователи'
-        permissions = [
-            ("can_set_user_inactive", "Can blocked user (bool is_active = False)"),
-        ]
 
     def __str__(self):
         return f"{self.name} ({self.email})"
 
 
 class UserToken(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='токен для восстановления пароля',
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='пользователь к которому относится токен',
                              help_text='токен для восстановления пароля', related_name='user_token')
 
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='дата создания',
