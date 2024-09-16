@@ -19,6 +19,7 @@ from dotenv import load_dotenv
 
 from restaurant.utils.utils import get_content_text_from_postgre, \
     get_content_image_from_postgre, get_content_link_from_postgre
+from users.models import User
 
 load_dotenv()
 
@@ -99,10 +100,43 @@ class BookingListView(LoginRequiredMixin, ListView):
     login_url = "users:login"
     redirect_field_name = "login"
 
+    def get_success_url(self):
+        user_pk = self.request.user.pk
+        return reverse('restaurant:booking_list')
+
+
+    def form_valid(self, form):
+        user = self.request.user
+        if user == self.object.user or user.is_moderator:
+            return
+        else:
+            raise PermissionDenied
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['only_users'] = os.getenv("ONLY_USERS_PROPERTY")
+        context['has_been'] = os.getenv("HAS_BEEN")
+
+        context['only_users'] = False
+        # context['has_been'] = False
+
+
+        context['time_offset'] = self.request.user.time_offset
+        user = self.request.user
+        pk = self.kwargs.get("pk")
+        context['user'] = user
+
+        if os.getenv("ONLY_USERS_PROPERTY"):
+            unfiltered_booking = Booking.objects.filter(user=user)
+        else:
+            unfiltered_booking = Booking.objects.all()
+
+        context['booking_list'] = unfiltered_booking.order_by("date_field", "time_start")
+
+
+
         return context
+
 
 
 class BookingCreateUpdateMixin:
@@ -319,8 +353,14 @@ def toggle_activity_booking(request, pk):
 class QuestionListView(ListView):
     model = Questions
 
+    login_url = "users:login"
+    redirect_field_name = "login"
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+
+
         CONST1 = "questions_and_answers"
 
         context[CONST1.replace('-', '_')] = get_content_text_from_postgre(CONST1)

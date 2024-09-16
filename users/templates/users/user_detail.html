@@ -18,13 +18,13 @@
 
                 <h1 class="card-title  text-center">
                     <img
-                            src="{% static 'image/news-paper-svgrepo-com.svg' %}"
+                            src="{% static 'image/user-svgrepo-com.svg' %}"
                             alt="Hungry Shark. History of booking."
                             height="100px"
                             width="100px"/>
                     <br>
 
-                    <div style="color: blue ">История бронирований</div>
+                    <div style="color: blue ">Информация о пользователе</div>
                 </h1>
                 </p>
                 <hr>
@@ -47,7 +47,7 @@
                 <hr>
 
                 <h5 class="card-title">
-                    <div style="color: orange"><b>Список бронирований пользователя:</b></div>
+                    <div style="color: orange"><b>Список <u>актуальных</u> бронирований пользователя:</b></div>
 
                 </h5>
                 <br>
@@ -72,11 +72,9 @@
                     </tr>
 
                     {% for object in booking_list %}
+                    {%if object.date_field|has_been:object.time_start == False %}
+
                     <tr>
-
-                        {%if object.date_field|has_been:object.time_start %}
-
-
 
 
                         <td>{{object.table}}, &nbsp; {{object.places}} места</td>
@@ -97,52 +95,14 @@
 
 
                         </td>
-                        <td>{{ object.created_at|time_to_local:object.user.time_offset }}</td>
+                        <td>{{ object.created_at|time_to_local:user.time_offset }}</td>
 
 
-                        <td>
-                            <a class="btn btn-secondary disabled"
-                               role="button" aria-disabled="true" href="{%url 'restaurant:booking_activity' object.pk%}"
-                            >&nbsp;Прошло &nbsp; &nbsp;</a>
-                        </td>
                         <td>
                             <a class="btn btn-primary" href="{%url 'restaurant:booking_detail' object.pk%}"
                                role="button">Информация</a>
                         </td>
-                        <td>
-                            <a class="btn btn-secondary disabled" href="#"
-                               role="button" aria-disabled="true">Изменить</a>
-                            </a>
 
-                        </td>
-                        <td>
-                            <a class="btn btn-primary" href="{%url 'restaurant:booking_delete' object.pk%}"
-                               role="button">Удалить</a>
-                        </td>
-
-
-                        {% else %}
-
-
-                        <td>{{object.table}}, &nbsp; {{object.places}} места</td>
-
-                        <td>{{object.date_field}}</td>
-                        <td>{{object.time_start}} - {{object.time_end}}</td>
-
-                        <td>
-                            {% if object.notification == 0 %}
-                            ---
-                            {% else %}
-                            {% if object.notification == 1 %}
-                            {{object.notification}} час
-                            {% else %}
-                            {{object.notification}} часа
-                            {% endif %}
-                            {%endif%}
-
-
-                        </td>
-                        <td>{{ object.created_at|time_to_local:object.user.time_offset }}</td>
 
 
                         <td>
@@ -154,24 +114,22 @@
                                role="button" aria-disabled="true" href="{%url 'restaurant:booking_activity' object.pk%}"
                             >Неактивно</a>
 
-                            {%endif%}
+
                         </td>
-                        <td>
-                            <a class="btn btn-primary" href="{%url 'restaurant:booking_detail' object.pk%}"
-                               role="button">Информация</a>
-                        </td>
+
                         <td>
                             <a class="btn btn-primary" href="{%url 'restaurant:booking_update' object.pk%}"
                                role="button">Изменить</a>
                         </td>
+
+
+                        {% endif %}
                         <td>
                             <a class="btn btn-primary" href="{%url 'restaurant:booking_delete' object.pk%}"
                                role="button">Удалить</a>
                         </td>
 
-                        {% endif %}
-
-
+                        {%endif%}
                         {% endfor %}
 
                 </table>
