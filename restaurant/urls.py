@@ -1,4 +1,5 @@
 from django.urls import path
+from django.views.decorators.cache import cache_page
 
 from .views import HomePageView, AboutUsPageView, BookingListView, BookingCreateView, BookingUpdateView, \
     BookingDeleteView, BookingDetailView, toggle_activity_booking, confirm_booking, booking_verification, \
@@ -11,8 +12,11 @@ from restaurant.apps import RestaurantConfig
 app_name = RestaurantConfig.name
 
 urlpatterns = [
-    path("", HomePageView.as_view(), name="main"),
-    path("about_us/", AboutUsPageView.as_view(), name="about_us"),
+    # страницы вообще почти не меняются, потому закеширую их на 300 секунд (5 минут!)
+    # изменение параметров страницы (текст и картинки) будут конечно отражаться на сайте с 5 минутной задержкой
+
+    path("", cache_page(300)(HomePageView.as_view()), name="main"),
+    path("about_us/", cache_page(300)(AboutUsPageView.as_view()), name="about_us"),
 
     path("booking_list/", BookingListView.as_view(), name="booking_list"),
     path("booking_create/", BookingCreateView.as_view(), name="booking_create"),
