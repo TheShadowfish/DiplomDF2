@@ -67,28 +67,12 @@ class RegisterView(CreateView):
         redirect_url = reverse('users:confirm_email', args=[user.email])
         self.success_url = redirect_url
 
-        # print(f'Отправлено {EMAIL_HOST_USER} to {user.email}')
 
         return super().form_valid(form)
-    #
-    # def get_success_url(self):
-    #     return reverse("users:confirm_email", args=[self.kwargs.get("email")])
 
-    # def set_context_data(self, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-    #     user_email = self.kwargs.get("email")
-    #     context['user_email'] = user_email
-    #     print(f'user_email {user_email}')
-    #     return context
 
 
 def email_verification(request, token):
-    # user = get_object_or_404(User)
-    # message = Message.objects.get(pk=mailing_item.message_id)
-    # mail_title = mailing_item.message.title
-    # mail_body = mailing_item.message.body
-    # mail_list = Client.objects.filter(mailing=mailing_item)
-
     this_user_token = get_object_or_404(UserToken, token=token)
     user = this_user_token.user
 
@@ -107,12 +91,6 @@ def email_verification(request, token):
         user.is_active = True
         user.save()
         return render(request, 'users/email_confirmed.html')
-
-    #
-    # user = get_object_or_404(User, token=token)
-    # user.is_active = True
-    # user.save()
-    # return redirect(reverse('users:login'))
 
 
 def token_expired(request):
@@ -137,39 +115,15 @@ def confirm_email(request, email):
     return render(request, 'users/confirm_email.html', context)
 
 
-# class UserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
-#     model = User
-#     permission_required = "users.view_user"
-
-
-
 class ProfileView(LoginRequiredMixin, UpdateView):
     model = User
     form_class = UserProfileForm
 
 
-
-
-    # success_url = reverse_lazy('users:profile')
-
-
-    # def get_object(self, queryset=None):
-    #     return self.request.user
-
     def get_success_url(self):
 
         user_pk = self.request.user.pk
         return reverse('users:user_detail', kwargs={'pk': user_pk})
-
-        # return reverse('users:user_detail', args=[self.kwargs.get("pk")])
-
-    # ['users/user_detail/(?P<pk>[0-9]+)/\\Z']
-    # success_url = reverse_lazy('users:user_list')
-    # success_url = reverse_lazy('users:user_detail', kwargs={'pk': get_object().pk})
-    # success_url =  reverse_lazy('company', kwargs={'farm_id': farmid})
-    # "{% url 'catalog:product_update' object.pk%}"
-    # 'users/user_detail/(?P<pk>[0-9]+)/\\Z'
-
 
 
     def get_object(self, queryset=None):
@@ -178,10 +132,7 @@ class ProfileView(LoginRequiredMixin, UpdateView):
 
 class UserDetailView(LoginRequiredMixin, GetFormClassUserIsOwnerMixin, DetailView):
     model = User
-    # permission_required = ""
-    # permission_required()
-    #
-    # permission_required = "users.view_user"
+
     login_url = "users:login"
     redirect_field_name = "login"
 
@@ -196,7 +147,6 @@ class UserDetailView(LoginRequiredMixin, GetFormClassUserIsOwnerMixin, DetailVie
         user = self.request.user
         pk = self.kwargs.get("pk")
 
-        # print(f"{user.pk} =user.pk == self.kwargs.get('pk')= {pk}")
         if user.is_moderator or user.pk == pk:
             return context
         else:
@@ -204,26 +154,11 @@ class UserDetailView(LoginRequiredMixin, GetFormClassUserIsOwnerMixin, DetailVie
 
 
 
-
-
-    # def get_form_class(self):
-    #     user = self.request.user
-    #     pk = self.kwargs.get("pk")
-    #
-    #     print(f"{user.pk} =user.pk == self.kwargs.get('pk')= {object.pk}")
-    #
-    #     if user.pk == self.kwargs.get("pk"):
-    #         return UserProfileForm
-    #     raise PermissionDenied
-
-
-
-
-class UserDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
-    model = User
-    # Суперпользователь сможет
-    permission_required = "users.delete_user"
-    success_url = reverse_lazy('users:user_list')
+# class UserDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+#     model = User
+#     # Суперпользователь сможет
+#     permission_required = "users.delete_user"
+#     success_url = reverse_lazy('users:user_list')
 
 
 def password_recovery(request):
@@ -270,18 +205,18 @@ def password_recovery(request):
 
     return render(request, 'users/password_recovery.html')
 
-
-@login_required
-@permission_required('users.can_set_user_inactive')
-def toggle_activity_user(request, pk):
-    user = get_object_or_404(User, pk=pk)
-    if user.is_active:
-        user.is_active = False
-        user.is_banned = True
-    else:
-        user.is_active = True
-        user.is_banned = False
-
-    user.save()
-
-    return redirect(reverse('users:user_list'))
+#
+# @login_required
+# @permission_required('users.can_set_user_inactive')
+# def toggle_activity_user(request, pk):
+#     user = get_object_or_404(User, pk=pk)
+#     if user.is_active:
+#         user.is_active = False
+#         user.is_banned = True
+#     else:
+#         user.is_active = True
+#         user.is_banned = False
+#
+#     user.save()
+#
+#     return redirect(reverse('users:user_list'))

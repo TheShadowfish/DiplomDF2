@@ -189,8 +189,8 @@ class BookingListViewTest(TestCase):
     fixtures = ['test_data.json']
     def setUp(self):
         # Создание ользователя
-        test_user1 = User.objects.create_user(email='test_user1@test.ru', name='user1', password='test')
-        test_user1.save()
+        test_user_booking_list = User.objects.create_user(email='test_user_booking_list@test.ru', name='user1', password='test')
+        test_user_booking_list.save()
 
         #берем первый попавшийся столик из фикстуры
         table = Table.objects.first()
@@ -205,7 +205,7 @@ class BookingListViewTest(TestCase):
             time_next_1h = datetime.time((8+i), 0, 0)
             time_next_2h = datetime.time((9+i), 0, 0)
 
-            booking = Booking.objects.create(user=test_user1, table=table, places=4, description='test_booking',
+            booking = Booking.objects.create(user=test_user_booking_list, table=table, places=4, description='test_booking',
                                                     notification=0,
                                                     date_field=date_next, time_start=time_next_1h,
                                                     time_end=time_next_2h, active=True)
@@ -217,11 +217,11 @@ class BookingListViewTest(TestCase):
         self.assertRedirects(resp, '/users/login/?login=/booking_list/')
 
     def test_logged_in_uses_correct_template(self):
-        login = self.client.login(email='test_user1@test.ru', password='test')
+        login = self.client.login(email='test_user_booking_list@test.ru', password='test')
         resp = self.client.get(reverse('restaurant:booking_list'))
 
         # Проверка что пользователь залогинился
-        self.assertEqual(str(resp.context['user']),  'user1 (test_user1@test.ru)')
+        self.assertEqual(str(resp.context['user']),  'user1 (test_user_booking_list@test.ru)')
         #return f"{self.name} ({self.email})
         # Проверка ответа на запрос
         self.assertEqual(resp.status_code, 200)
@@ -230,11 +230,11 @@ class BookingListViewTest(TestCase):
         self.assertTemplateUsed(resp, 'restaurant/booking_list.html')
 
     def test_only_user_bookings_in_list(self):
-        login = self.client.login(email='test_user1@test.ru', password='test')
+        login = self.client.login(email='test_user_booking_list@test.ru', password='test')
         resp = self.client.get(reverse('restaurant:booking_list'))
 
         # Проверка, что пользователь залогинился
-        self.assertEqual(str(resp.context['user']), 'user1 (test_user1@test.ru)')
+        self.assertEqual(str(resp.context['user']), 'user1 (test_user_booking_list@test.ru)')
         # Check that we got a response "success"
         self.assertEqual(resp.status_code, 200)
 

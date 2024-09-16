@@ -2,8 +2,8 @@ from django.contrib.auth.views import LoginView, LogoutView, PasswordResetView, 
 from django.urls import path, reverse_lazy
 
 from users.apps import UsersConfig
-from users.views import RegisterView, email_verification, UserDetailView, UserDeleteView, \
-    confirm_email, ProfileView, password_recovery, toggle_activity_user
+from users.views import RegisterView, email_verification, UserDetailView, \
+    confirm_email, ProfileView, password_recovery
 
 app_name = UsersConfig.name
 
@@ -20,9 +20,9 @@ urlpatterns = [
     path('user_detail/<int:pk>/', UserDetailView.as_view(), name='user_detail'),
 
 
-    path('user_activity/<int:pk>/', toggle_activity_user, name='user_activity'),
+    # path('user_activity/<int:pk>/', toggle_activity_user, name='user_activity'),
 
-    path('user_delete/<int:pk>/', UserDeleteView.as_view(), name='user_delete'),
+    # path('user_delete/<int:pk>/', UserDeleteView.as_view(), name='user_delete'),
 
     path("password_recovery/", password_recovery, name='password_recovery'),
 
