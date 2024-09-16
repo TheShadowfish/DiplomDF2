@@ -114,8 +114,11 @@ class BookingListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['only_users'] = os.getenv("ONLY_USERS_PROPERTY")
-        context['has_been'] = os.getenv("HAS_BEEN")
+
+        # HAS_BEEN - реализация в будующем в настройках пользователя показывать ли прошедшие бронирования
+        # # ONLY_USERS_PROPERTY - для обычных пользователей, админы смогут видеть все
+        # context['only_users'] = os.getenv("ONLY_USERS_PROPERTY")
+        context['has_been'] = True
 
         context['only_users'] = False
         # context['has_been'] = False
@@ -192,7 +195,7 @@ class BookingCreateUpdateMixin:
         # список pk бронирований, которые могут быть подтверждены
         booking_tokens = [token.booking.pk for token in  BookingToken.objects.filter(created_at__gt=time_border)]
 
-        not_has_been_tokens = [token.booking.pk for token in BookingToken.objects.filter(created_at__gt=time_border)]
+        # not_has_been_tokens = [token.booking.pk for token in BookingToken.objects.filter(created_at__gt=time_border)]
 
 
         # ну 3.14159здец конечно...

@@ -154,7 +154,9 @@
                 <br>
 
                 <li><a href="{% url 'restaurant:question_list' %}"> <b>Задайте нам вопрос</b>  </a></li>
+                {% comment 'Отзывы пока не реализовал' %}
                 <li><b>Оставьте отзыв о посещении ресторана</b> (страница отзывов - необходима регистрация) <br></li>
+                {% endcomment %}
 
             </p> <br>
 
@@ -168,82 +170,4 @@
 </div>
 
 
-{% comment "Можно всобачить примеры блюд" %}
-<div class="row text-right">
-{% for article in random_articles %}
-
-    <div class="col-4">
-
-        <div class="card mb-3 box-shadow">
-            <img src="{{ article.image | media_filter }}" class="card-img-top" alt={{article.image|media_filter}}>
-
-
-            <div class="card-body">
-                <h5 class="card-title">
-                    <div style="color: orange"><b> {{article.title}}</b></div>
-                </h5>
-                <p class="card-text">
-                  {% if article.body|comment_markdown|length >= 300 %}
-                    {{ article.body|comment_markdown|slice:":300"}} ...
-                    {% else %}
-                    {{ article.body}}
-                    {% endif %}
-                </p>
-                <br>
-                <p class="card-text">
-                    <b>Опубликовано</b> {{article.created_at}}<br>
-                    <b>Просмотров</b>{{article.views_count}}<br>
-                   </p>
-
-
-                <div class="btn-group">
-                    <a class="btn btn-success" href="{% url 'blogapp:article_detail' article.pk%}" role="button">Посмотреть</a>
-
-                </div>
-
-            </div>
-
-    </div>
-
-
-    </div>
-    {% endfor %}
-</div>
-{% endcomment %}
-
-
-{% comment "Этот HTML код пока не нужен, но вдруг пригодится потом" %}
-<div class="col-4">
-
-    <div class="card mb-3 box-shadow">
-
-
-        <div class="card-body">
-            <h5 class="card-title">
-                <div style="color: orange"><b>Список уникальных клиентов</b></div>
-            </h5>
-            <p class="card-text">
-
-                {% for client in emails_unique%}
-
-                {{client.email}} <br>
-
-                {% endfor %}
-                <br><br>
-                <b>Количество статей в блоге: </b> {{article_list_len}}
-
-
-
-
-            </p>
-        </div>
-    </div>
-
-</div>
-{% endcomment%}
-</div>
-
-
-</div>
-</div>
 {% endblock %}

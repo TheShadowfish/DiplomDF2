@@ -33,10 +33,6 @@ class UserProfileViewTest(TestCase):
 
 
     def test_logged_in_uses_correct_template(self):
-        # pk = User.objects.get(email='test_user_test_view@test.ru').pk
-        # login = self.client.login(email='test_user1@test.ru', password='test')
-        # resp = self.client.get(reverse('restaurant:booking_list'))
-
         login = self.client.login(email='test_user_profile@test.ru', password='test')
         resp = self.client.get(reverse('users:profile'))
 
@@ -79,12 +75,6 @@ class UserDetailViewTest(TestCase):
         # pk = User.objects.get(email='test_user_test_view@test.ru').pk
         # login = self.client.login(email='test_user1@test.ru', password='test')
         # resp = self.client.get(reverse('restaurant:booking_list'))
-
-        # <a class="p-2 btn btn-outline-primary" href="{% url 'users:profile' %}">Профиль</a>
-        # <a class="p-2 btn btn-outline-primary" href="{% url 'users:user_detail' user.pk%}">Инфо</a>
-        # return redirect(reverse('users:user_detail', kwargs={'pk': user_pk}))
-        # path('user_detail/<int:pk>/', UserDetailView.as_view(), name='user_detail'),
-        # 8000 / users / user_detail / 3 /   <a class="p-2 btn btn-outline-primary" href="{% url 'users:user_detail' user.pk%}">Инфо</a>
 
         user_pk = User.objects.get(email='test_user_detail@test.ru').pk
 

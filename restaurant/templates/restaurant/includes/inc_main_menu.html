@@ -30,22 +30,12 @@
                 &nbsp;
 <!--                path("question_list/", QuestionListView.as_view(), name='question_list'),-->
 
-
+                {% comment "Задел на будущее" %}
                 <a class="p-2 btn btn-outline-primary" href="#">Наш блог NA-UC</a>
                 &nbsp;
                 <a class="p-2 btn btn-outline-primary" href="#">Оставить отзыв NA-UC</a>
                 &nbsp;
 
-
-
-                {% comment "Это и из админки хорошо делается" %}
-                {% if user.is_staff or user.is_superuser %}
-                <a class="p-2 btn btn-outline-primary" href="{%url 'users:user_list' %}">Список
-                    зарегистрированных
-                    пользователей</a>
-                &nbsp;
-
-                {% endif %}
                 {% endcomment %}
 
             </ul>
