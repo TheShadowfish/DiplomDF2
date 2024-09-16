@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 
 import os
-from datetime import timedelta
 from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,12 +21,10 @@ load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 
-DEBUG = os.getenv('DEBUG') == 'True'
+DEBUG = os.getenv("DEBUG") == "True"
 
 # change when hosting!
-ALLOWED_HOSTS=[os.getenv("ALLOWED_HOSTS")]
-# ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS")
-
+ALLOWED_HOSTS = [os.getenv("ALLOWED_HOSTS")]
 
 # Application definition
 
@@ -84,7 +81,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
@@ -98,7 +94,6 @@ DATABASES = {
         "PASSWORD": os.getenv("DB_POSTRESQL_PASSWORD"),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -118,7 +113,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
@@ -129,7 +123,6 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
@@ -147,20 +140,17 @@ if ENV_TYPE == "local":
 else:
     STATIC_ROOT = BASE_DIR / "static"
 
-
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
-EMAIL_HOST = os.getenv('EMAIL_HOST')
-EMAIL_PORT = os.getenv('EMAIL_PORT')
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS') == 'True'
-EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL') == 'True'
-SERVER_EMAIL= os.getenv('SERVER_EMAIL')
-DEFAULT_FROM_EMAIL=os.getenv('DEFAULT_FROM_EMAIL')
-
-
+EMAIL_HOST = os.getenv("EMAIL_HOST")
+EMAIL_PORT = os.getenv("EMAIL_PORT")
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS") == "True"
+EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL") == "True"
+SERVER_EMAIL = os.getenv("SERVER_EMAIL")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -171,17 +161,15 @@ AUTH_USER_MODEL = "users.User"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 
-LOGIN_URL = '/users/'
+LOGIN_URL = "/users/"
 
 REDIRECT_FIELD_NAME = "users/login.html"
 
+CORS_ALLOWED_ORIGINS = [os.getenv("CORS_ALLOWED_ORIGINS"), ]
 
+CSRF_TRUSTED_ORIGINS = [os.getenv("CSRF_TRUSTED_ORIGINS"), ]
 
-CORS_ALLOWED_ORIGINS = [os.getenv('CORS_ALLOWED_ORIGINS'),]
-
-CSRF_TRUSTED_ORIGINS = [os.getenv('CSRF_TRUSTED_ORIGINS'),]
-
-CORS_ALLOW_ALL_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS') == 'True'
+CORS_ALLOW_ALL_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS") == "True"
 
 #
 # # Celery Configuration Options
@@ -208,15 +196,13 @@ CORS_ALLOW_ALL_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS') == 'True'
 # TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 
 
-CACHE_ENABLED = os.getenv('CACHE_ENABLED') == 'True'
-
-
+CACHE_ENABLED = os.getenv("CACHE_ENABLED") == "True"
 
 if CACHE_ENABLED:
     CACHES = {
         "default": {
             "BACKEND": "django.core.cache.backends.redis.RedisCache",
-            # "LOCATION": os.getenv('LOCATION'),
+            # "LOCATION": os.getenv("LOCATION"),
             "LOCATION": "redis://127.0.0.1:6379",
             "TIMEOUT": 300  # Ручная регулировка времени жизни кеша в секундах, по умолчанию 300
         }

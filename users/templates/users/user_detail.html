@@ -113,6 +113,7 @@
                             <a class="btn btn-secondary disabled"
                                role="button" aria-disabled="true" href="{%url 'restaurant:booking_activity' object.pk%}"
                             >Неактивно</a>
+                            {% endif %}
 
 
                         </td>
@@ -123,7 +124,7 @@
                         </td>
 
 
-                        {% endif %}
+
                         <td>
                             <a class="btn btn-primary" href="{%url 'restaurant:booking_delete' object.pk%}"
                                role="button">Удалить</a>
