@@ -59,6 +59,16 @@ class QuestionsListViewTest(TestCase):
 
         self.assertTemplateUsed(resp, 'restaurant/questions_list.html')
 
+    def test_lists_resp_context(self):
+        #Get second page and confirm it has (exactly) remaining 3 items
+        resp = self.client.get(reverse('restaurant:question_list'))
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue('time_offset' in resp.context)
+        self.assertTrue('questions_and_answers' in resp.context)
+        self.assertTrue('time_offset' in resp.context)
+        # self.assertTrue(resp.context['is_paginated'] == True)
+        # self.assertTrue( len(resp.context['author_list']) == 3)
+
 
 
 class HomeListViewTest(TestCase):
@@ -84,6 +94,28 @@ class HomeListViewTest(TestCase):
         self.assertEqual(resp.status_code, 200)
 
         self.assertTemplateUsed(resp, 'restaurant/home.html')
+
+    def test_lists_resp_context(self):
+        #Get second page and confirm it has (exactly) remaining 3 items
+        resp = self.client.get(reverse('restaurant:main'))
+        self.assertEqual(resp.status_code, 200)
+
+
+        self.assertTrue('home_about_inside1' in resp.context)
+        self.assertTrue('home_about_inside2' in resp.context)
+        self.assertTrue(resp.context['home_about'])
+        self.assertTrue('home_food1' in resp.context)
+        self.assertTrue('home_food2' in resp.context)
+        self.assertTrue('home_food3' in resp.context)
+        self.assertTrue('home_offer' in resp.context)
+        self.assertTrue('telegram' in resp.context)
+        self.assertTrue('home_adress' in resp.context)
+        self.assertTrue('whatsup' in resp.context)
+        self.assertTrue('vkontakte' in resp.context)
+        # print(f"resp.context {resp.context}")
+
+        # self.assertTrue(resp.context['is_paginated'] == True)
+        # self.assertTrue( len(resp.context['author_list']) == 3)
 
 
 class AboutListViewTest(TestCase):
@@ -111,4 +143,22 @@ class AboutListViewTest(TestCase):
         self.assertEqual(resp.status_code, 200)
 
         self.assertTemplateUsed(resp, 'restaurant/about_us.html')
+
+    def test_lists_resp_context(self):
+        #Get second page and confirm it has (exactly) remaining 3 items
+        resp = self.client.get(reverse('restaurant:about_us'))
+        self.assertEqual(resp.status_code, 200)
+
+
+        self.assertTrue('about_us_mission_part' in resp.context)
+        self.assertTrue('about_us_history_part1' in resp.context)
+        self.assertTrue('about_us_history_part2' in resp.context)
+        self.assertTrue('about_us_command_part1' in resp.context)
+        self.assertTrue('about_us_command_part2' in resp.context)
+        self.assertTrue('about_us_inside3' in resp.context)
+        self.assertTrue('about_us_inside4' in resp.context)
+        self.assertTrue('about_us_team1' in resp.context)
+        self.assertTrue('about_us_team2' in resp.context)
+        self.assertTrue('about_us_team3' in resp.context)
+
 

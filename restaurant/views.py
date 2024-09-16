@@ -352,7 +352,7 @@ class QuestionCreateView(CreateView):
 
     def get_form_class(self):
         user = self.request.user
-        if user.is_moderator or user.is_staff:
+        if user.is_superuser or user.is_staff:
             return QuestionsForm
         else:
             return LimitedQuestionsForm
@@ -360,7 +360,7 @@ class QuestionCreateView(CreateView):
 
     def get_success_url(self):
         user = self.request.user
-        if user.is_moderator or user.is_staff:
+        if user.is_superuser or user.is_staff:
             return reverse("restaurant:question_list")
         else:
             return reverse('restaurant:questions_success', args=['question_premoderated'])

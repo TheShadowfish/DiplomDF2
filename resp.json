@@ -1,0 +1,555 @@
+resp.context [
+  [
+    {
+      'True': True,
+      'False': False,
+      'None': None
+    },
+    {
+      'csrf_token': <SimpleLazyObject
+      :
+      <function
+      csrf.<locals>._get_val
+      at
+      0x71e1e7a90c20>>,
+      'request': <WSGIRequest
+      :
+      GET
+      '/question_list/'
+      >,
+      'user': <SimpleLazyObject
+      :
+      <django.contrib.auth.models.AnonymousUser
+      object
+      at
+      0x71e1e7a9bb90>>,
+      'perms': PermWrapper(<SimpleLazyObject
+      :
+      <django.contrib.auth.models.AnonymousUser
+      object
+      at
+      0x71e1e7a9bb90>>),
+      'messages': <FallbackStorage
+      :
+      request=<WSGIRequest: GET
+      '/question_list/'
+      >>,
+      'DEFAULT_MESSAGE_LEVELS': {
+        'DEBUG': 10,
+        'INFO': 20,
+        'SUCCESS': 25,
+        'WARNING': 30,
+        'ERROR': 40
+      }
+    },
+    {},
+    {
+      'paginator': None,
+      'page_obj': None,
+      'is_paginated': False,
+      'object_list': <QuerySet
+    [
+      <Questions
+      :
+      Каковы
+      часы
+      работы
+      вашего
+      ресторана
+      ?
+      Как
+      я
+      могу
+      забронировать
+      место
+      ?
+      >,
+      <Questions
+      :
+      Насколько
+      велика
+      вероятность
+      насмерть
+      отравиться
+      рыбой
+      фугу
+      ?
+      >,
+      <Questions
+      :
+      Насколько
+      большие
+      порции
+      вы
+      можете
+      приготовить
+      ?
+      Привык
+      съедать
+      не
+      менее
+      3
+      килограммов.>,
+      <Questions
+      :
+      Насколько
+      большие
+      порции
+      вы
+      можете
+      приготовить
+      ?
+      Привык
+      съедать
+      не
+      менее
+      3
+      килограммов.>
+    ]
+    >,
+    'questions_list'
+    :
+    <QuerySet
+    [
+      <Questions
+      :
+      Каковы
+      часы
+      работы
+      вашего
+      ресторана
+      ?
+      Как
+      я
+      могу
+      забронировать
+      место
+      ?
+      >,
+      <Questions
+      :
+      Насколько
+      велика
+      вероятность
+      насмерть
+      отравиться
+      рыбой
+      фугу
+      ?
+      >,
+      <Questions
+      :
+      Насколько
+      большие
+      порции
+      вы
+      можете
+      приготовить
+      ?
+      Привык
+      съедать
+      не
+      менее
+      3
+      килограммов.>,
+      <Questions
+      :
+      Насколько
+      большие
+      порции
+      вы
+      можете
+      приготовить
+      ?
+      Привык
+      съедать
+      не
+      менее
+      3
+      килограммов.>
+    ]
+    >,
+    'view'
+    :
+    <restaurant.views.QuestionListView
+    object
+    at
+    0x71e1e7a80750>,
+    'questions_and_answers'
+    :
+    'Здесь вы можете найти ответы на часто задаваемые вопросы, а также задать свой. Вопросы проходят премодерацию.',
+    'time_offset'
+    :
+    0
+    }
+  ],
+  [
+    {
+      'True': True,
+      'False': False,
+      'None': None
+    },
+    {
+      'csrf_token': <SimpleLazyObject
+      :
+      <function
+      csrf.<locals>._get_val
+      at
+      0x71e1e7a90c20>>,
+      'request': <WSGIRequest
+      :
+      GET
+      '/question_list/'
+      >,
+      'user': <SimpleLazyObject
+      :
+      <django.contrib.auth.models.AnonymousUser
+      object
+      at
+      0x71e1e7a9bb90>>,
+      'perms': PermWrapper(<SimpleLazyObject
+      :
+      <django.contrib.auth.models.AnonymousUser
+      object
+      at
+      0x71e1e7a9bb90>>),
+      'messages': <FallbackStorage
+      :
+      request=<WSGIRequest: GET
+      '/question_list/'
+      >>,
+      'DEFAULT_MESSAGE_LEVELS': {
+        'DEBUG': 10,
+        'INFO': 20,
+        'SUCCESS': 25,
+        'WARNING': 30,
+        'ERROR': 40
+      }
+    },
+    {},
+    {
+      'paginator': None,
+      'page_obj': None,
+      'is_paginated': False,
+      'object_list': <QuerySet
+    [
+      <Questions
+      :
+      Каковы
+      часы
+      работы
+      вашего
+      ресторана
+      ?
+      Как
+      я
+      могу
+      забронировать
+      место
+      ?
+      >,
+      <Questions
+      :
+      Насколько
+      велика
+      вероятность
+      насмерть
+      отравиться
+      рыбой
+      фугу
+      ?
+      >,
+      <Questions
+      :
+      Насколько
+      большие
+      порции
+      вы
+      можете
+      приготовить
+      ?
+      Привык
+      съедать
+      не
+      менее
+      3
+      килограммов.>,
+      <Questions
+      :
+      Насколько
+      большие
+      порции
+      вы
+      можете
+      приготовить
+      ?
+      Привык
+      съедать
+      не
+      менее
+      3
+      килограммов.>
+    ]
+    >,
+    'questions_list'
+    :
+    <QuerySet
+    [
+      <Questions
+      :
+      Каковы
+      часы
+      работы
+      вашего
+      ресторана
+      ?
+      Как
+      я
+      могу
+      забронировать
+      место
+      ?
+      >,
+      <Questions
+      :
+      Насколько
+      велика
+      вероятность
+      насмерть
+      отравиться
+      рыбой
+      фугу
+      ?
+      >,
+      <Questions
+      :
+      Насколько
+      большие
+      порции
+      вы
+      можете
+      приготовить
+      ?
+      Привык
+      съедать
+      не
+      менее
+      3
+      килограммов.>,
+      <Questions
+      :
+      Насколько
+      большие
+      порции
+      вы
+      можете
+      приготовить
+      ?
+      Привык
+      съедать
+      не
+      менее
+      3
+      килограммов.>
+    ]
+    >,
+    'view'
+    :
+    <restaurant.views.QuestionListView
+    object
+    at
+    0x71e1e7a80750>,
+    'questions_and_answers'
+    :
+    'Здесь вы можете найти ответы на часто задаваемые вопросы, а также задать свой. Вопросы проходят премодерацию.',
+    'time_offset'
+    :
+    0
+    }
+  ],
+  [
+    {
+      'True': True,
+      'False': False,
+      'None': None
+    },
+    {
+      'csrf_token': <SimpleLazyObject
+      :
+      <function
+      csrf.<locals>._get_val
+      at
+      0x71e1e7a90c20>>,
+      'request': <WSGIRequest
+      :
+      GET
+      '/question_list/'
+      >,
+      'user': <SimpleLazyObject
+      :
+      <django.contrib.auth.models.AnonymousUser
+      object
+      at
+      0x71e1e7a9bb90>>,
+      'perms': PermWrapper(<SimpleLazyObject
+      :
+      <django.contrib.auth.models.AnonymousUser
+      object
+      at
+      0x71e1e7a9bb90>>),
+      'messages': <FallbackStorage
+      :
+      request=<WSGIRequest: GET
+      '/question_list/'
+      >>,
+      'DEFAULT_MESSAGE_LEVELS': {
+        'DEBUG': 10,
+        'INFO': 20,
+        'SUCCESS': 25,
+        'WARNING': 30,
+        'ERROR': 40
+      }
+    },
+    {},
+    {
+      'paginator': None,
+      'page_obj': None,
+      'is_paginated': False,
+      'object_list': <QuerySet
+    [
+      <Questions
+      :
+      Каковы
+      часы
+      работы
+      вашего
+      ресторана
+      ?
+      Как
+      я
+      могу
+      забронировать
+      место
+      ?
+      >,
+      <Questions
+      :
+      Насколько
+      велика
+      вероятность
+      насмерть
+      отравиться
+      рыбой
+      фугу
+      ?
+      >,
+      <Questions
+      :
+      Насколько
+      большие
+      порции
+      вы
+      можете
+      приготовить
+      ?
+      Привык
+      съедать
+      не
+      менее
+      3
+      килограммов.>,
+      <Questions
+      :
+      Насколько
+      большие
+      порции
+      вы
+      можете
+      приготовить
+      ?
+      Привык
+      съедать
+      не
+      менее
+      3
+      килограммов.>
+    ]
+    >,
+    'questions_list'
+    :
+    <QuerySet
+    [
+      <Questions
+      :
+      Каковы
+      часы
+      работы
+      вашего
+      ресторана
+      ?
+      Как
+      я
+      могу
+      забронировать
+      место
+      ?
+      >,
+      <Questions
+      :
+      Насколько
+      велика
+      вероятность
+      насмерть
+      отравиться
+      рыбой
+      фугу
+      ?
+      >,
+      <Questions
+      :
+      Насколько
+      большие
+      порции
+      вы
+      можете
+      приготовить
+      ?
+      Привык
+      съедать
+      не
+      менее
+      3
+      килограммов.>,
+      <Questions
+      :
+      Насколько
+      большие
+      порции
+      вы
+      можете
+      приготовить
+      ?
+      Привык
+      съедать
+      не
+      менее
+      3
+      килограммов.>
+    ]
+    >,
+    'view'
+    :
+    <restaurant.views.QuestionListView
+    object
+    at
+    0x71e1e7a80750>,
+    'questions_and_answers'
+    :
+    'Здесь вы можете найти ответы на часто задаваемые вопросы, а также задать свой. Вопросы проходят премодерацию.',
+    'time_offset'
+    :
+    0
+    },
+    {}
+  ]
+]

@@ -110,10 +110,11 @@
                         <div style="color: blue ">Вопрос:</div>
                         {{object.question_text}}
 
-                        {% if object.answer_text.count > 0 %}
+                        {% if object.answer_text %}
                         <div style="color: blue ">Ответ:</div>
-                        {{object.answer_text}}
+                        {{object.answer_text}}<br><br>
                         {% endif %}
+
 
                          <div style="color: blue ">Дата создания:</div>
                         {{object.created_at|time_to_local:time_offset}}
