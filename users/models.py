@@ -75,7 +75,7 @@ class User(AbstractUser):
         ]
 
     def __str__(self):
-        return f" {self.name} ({self.email})"
+        return f"{self.name} ({self.email})"
 
 
 class UserToken(models.Model):

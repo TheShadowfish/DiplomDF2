@@ -1,11 +1,13 @@
+import datetime
 import secrets
 
 from django.test import TestCase
 
-from restaurant.models import Questions
+from restaurant.models import Questions, Table, Booking
 from django.urls import reverse
 
 from restaurant.templatetags.my_tags import generate_fake_mail
+from users.models import User
 
 
 class QuestionsListViewTest(TestCase):
@@ -161,4 +163,184 @@ class AboutListViewTest(TestCase):
         self.assertTrue('about_us_team2' in resp.context)
         self.assertTrue('about_us_team3' in resp.context)
 
+# class TestRedirect(TestCase):
+#     fixtures = ['test_data.json']
+#     def test_booking_create_reverse(self):
+#         resp = self.client.get(reverse('restaurant:booking_create'))
+#         self.assertEqual(resp.status_code, 302)
+#         self.assertRedirects(resp, '/users/login/?login=/booking_create/')
+#         # AssertionError: '/users/login/?login=%2Fbooking_create%2F' != '/users/login/?next=%2Frestaurant%2Fbooking_create%2F'
+#
+#         # self.assertEqual(resp.location, 'users:login')
+#
+#         # self.assertTemplateUsed(resp, 'restaurant/booking_create.html')
+#
+#         # resp
+#
+#     def test_booking_list_reverse(self):
+#         resp = self.client.get(reverse('restaurant:booking_list'))
+#         self.assertEqual(resp.status_code, 302)
+#
+#         self.assertRedirects(resp, '/users/login/?login=/booking_list/')
 
+
+
+class BookingListViewTest(TestCase):
+    fixtures = ['test_data.json']
+    def setUp(self):
+        # Создание ользователя
+        test_user1 = User.objects.create_user(email='test_user1@test.ru', name='user1', password='test')
+        test_user1.save()
+
+        #берем первый попавшийся столик из фикстуры
+        table = Table.objects.first()
+
+
+        # Создание 10 объектов Booking
+        number_of_booking_copies = 10
+
+        for i, booking in enumerate(range(number_of_booking_copies), start=1):
+
+            date_next = datetime.date.today() + datetime.timedelta(days=1)
+            time_next_1h = datetime.time((8+i), 0, 0)
+            time_next_2h = datetime.time((9+i), 0, 0)
+
+            booking = Booking.objects.create(user=test_user1, table=table, places=4, description='test_booking',
+                                                    notification=0,
+                                                    date_field=date_next, time_start=time_next_1h,
+                                                    time_end=time_next_2h, active=True)
+            booking.save()
+
+    def test_redirect_if_not_logged_in(self):
+        resp = self.client.get(reverse('restaurant:booking_list'))
+        self.assertEqual(resp.status_code, 302)
+        self.assertRedirects(resp, '/users/login/?login=/booking_list/')
+
+    def test_logged_in_uses_correct_template(self):
+        login = self.client.login(email='test_user1@test.ru', password='test')
+        resp = self.client.get(reverse('restaurant:booking_list'))
+
+        # Проверка что пользователь залогинился
+        self.assertEqual(str(resp.context['user']),  'user1 (test_user1@test.ru)')
+        #return f"{self.name} ({self.email})
+        # Проверка ответа на запрос
+        self.assertEqual(resp.status_code, 200)
+
+        # Проверка того, что мы используем правильный шаблон
+        self.assertTemplateUsed(resp, 'restaurant/booking_list.html')
+
+    def test_only_user_bookings_in_list(self):
+        login = self.client.login(email='test_user1@test.ru', password='test')
+        resp = self.client.get(reverse('restaurant:booking_list'))
+
+        # Проверка, что пользователь залогинился
+        self.assertEqual(str(resp.context['user']), 'user1 (test_user1@test.ru)')
+        # Check that we got a response "success"
+        self.assertEqual(resp.status_code, 200)
+
+        # Проверка, что все бронирования пользователя показаны
+        self.assertTrue('booking_list' in resp.context)
+        self.assertEqual(len(resp.context['booking_list']), 10)
+
+        # Подтверждение, что все бронирования принадлежат testuser1
+        for booking_item in resp.context['booking_list']:
+            self.assertEqual(resp.context['user'], booking_item.user)
+
+        # проверка, что список отсортирован
+        date_last = 0
+        time_last = 0
+
+        for copy in resp.context['booking_list']:
+            if date_last == 0:
+                date_last = copy.date_field
+                time_last = copy.time_start
+            else:
+                self.assertTrue(copy.date_field >= date_last)
+                self.assertTrue(copy.time_start >= time_last)
+
+class BookingCreateViewTest(TestCase):
+    fixtures = ['test_data.json']
+
+    def setUp(self):
+        # Создание пользователя
+        test_user2 = User.objects.create_user(email='test_user2@test.ru', name='user2', password='test')
+        test_user2.save()
+
+        test_user1 = User.objects.create_user(email='test_user1@test.ru', name='user1', password='test')
+        test_user1.save()
+
+        # берем первый попавшийся столик из фикстуры
+        table_1 = Table.objects.first()
+
+        # берем первый попавшийся столик из фикстуры
+        table_2 = Table.objects.last()
+
+        # Создание 10 объектов Booking
+        number_of_booking_copies = 10
+
+        for i, booking in enumerate(range(number_of_booking_copies), start=1):
+            date_next = datetime.date.today() + datetime.timedelta(days=1)
+            time_next_1h = datetime.time((8 + i), 0, 0)
+            time_next_2h = datetime.time((9 + i), 0, 0)
+
+            booking = Booking.objects.create(user=test_user2, table=table_2, places=4, description='test_booking',
+                                            notification=0,
+                                            date_field=date_next, time_start=time_next_1h,
+                                            time_end=time_next_2h, active=True)
+            booking = Booking.objects.create(user=test_user1, table=table_1, places=4, description='test_booking',
+                                             notification=0,
+                                             date_field=date_next, time_start=time_next_1h,
+                                             time_end=time_next_2h, active=True)
+
+            booking.save()
+
+    def test_redirect_if_not_logged_in(self):
+        resp = self.client.get(reverse('restaurant:booking_create'))
+        self.assertEqual(resp.status_code, 302)
+        self.assertRedirects(resp, '/users/login/?login=/booking_create/')
+
+    def test_logged_in_uses_correct_template(self):
+        login = self.client.login(email='test_user2@test.ru', password='test')
+        resp = self.client.get(reverse('restaurant:booking_create'))
+
+        # Проверка, что пользователь залогинился
+        self.assertEqual(str(resp.context['user']), 'user2 (test_user2@test.ru)')
+        # return f"{self.name} ({self.email})
+        # Проверка ответа на запрос
+        self.assertEqual(resp.status_code, 200)
+
+        # Проверка того, что мы используем правильный шаблон
+        self.assertTemplateUsed(resp, 'restaurant/booking_form.html')
+
+    def test_seeing_active_bookings_when_create(self):
+        login = self.client.login(email='test_user2@test.ru', password='test')
+        resp = self.client.get(reverse('restaurant:booking_create'))
+
+        # Проверка, что пользователь залогинился
+        self.assertEqual(str(resp.context['user']), 'user2 (test_user2@test.ru)')
+        # Check that we got a response "success"
+        self.assertEqual(resp.status_code, 200)
+
+        # Проверка, что все бронирования пользователя показаны
+        self.assertTrue('booking_list' in resp.context)
+        self.assertEqual(len(resp.context['booking_list']), 20)
+
+        # Подтверждение, что бронирования принадлежат разным пользователям
+        different_users=False
+        for booking_item in resp.context['booking_list']:
+            if booking_item.user != resp.context['user']:
+                different_users = True
+                break
+        self.assertTrue(different_users)
+
+        # проверка что список отсортирован
+        date_last = 0
+        time_last = 0
+
+        for copy in resp.context['booking_list']:
+            if date_last == 0:
+                date_last = copy.date_field
+                time_last = copy.time_start
+            else:
+                self.assertTrue(copy.date_field >= date_last)
+                self.assertTrue(copy.time_start >= time_last)
