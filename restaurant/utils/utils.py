@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta, time
-from restaurant.models import ContentText, ContentImage, Contentlink, ContentParameters
+from restaurant.models import ContentText, ContentImage, Contentlink, ContentParameters, BookingToken, Booking
 
 
 def get_content_text_from_postgre(title):
@@ -73,3 +73,35 @@ def get_content_parameters(ignored_error):
                     "confirm_timedelta": 45}
         else:
             return False
+
+
+def get_actual_bookings(user):
+
+    # 1) все неактивные бронирования проигнорим
+
+    # booking_tokens = [token.booking.pk for token in BookingToken.objects.filter(created_at__gt=time_border)]
+
+    date_now = datetime.now()
+    # для начала
+    #
+    # now = Booking.objects.filter(active=True)
+
+    # print(user)
+
+
+    # now = Booking.objects.filter(active=True, user=user).filter(date_field__year__gte=date_now.year, date_field__month__gte=date_now.month,
+    #                              date_field__day__gte=(date_now - timedelta(days=1)).day)
+
+    now = Booking.objects.filter(active=True).filter(date_field__year__gte=date_now.year, date_field__month__gte=date_now.month,
+                                 date_field__day__gte=(date_now - timedelta(days=1)).day)
+
+    # time_start, time_end = time_segment()
+
+    # теперь проще найти бронирования, которые еще длятся
+    still_is = [booking.pk for booking in now if (time_segment(booking.date_field, booking.time_start, booking.time_end))[0] > date_now]
+
+    bookings_active = now.filter(pk__in=still_is)
+    print(bookings_active)
+
+    return bookings_active
+

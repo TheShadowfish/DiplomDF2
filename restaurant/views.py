@@ -179,6 +179,9 @@ class BookingCreateUpdateMixin:
         time_border = timezone.now() - confirm_timedelta
 
         # список pk бронирований, которые могут быть подтверждены
+        # а фильтрацию бронирований мы затолкаем в utils?
+
+
         booking_tokens = [token.booking.pk for token in BookingToken.objects.filter(created_at__gt=time_border)]
 
         # not_has_been_tokens = [token.booking.pk for token in BookingToken.objects.filter(created_at__gt=time_border)]
@@ -186,6 +189,8 @@ class BookingCreateUpdateMixin:
         # ну 3.14159здец конечно...
         date_now = datetime.now()
         # для начала
+
+
         now = Booking.objects.filter(date_field__year__gte=date_now.year, date_field__month__gte=date_now.month,
                                      date_field__day__gte=(date_now - timedelta(days=1)).day)
 
