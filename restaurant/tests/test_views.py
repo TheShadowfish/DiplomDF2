@@ -1,7 +1,10 @@
 import datetime
 from django.test import TestCase
+
 from restaurant.models import Table, Booking
 from django.urls import reverse
+
+from restaurant.templates.restaurant.services import cache_clear
 from users.models import User
 
 
@@ -30,7 +33,14 @@ class QuestionsListViewTest(TestCase):
 
 
 class HomeListViewTest(TestCase):
+
+    # CACHE_ENABLED = False
+    # cache_clear()
     fixtures = ["test_data.json"]
+
+    def setUp(self):
+        self.CACHE_ENABLED = False
+        cache_clear()
 
     def test_home_url_exists_at_desired_location(self):
         resp = self.client.get("/")
@@ -46,6 +56,9 @@ class HomeListViewTest(TestCase):
         self.assertTemplateUsed(resp, "restaurant/home.html")
 
     def test_lists_resp_context(self):
+        self.cache_off = False
+        self.CACHE_ENABLED = False
+
         resp = self.client.get(reverse("restaurant:main"))
         self.assertEqual(resp.status_code, 200)
 
@@ -63,7 +76,16 @@ class HomeListViewTest(TestCase):
 
 
 class AboutListViewTest(TestCase):
+
+    # CACHE_ENABLED = False
+    # cache_clear()
     fixtures = ["test_data.json"]
+
+    def setUp(self):
+        # self.cache_off = False
+        self.CACHE_ENABLED = False
+        cache_clear()
+
 
     def test_home_url_exists_at_desired_location(self):
         resp = self.client.get("/about_us/")
@@ -80,6 +102,7 @@ class AboutListViewTest(TestCase):
         self.assertTemplateUsed(resp, "restaurant/about_us.html")
 
     def test_lists_resp_context(self):
+
         resp = self.client.get(reverse("restaurant:about_us"))
         self.assertEqual(resp.status_code, 200)
 

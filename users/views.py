@@ -2,6 +2,7 @@ import secrets
 import string
 
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import LogoutView, LoginView
 from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
 from django.shortcuts import render, get_object_or_404, redirect
@@ -10,7 +11,8 @@ from django.utils import timezone
 from django.views.generic import CreateView, UpdateView, DetailView
 
 from config.settings import EMAIL_HOST_USER
-from restaurant.models import Booking, ContentParameters
+from restaurant.models import ContentParameters
+from restaurant.templates.restaurant.services import get_cached_booking_list, cache_clear
 from users.forms import UserRegisterForm, UserProfileForm
 from users.models import User, UserToken
 
@@ -125,8 +127,10 @@ class UserDetailView(LoginRequiredMixin, GetFormClassUserIsOwnerMixin, DetailVie
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        unfiltered_booking = Booking.objects.filter(user=self.object)
-        context["booking_list"] = unfiltered_booking.order_by("date_field", "time_start")
+        context["booking_list"] = get_cached_booking_list().filter(user=self.object).order_by("date_field", "time_start")
+
+        # unfiltered_booking = Booking.objects.filter(user=self.object)
+        # context["booking_list"] = unfiltered_booking.order_by("date_field", "time_start")
 
         user = self.request.user
         pk = self.kwargs.get("pk")
@@ -167,3 +171,21 @@ def password_recovery(request):
         return redirect(reverse("users:login"))
 
     return render(request, "users/password_recovery.html")
+
+
+
+class CacheClearedLogoutView(LogoutView):
+
+    def post(self, request, *args, **kwargs):
+        """Logout may be done via POST."""
+        cache_clear()
+        return super().post(request, *args, **kwargs)
+
+
+def cache_clear_when_login(request):
+    # Ваш код обработки запроса
+    # ...
+    # Очистка кэша страницы
+    cache_clear()
+    return redirect(reverse("users:login"))
+

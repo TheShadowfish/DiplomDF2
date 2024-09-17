@@ -16,11 +16,12 @@ from restaurant.models import Booking, Table, BookingToken, ContentParameters, Q
 
 from dotenv import load_dotenv
 
+from restaurant.templates.restaurant.services import get_cached_booking_list, get_cached_questions_list, \
+    cache_delete_question_list, cache_delete_booking_list
 from restaurant.utils.utils import get_content_text_from_postgre, \
     get_content_image_from_postgre, get_content_link_from_postgre
 
 load_dotenv()
-
 
 class HomePageView(TemplateView):
     template_name = "restaurant/home.html"
@@ -120,9 +121,11 @@ class BookingListView(LoginRequiredMixin, ListView):
         user = self.request.user
         context["user"] = user
 
-        unfiltered_booking = Booking.objects.filter(user=user)
+        cashed_booking = get_cached_booking_list()
 
-        context["booking_list"] = unfiltered_booking.order_by("date_field", "time_start")
+
+        # unfiltered_booking = cashed_booking.filter(user=user)
+        context["booking_list"] = cashed_booking.filter(user=user).order_by("date_field", "time_start")
 
         return context
 
@@ -155,6 +158,7 @@ class BookingCreateUpdateMixin:
             recipient_list=[email]
         )
 
+        get_cached_booking_list(recached=True)
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -240,18 +244,20 @@ def booking_verification(request, token):
         # confirm_timedelta = timezone.timedelta(minutes=ContentParameters.objects.get(title="confirm_timedelta"))
     except Exception:
         confirm_timedelta_raw = timezone.timedelta(minutes=45)
-        print("confirm_timedelta_raw - установлено по умолчаеию (45 минут)")
+        print("confirm_timedelta_raw - установлено по умолчанию (45 минут)")
 
     confirm_timedelta = timezone.timedelta(minutes=int(confirm_timedelta_raw.body))
 
     if this_booking_token.created_at < timezone.now() - confirm_timedelta:
         booking.delete()
         this_booking_token.delete()
+        get_cached_booking_list(recached=True)
         return render(request, "restaurant/token_expired.html")
     else:
         this_booking_token.delete()
         booking.active = True
         booking.save()
+        get_cached_booking_list(recached=True)
         return render(request, "restaurant/booking_confirmed.html")
 
 
@@ -293,8 +299,17 @@ class BookingDeleteView(LoginRequiredMixin, DeleteView):
         return reverse("restaurant:booking_list")
 
     def form_valid(self, form):
+
+        # booking_list = get_cached_booking_list(recached=True)
+        # print(booking_list)
+        # booking_list_2 = Booking.objects.all()
+        # print(booking_list_2)
+        # assert (str(booking_list) == str(booking_list_2))
+
         user = self.request.user
         if user == self.object.user:
+            cache_delete_booking_list()
+            # get_cached_booking_list(recached=True)
             return super().form_valid(form)
         else:
             raise PermissionDenied
@@ -313,10 +328,26 @@ class BookingDetailView(LoginRequiredMixin, DetailView):
     def form_valid(self, form):
         user = self.request.user
         if user == self.object.user or user.is_moderator:
+            cashed_booking = get_cached_booking_list()
+
+            # unfiltered_booking = cashed_booking.filter(user=user)
+            # context["object"] = cashed_booking.filter(user=user).order_by("date_field", "time_start")
+
+            # get_cached_booking_list()
             return super().form_valid(form)
         else:
             raise PermissionDenied
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # pk = self.kwargs.get('pk')
+        # cashed_booking = get_cached_booking_list()
+        # print(pk)
+        # print(cashed_booking)
+        context["object"] = get_cached_booking_list().get(id=self.kwargs.get('pk'))
 
+        return context
+
+        # context["object"] = this_booking
 
 def toggle_activity_booking(request, pk):
     booking_item = get_object_or_404(Booking, pk=pk)
@@ -327,7 +358,9 @@ def toggle_activity_booking(request, pk):
     booking_item.save()
 
     user_pk = booking_item.user.pk
-    return redirect(reverse("users:user_detail", kwargs={"pk": user_pk}))
+
+    get_cached_booking_list(recached=True)
+    return redirect(reverse("restaurant:booking_list"))
 
 
 class QuestionListView(ListView):
@@ -342,11 +375,19 @@ class QuestionListView(ListView):
         CONST1 = "questions_and_answers"
         context[CONST1.replace("-", "_")] = get_content_text_from_postgre(CONST1)
 
+        cashed_questions = get_cached_questions_list()
+        context["object_list"] = cashed_questions
+
         user = self.request.user
         try:
             context["time_offset"] = user.time_offset
         except Exception:
             context["time_offset"] = 0
+
+
+
+
+
 
         return context
 
@@ -361,6 +402,14 @@ class QuestionCreateView(CreateView):
         else:
             return LimitedQuestionsForm
 
+    def form_valid(self, form):
+
+        questions_list = form.save()
+        questions_list.save()
+        get_cached_questions_list(recached=True)
+        return super().form_valid(form)
+
+
     def get_success_url(self):
 
         user = self.request.user
@@ -370,6 +419,7 @@ class QuestionCreateView(CreateView):
             return reverse("restaurant:questions_success", args=["question_premoderated"])
 
 
+
 class QuestionUpdateView(LoginRequiredMixin, UpdateView):
     model = Questions
     form_class = QuestionsForm
@@ -377,11 +427,11 @@ class QuestionUpdateView(LoginRequiredMixin, UpdateView):
     redirect_field_name = "login"
     success_url = reverse_lazy("restaurant:question_list")
 
-    def get_form_class(self):
-        user = self.request.user
-        if user.is_staff or user.is_moderator:
-            return QuestionsForm
-        raise PermissionDenied
+    def form_valid(self, form):
+        questions_list = form.save()
+        questions_list.save()
+        get_cached_questions_list(recached=True)
+        return super().form_valid(form)
 
 
 class QuestionDeleteView(LoginRequiredMixin, DeleteView):
@@ -389,6 +439,16 @@ class QuestionDeleteView(LoginRequiredMixin, DeleteView):
     login_url = "users:login"
     redirect_field_name = "login"
     success_url = reverse_lazy("restaurant:question_list")
+
+    def form_valid(self, form):
+
+        cache_delete_question_list()
+
+        return super().form_valid(form)
+
+
+
+
 
 
 def questions_success(request, message):

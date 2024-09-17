@@ -72,8 +72,14 @@
 
 
                 {% else %}
+                {% comment 'С грязным кешем на главную страницу не входить!' %}
                 <a class="p-2 btn btn-outline-primary" href="{% url 'users:login' %}">Войти</a>
                 &nbsp;
+                {% endcomment %}
+                <a class="p-2 btn btn-outline-primary" href="{% url 'users:user_login' %}">Войти</a>
+                &nbsp;
+
+
                 <a class="p-2 btn btn-outline-primary" href="{% url 'users:register' %}">Регистрация</a>
                 &nbsp;&nbsp;
                 {% endif %}

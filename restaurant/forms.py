@@ -6,6 +6,7 @@ from django.forms import BooleanField, TimeField, DateField, NumberInput, Textar
 from django.utils import timezone
 
 from restaurant.models import Booking, BookingToken, Questions
+from restaurant.templates.restaurant.services import get_cached_questions_list
 from restaurant.utils.utils import time_segment, get_content_parameters
 
 
@@ -156,9 +157,16 @@ class QuestionsForm(StyleFormMixin, forms.ModelForm):
         exclude = (
             "created_at",
         )
+    # def form_valid(self, form):
+    #     get_cached_questions_list(recached=True)
+    #     return super().form_valid(form)
 
 
 class LimitedQuestionsForm(StyleFormMixin, forms.ModelForm):
     class Meta:
         model = Questions
         fields = ("question_text", "sign",)
+
+    # def form_valid(self, form):
+    #     get_cached_questions_list(recached=True)
+    #     return super().form_valid(form)

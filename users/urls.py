@@ -3,13 +3,14 @@ from django.urls import path, reverse_lazy
 
 from users.apps import UsersConfig
 from users.views import RegisterView, email_verification, UserDetailView, \
-    confirm_email, ProfileView, password_recovery
+    confirm_email, ProfileView, password_recovery, CacheClearedLogoutView, cache_clear_when_login
 
 app_name = UsersConfig.name
 
 urlpatterns = [
     path("login/", LoginView.as_view(template_name="users/login.html"), name="login"),
-    path("logout/", LogoutView.as_view(), name="logout"),
+    path("user_login/", cache_clear_when_login, name="user_login"),
+    path("logout/", CacheClearedLogoutView.as_view(), name="logout"),
     path("register/", RegisterView.as_view(), name="register"),
     path("email-confirm/<str:token>/", email_verification, name="email-confirm"),
     path("users/token_expired.html/", email_verification, name="token_expired"),

@@ -14,7 +14,7 @@ app_name = RestaurantConfig.name
 urlpatterns = [
     # страницы вообще почти не меняются, потому закеширую их на 300 секунд (5 минут!)
     # изменение параметров страницы (текст и картинки) будут конечно отражаться на сайте с 5 минутной задержкой
-
+    # не вижу в этом проблемы, они меняются так редко что можно и подождать
     path("", cache_page(300)(HomePageView.as_view()), name="main"),
     path("about_us/", cache_page(300)(AboutUsPageView.as_view()), name="about_us"),
 
