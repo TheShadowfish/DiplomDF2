@@ -1,7 +1,7 @@
-from django.contrib.sites import requests
+# from django.contrib.sites import requests
 
 from config import settings
-# import requests
+import requests
 
 
 def send_telegram_message(chat_id, message):

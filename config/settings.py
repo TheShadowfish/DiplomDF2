@@ -3,8 +3,6 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 
-
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv()
@@ -185,21 +183,16 @@ CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
 CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND")
 
 CELERY_BEAT_SCHEDULE = {
-    "resaurant.tasks.find_active_bookings": {
-        "task": "resaurant.tasks.find_active_bookings",
+    "restaurant.tasks.find_active_bookings": {
+        "task": "restaurant.tasks.find_active_bookings",
         "schedule": timedelta(minutes=1),  # Run every day at 00:00
     }
 }
 # CELERY_BEAT_SCHEDULE = "django_celery_beat.schedulers:DatabaseScheduler"
 
-
-
-
-
 TELEGRAM_URL = os.getenv("TELEGRAM_URL")
- # "https://api.telegram.org/bot"
+# "https://api.telegram.org/bot"
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
-
 
 CACHE_ENABLED = os.getenv("CACHE_ENABLED") == "True"
 

@@ -1,4 +1,4 @@
-from django.contrib.auth.views import LoginView, LogoutView, PasswordResetView, PasswordResetConfirmView
+from django.contrib.auth.views import LoginView, PasswordResetView, PasswordResetConfirmView
 from django.urls import path, reverse_lazy
 
 from users.apps import UsersConfig
@@ -8,6 +8,8 @@ from users.views import RegisterView, email_verification, UserDetailView, \
 app_name = UsersConfig.name
 
 urlpatterns = [
+
+
     path("login/", LoginView.as_view(template_name="users/login.html"), name="login"),
     path("user_login/", cache_clear_when_login, name="user_login"),
     path("logout/", CacheClearedLogoutView.as_view(), name="logout"),

@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta, time
-from restaurant.models import ContentText, ContentImage, Contentlink, ContentParameters, BookingToken, Booking
+from restaurant.models import ContentText, ContentImage, Contentlink, ContentParameters, Booking
 
 
 def get_content_text_from_postgre(title):
@@ -75,33 +75,31 @@ def get_content_parameters(ignored_error):
             return False
 
 
-def get_actual_bookings(user):
+def get_actual_bookings(active=True, time_start=True):
 
     # 1) все неактивные бронирования проигнорим
 
     # booking_tokens = [token.booking.pk for token in BookingToken.objects.filter(created_at__gt=time_border)]
 
-    date_now = datetime.now()
-    # для начала
-    #
-    # now = Booking.objects.filter(active=True)
+    now = datetime.now()
 
-    # print(user)
+    if active:
+        first_filter = Booking.objects.filter(active=True)
+    else:
+        first_filter = Booking.objects.all()
 
+    second_filter = first_filter.filter(date_field__year__gte=now.year, date_field__month__gte=now.month,
+                                        date_field__day__gte=(now - timedelta(days=1)).day)
 
-    # now = Booking.objects.filter(active=True, user=user).filter(date_field__year__gte=date_now.year, date_field__month__gte=date_now.month,
-    #                              date_field__day__gte=(date_now - timedelta(days=1)).day)
+    if (time_start):
+        still_is = [b.pk for b in second_filter if
+                    (time_segment(b.date_field, b.time_start, b.time_end)[0] > (now + timedelta(hours=b.user.time_offset)))]
 
-    now = Booking.objects.filter(active=True).filter(date_field__year__gte=date_now.year, date_field__month__gte=date_now.month,
-                                 date_field__day__gte=(date_now - timedelta(days=1)).day)
+        third_filter = second_filter.filter(pk__in=still_is)
+    else:
+        still_is = [b.pk for b in second_filter if
+                    (time_segment(b.date_field, b.time_start, b.time_end)[1] > (now + timedelta(hours=b.user.time_offset)))]
 
-    # time_start, time_end = time_segment()
+        third_filter = second_filter.filter(pk__in=still_is)
 
-    # теперь проще найти бронирования, которые еще длятся
-    still_is = [booking.pk for booking in now if (time_segment(booking.date_field, booking.time_start, booking.time_end))[0] > date_now]
-
-    bookings_active = now.filter(pk__in=still_is)
-    print(bookings_active)
-
-    return bookings_active
-
+    return third_filter

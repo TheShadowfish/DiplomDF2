@@ -12,6 +12,8 @@ from restaurant.apps import RestaurantConfig
 app_name = RestaurantConfig.name
 
 urlpatterns = [
+    # path("actual_booking/", actual_booking, name="actual_booking"),
+
     # страницы вообще почти не меняются, потому закеширую их на 300 секунд (5 минут!)
     # изменение параметров страницы (текст и картинки) будут конечно отражаться на сайте с 5 минутной задержкой
     # не вижу в этом проблемы, они меняются так редко что можно и подождать

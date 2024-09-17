@@ -62,11 +62,10 @@ class TestBookingForm(TestCase):
         self.assertTrue(form.fields["places"].label == "Число бронируемых мест")
         self.assertTrue(form.fields["description"].label == "Примечания")
         self.assertTrue(form.fields["places"].label == "Число бронируемых мест")
-        self.assertTrue(form.fields["notification"].label == "Оповещение")
+        self.assertTrue(form.fields["notification"].label == "Оповещение на Telegram (если указан при регистрации)")
         self.assertTrue(form.fields["date_field"].label == "Дата бронирования")
         self.assertTrue(form.fields["time_start"].label == "Начало бронирования")
         self.assertTrue(form.fields["time_end"].label == "Конец бронирования")
-        self.assertTrue(form.fields["notification"].label == "Оповещение")
 
         with self.assertRaises(Exception):
             self.assertTrue(form.fields["user"].label == "пользователь")
