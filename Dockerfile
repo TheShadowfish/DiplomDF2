@@ -2,7 +2,7 @@
 FROM python:3.11
 
 # Устанавливаем рабочую директорию в контейнере
-WORKDIR /HungryShark
+WORKDIR /hungry_shark
 
 # Копируем зависимости в контейнер
 COPY ./requirements.txt .
