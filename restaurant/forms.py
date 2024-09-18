@@ -6,7 +6,7 @@ from django.forms import BooleanField, TimeField, DateField, NumberInput, Textar
 from django.utils import timezone
 
 from restaurant.models import Booking, BookingToken, Questions
-from restaurant.utils.utils import time_segment, get_content_parameters
+from restaurant.utils.utils import time_segment, get_content_parameters, get_actual_bookings
 
 
 class StyleFormMixin:
@@ -94,23 +94,32 @@ class BookingForm(StyleFormMixin, forms.ModelForm):
 
         t_start, t_end = time_segment(data["date_field"], data["time_start"], data["time_end"])
         table = data["table"]
-        t_now = datetime.datetime.now()
 
-        # список pk бронирований, которые могут быть подтверждены
+        # отбор по времени конца бронирования без учета активности:
+        present_time_booking = get_actual_bookings(active=False, time_start=False)
+        # время подтверждения не истекло у следующих pk
         booking_tokens = [token.booking.pk for token in BookingToken.objects.filter(created_at__gt=time_border)]
-
+        # теперь фильтруем по pk исключая те, которые не были подтверждены
         # получение списка актуальных бронирований
-        # получение уменьшенного списка бронирований
-        bookings = (Booking.objects.filter(table=table).filter(Q(active=True) | Q(pk__in=booking_tokens)).
-                    filter(date_field__year__gte=t_now.year, date_field__month__gte=t_now.month,
-                           date_field__day__gte=(t_now - datetime.timedelta(days=1)).day).order_by("date_field",
-                                                                                                   "time_start"))
+        bookings = (present_time_booking.filter(table=table).filter(Q(active=True) | Q(pk__in=booking_tokens)).
+                    order_by("date_field", "time_start"))
+
+        #
+        # # список pk бронирований, которые могут быть подтверждены
+        # booking_tokens = [token.booking.pk for token in BookingToken.objects.filter(created_at__gt=time_border)]
+        #
+        # # получение списка актуальных бронирований
+        # # получение уменьшенного списка бронирований
+        # bookings = (Booking.objects.filter(table=table).filter(Q(active=True) | Q(pk__in=booking_tokens)).
+        #             filter(date_field__year__gte=t_now.year, date_field__month__gte=t_now.month,
+        #                    date_field__day__gte=(t_now - datetime.timedelta(days=1)).day).order_by("date_field",
+        #                                                                                            "time_start"))
 
         # проверка перекрытия времени бронирований
         for b in bookings:
             b_start, b_end = time_segment(b.date_field, b.time_start, b.time_end)
 
-            # если это обновление, то будет оюновляемый объект, иначе None
+            # если это обновление, то будет обновляемый объект, иначе None
             booking_id = self.instance
 
             if b_start <= t_start < b_end and booking_id.pk != b.pk:

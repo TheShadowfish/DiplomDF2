@@ -265,7 +265,7 @@ class BookingModelTest(TestCase):
     def test_booking_notification_label(self):
         booking = Booking.objects.first()
         field_label = booking._meta.get_field("notification").verbose_name
-        self.assertEquals(field_label, "Оповещение")
+        self.assertEquals(field_label, "Оповещение на Telegram (если указан при регистрации)")
 
     def test_booking_date_field_label(self):
         booking = Booking.objects.first()

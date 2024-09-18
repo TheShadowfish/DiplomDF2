@@ -43,7 +43,7 @@ class Booking(models.Model):
                                    help_text="Введите примечания к бронированию", **NULLABLE)
 
     notification = models.SmallIntegerField(
-        default=0, verbose_name="Оповещение", choices=NOTIFICATION_HOURS
+        default=0, verbose_name="Оповещение на Telegram (если указан при регистрации)", choices=NOTIFICATION_HOURS
     )
 
     date_field = models.DateField(verbose_name="дата бронирования", help_text="введите дата бронирования")

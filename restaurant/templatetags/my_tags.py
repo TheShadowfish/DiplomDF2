@@ -35,6 +35,13 @@ def has_been(value, arg):
     return True
 
 
+@register.filter
+def time_offset(value, arg):
+    time = value + datetime.timedelta(hours=arg)
+
+    return time
+
+
 # Создание тега
 @register.simple_tag
 def generate_fake_mail(length: int = 10) -> object:

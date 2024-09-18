@@ -1,5 +1,4 @@
 import secrets
-from datetime import datetime, timedelta
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
@@ -16,8 +15,10 @@ from restaurant.models import Booking, Table, BookingToken, ContentParameters, Q
 
 from dotenv import load_dotenv
 
+from restaurant.templates.restaurant.services import get_cached_booking_list, get_cached_questions_list, \
+    cache_delete_question_list, cache_delete_booking_list
 from restaurant.utils.utils import get_content_text_from_postgre, \
-    get_content_image_from_postgre, get_content_link_from_postgre
+    get_content_image_from_postgre, get_content_link_from_postgre, get_actual_bookings, get_content_parameters
 
 load_dotenv()
 
@@ -120,9 +121,10 @@ class BookingListView(LoginRequiredMixin, ListView):
         user = self.request.user
         context["user"] = user
 
-        unfiltered_booking = Booking.objects.filter(user=user)
+        cashed_booking = get_cached_booking_list()
 
-        context["booking_list"] = unfiltered_booking.order_by("date_field", "time_start")
+        # unfiltered_booking = cashed_booking.filter(user=user)
+        context["booking_list"] = cashed_booking.filter(user=user).order_by("date_field", "time_start")
 
         return context
 
@@ -147,7 +149,7 @@ class BookingCreateUpdateMixin:
 
         host = self.request.get_host()
         url = f"http://{host}/booking_verification/{token}/"
-        # print(url)
+
         send_mail(
             subject="Подтверждение бронирования",
             message=f"Привет, перейди по ссылке для подтверждения бронирования: {url}",
@@ -155,6 +157,7 @@ class BookingCreateUpdateMixin:
             recipient_list=[email]
         )
 
+        get_cached_booking_list(recached=True)
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -171,34 +174,18 @@ class BookingCreateUpdateMixin:
                 minutes=ContentParameters.objects.get(title="confirm_timedelta"))
         except Exception:
             confirm_timedelta = timezone.timedelta(minutes=45)
-            # print(f"confirm_timedelta - установлено по умолчаеию (45 минут)")
+
         time_border = timezone.now() - confirm_timedelta
 
         # список pk бронирований, которые могут быть подтверждены
+
+        # отбор по времени конца бронирования без учета активности:
+        present_time_booking = get_actual_bookings(active=False, time_start=False)
+        # время подтверждения не истекло у следующих pk
         booking_tokens = [token.booking.pk for token in BookingToken.objects.filter(created_at__gt=time_border)]
-
-        # not_has_been_tokens = [token.booking.pk for token in BookingToken.objects.filter(created_at__gt=time_border)]
-
-        # ну 3.14159здец конечно...
-        date_now = datetime.now()
-        # для начала
-        now = Booking.objects.filter(date_field__year__gte=date_now.year, date_field__month__gte=date_now.month,
-                                     date_field__day__gte=(date_now - timedelta(days=1)).day)
-
-        # теперь проще найти бронирования, которые еще длятся
-        still_is = []
-        for n in now:
-            n_end = datetime(year=n.date_field.year, month=n.date_field.month,
-                             day=n.date_field.day, hour=n.time_end.hour,
-                             minute=n.time_end.minute)
-            if n.time_start > n.time_end:
-                n_end += timedelta(days=1)
-
-            if n_end > date_now:
-                still_is.append(n.pk)
-
+        # теперь фильтруем по pk исключая те, которые не были подтверждены
         # получение списка актуальных бронирований
-        bookings = Booking.objects.filter(pk__in=still_is).filter(Q(active=True) | Q(pk__in=booking_tokens)).order_by(
+        bookings = present_time_booking.filter(Q(active=True) | Q(pk__in=booking_tokens)).order_by(
             "date_field", "time_start")
 
         # получение списка задействованных столиков
@@ -208,9 +195,15 @@ class BookingCreateUpdateMixin:
         context["tables_list"] = tables
         context["booking_list"] = bookings
 
-        context["period_of_booking"] = ContentParameters.objects.get(title="period_of_booking").body
-        context["work_start"] = ContentParameters.objects.get(title="work_start").body
-        context["work_end"] = ContentParameters.objects.get(title="work_end").body
+        parameters = get_content_parameters(False)
+        if parameters:
+            context["period_of_booking"] = parameters.get("period_of_booking")
+            context["work_start"] = parameters.get("work_start")
+            context["work_end"] = parameters.get("work_end")
+        else:
+            context["period_of_booking"] = "[period_of_booking - ошибка получения]"
+            context["work_start"] = "[work_start - ошибка получения]"
+            context["work_end"] = "[work_end - ошибка получения]"
 
         CONST1 = "booking_create"
         context[CONST1.replace("-", "_")] = get_content_text_from_postgre(CONST1)
@@ -223,7 +216,7 @@ def confirm_booking(request, email):
         confirm_timedelta = ContentParameters.objects.get(title="confirm_timedelta")
     except Exception as e:
         confirm_timedelta = 45
-        print(f"confirm_timedelta - установлено по умолчанию (45 минут) {e}")
+        print(f"Ошибка при обращении к параметру базы данных 'ContentParameters:confirm_timedelta' {e}")
 
     context = {
         "email": email, "confirm_timedelta": confirm_timedelta
@@ -240,18 +233,19 @@ def booking_verification(request, token):
         # confirm_timedelta = timezone.timedelta(minutes=ContentParameters.objects.get(title="confirm_timedelta"))
     except Exception:
         confirm_timedelta_raw = timezone.timedelta(minutes=45)
-        print("confirm_timedelta_raw - установлено по умолчаеию (45 минут)")
 
     confirm_timedelta = timezone.timedelta(minutes=int(confirm_timedelta_raw.body))
 
     if this_booking_token.created_at < timezone.now() - confirm_timedelta:
         booking.delete()
         this_booking_token.delete()
+        get_cached_booking_list(recached=True)
         return render(request, "restaurant/token_expired.html")
     else:
         this_booking_token.delete()
         booking.active = True
         booking.save()
+        get_cached_booking_list(recached=True)
         return render(request, "restaurant/booking_confirmed.html")
 
 
@@ -293,41 +287,48 @@ class BookingDeleteView(LoginRequiredMixin, DeleteView):
         return reverse("restaurant:booking_list")
 
     def form_valid(self, form):
+
         user = self.request.user
         if user == self.object.user:
+            cache_delete_booking_list()
+            # get_cached_booking_list(recached=True)
             return super().form_valid(form)
         else:
             raise PermissionDenied
 
 
 class BookingDetailView(LoginRequiredMixin, DetailView):
-
     model = Booking
     login_url = "users:login"
     redirect_field_name = "login"
 
-    def get_success_url(self):
-        user_pk = self.request.user.pk
-        return reverse("users:user_detail", kwargs={"pk": user_pk})
-
     def form_valid(self, form):
         user = self.request.user
         if user == self.object.user or user.is_moderator:
+            # cashed_booking = get_cached_booking_list()
+            #
+            # # unfiltered_booking = cashed_booking.filter(user=user)
+            # # context["object"] = cashed_booking.filter(user=user).order_by("date_field", "time_start")
+            #
+            # # get_cached_booking_list()
             return super().form_valid(form)
         else:
             raise PermissionDenied
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["object"] = get_cached_booking_list().get(id=self.kwargs.get("pk"))
+        return context
 
 
 def toggle_activity_booking(request, pk):
     booking_item = get_object_or_404(Booking, pk=pk)
     if booking_item.active:
         booking_item.active = False
-    # else:
-    #     booking_item.active = True
     booking_item.save()
 
-    user_pk = booking_item.user.pk
-    return redirect(reverse("users:user_detail", kwargs={"pk": user_pk}))
+    get_cached_booking_list(recached=True)
+    return redirect(reverse("restaurant:booking_list"))
 
 
 class QuestionListView(ListView):
@@ -341,6 +342,9 @@ class QuestionListView(ListView):
 
         CONST1 = "questions_and_answers"
         context[CONST1.replace("-", "_")] = get_content_text_from_postgre(CONST1)
+
+        cashed_questions = get_cached_questions_list()
+        context["object_list"] = cashed_questions
 
         user = self.request.user
         try:
@@ -361,6 +365,13 @@ class QuestionCreateView(CreateView):
         else:
             return LimitedQuestionsForm
 
+    def form_valid(self, form):
+
+        questions_list = form.save()
+        questions_list.save()
+        get_cached_questions_list(recached=True)
+        return super().form_valid(form)
+
     def get_success_url(self):
 
         user = self.request.user
@@ -377,11 +388,11 @@ class QuestionUpdateView(LoginRequiredMixin, UpdateView):
     redirect_field_name = "login"
     success_url = reverse_lazy("restaurant:question_list")
 
-    def get_form_class(self):
-        user = self.request.user
-        if user.is_staff or user.is_moderator:
-            return QuestionsForm
-        raise PermissionDenied
+    def form_valid(self, form):
+        questions_list = form.save()
+        questions_list.save()
+        get_cached_questions_list(recached=True)
+        return super().form_valid(form)
 
 
 class QuestionDeleteView(LoginRequiredMixin, DeleteView):
@@ -389,6 +400,11 @@ class QuestionDeleteView(LoginRequiredMixin, DeleteView):
     login_url = "users:login"
     redirect_field_name = "login"
     success_url = reverse_lazy("restaurant:question_list")
+
+    def form_valid(self, form):
+        cache_delete_question_list()
+
+        return super().form_valid(form)
 
 
 def questions_success(request, message):

@@ -22,24 +22,35 @@ class UtilsTest(TestCase):
         self.assertEquals(t_start_2, datetime(2024, 4, 1, 23, 0, 0))
         self.assertEquals(t_end_2, datetime(2024, 4, 2, 8, 0, 0))
 
-    def test_get_content_parameters(self):
-        dictionary_1 = get_content_parameters(ignored_error=True)
-        dictionary_2 = get_content_parameters(ignored_error=False)
-
-        ContentParameters.objects.create(title="period_of_booking", body=10)
-        ContentParameters.objects.create(title="work_start", body="12:00")
-        ContentParameters.objects.create(title="work_end", body="16:00")
-        ContentParameters.objects.create(title="confirm_timedelta", body=50)
-
+    def test_get_content_parameters_ignored_error_true(self):
         dict_1_eq = {"period_of_booking": 14, "work_start": time(8, 0, 0),
                      "work_end": time(23, 0, 0), "confirm_timedelta": 45}
+
+        ContentParameters.objects.all().delete()
+        dictionary_1 = get_content_parameters(ignored_error=True)
+        self.assertEquals(dictionary_1, dict_1_eq)
+
+    def test_get_content_parameters_ignored_error_false(self):
+        ContentParameters.objects.all().delete()
+        dictionary_1 = get_content_parameters(ignored_error=False)
+        self.assertEquals(dictionary_1, False)
+
+    def test_get_content_parameters_exists(self):
         dict_3_eg = {"period_of_booking": 10, "work_start": time(12, 0, 0),
                      "work_end": time(16, 0, 0), "confirm_timedelta": 50}
 
-        dictionary_3 = get_content_parameters(ignored_error=False)
+        ContentParameters.objects.all().delete()
 
-        self.assertEquals(dictionary_1, dict_1_eq)
-        self.assertEquals(dictionary_2, False)
+        c = ContentParameters.objects.create(title="period_of_booking", body=10)
+        c.save()
+        c = ContentParameters.objects.create(title="work_start", body="12:00")
+        c.save()
+        c = ContentParameters.objects.create(title="work_end", body="16:00")
+        c.save()
+        c = ContentParameters.objects.create(title="confirm_timedelta", body=50)
+        c.save()
+
+        dictionary_3 = get_content_parameters(ignored_error=False)
         self.assertEquals(dictionary_3, dict_3_eg)
 
     def test_get_content_text_from_postgre(self):

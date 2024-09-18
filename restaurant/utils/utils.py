@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta, time
-from restaurant.models import ContentText, ContentImage, Contentlink, ContentParameters
+from restaurant.models import ContentText, ContentImage, Contentlink, ContentParameters, Booking
 
 
 def get_content_text_from_postgre(title):
@@ -41,6 +41,21 @@ def time_segment(date: datetime.date, start: datetime.time, end: datetime.time) 
 
 def get_content_parameters(ignored_error):
     # выдернуть из базы данных параметры работы, бронирования и т.д.
+
+    period_of = ContentParameters.objects.filter(title="period_of_booking").exists()
+    work_start = ContentParameters.objects.filter(title="work_start").exists()
+    work_end = ContentParameters.objects.filter(title="work_end").exists()
+    confirm_t = ContentParameters.objects.filter(title="confirm_timedelta").exists()
+
+    if not (period_of and work_start and work_end and confirm_t):
+        if ignored_error:
+            work_start = time(8, 0, 0)
+            work_end = time(23, 0, 0)
+            period_of_booking = 14
+            return {"period_of_booking": period_of_booking, "work_start": work_start, "work_end": work_end,
+                    "confirm_timedelta": 45}
+        else:
+            return False
     try:
         period_of_booking = int(ContentParameters.objects.get(title="period_of_booking").body)
         work_start = time.fromisoformat(ContentParameters.objects.get(title="work_start").body)
@@ -56,4 +71,35 @@ def get_content_parameters(ignored_error):
             period_of_booking = 14
             return {"period_of_booking": period_of_booking, "work_start": work_start, "work_end": work_end,
                     "confirm_timedelta": 45}
-        return False
+        else:
+            return False
+
+
+def get_actual_bookings(active=True, time_start=True):
+
+    # 1) все неактивные бронирования проигнорим
+
+    # booking_tokens = [token.booking.pk for token in BookingToken.objects.filter(created_at__gt=time_border)]
+
+    now = datetime.now()
+
+    if active:
+        first_filter = Booking.objects.filter(active=True)
+    else:
+        first_filter = Booking.objects.all()
+
+    second_filter = first_filter.filter(date_field__year__gte=now.year, date_field__month__gte=now.month,
+                                        date_field__day__gte=(now - timedelta(days=1)).day)
+
+    if (time_start):
+        still_is = [b.pk for b in second_filter if
+                    (time_segment(b.date_field, b.time_start, b.time_end)[0] > (now + timedelta(hours=b.user.time_offset)))]
+
+        third_filter = second_filter.filter(pk__in=still_is)
+    else:
+        still_is = [b.pk for b in second_filter if
+                    (time_segment(b.date_field, b.time_start, b.time_end)[1] > (now + timedelta(hours=b.user.time_offset)))]
+
+        third_filter = second_filter.filter(pk__in=still_is)
+
+    return third_filter

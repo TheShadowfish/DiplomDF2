@@ -62,11 +62,10 @@ class TestBookingForm(TestCase):
         self.assertTrue(form.fields["places"].label == "Число бронируемых мест")
         self.assertTrue(form.fields["description"].label == "Примечания")
         self.assertTrue(form.fields["places"].label == "Число бронируемых мест")
-        self.assertTrue(form.fields["notification"].label == "Оповещение")
+        self.assertTrue(form.fields["notification"].label == "Оповещение на Telegram (если указан при регистрации)")
         self.assertTrue(form.fields["date_field"].label == "Дата бронирования")
         self.assertTrue(form.fields["time_start"].label == "Начало бронирования")
         self.assertTrue(form.fields["time_end"].label == "Конец бронирования")
-        self.assertTrue(form.fields["notification"].label == "Оповещение")
 
         with self.assertRaises(Exception):
             self.assertTrue(form.fields["user"].label == "пользователь")
@@ -177,7 +176,7 @@ class TestBookingForm(TestCase):
         user = User.objects.create_user(email="test@test.ru", password="test")
 
         # table с number = 1 уже есть
-        table = Table.objects.create(number=2, places=2, flour=1, description="test")
+        table = Table.objects.create(number=2, places=6, flour=1, description="test")
 
         date_next = datetime.date.today() + datetime.timedelta(days=1)
         time_next_1h = datetime.time(9, 0, 0)
@@ -293,7 +292,7 @@ class TestBookingForm(TestCase):
         user = User.objects.create_user(email="test3@test.ru", password="test")
 
         # table с number = 1 уже есть
-        table = Table.objects.create(number=4, places=2, flour=1, description="test")
+        table = Table.objects.create(number=4, places=6, flour=1, description="test")
 
         date_next = datetime.date.today() + datetime.timedelta(days=2)
         time_next_1h = datetime.time(9, 0, 0)
@@ -336,7 +335,7 @@ class TestBookingForm(TestCase):
     #
     def test_clean_total(self):
         user = User.objects.create_user(email="test4@test.ru", password="test")
-        table = Table.objects.create(number=5, places=2, flour=1, description="test")
+        table = Table.objects.create(number=5, places=6, flour=1, description="test")
 
         date_next = datetime.date.today() + datetime.timedelta(days=2)
         time_next_1h = datetime.time(9, 0, 0)
@@ -348,13 +347,16 @@ class TestBookingForm(TestCase):
         booking.save()
 
         correct_data = {"date_field": date_next, "time_start": datetime.time(14, 50, 0),
-                        "time_end": datetime.time(16, 50, 0), "table": table}
+                        "time_end": datetime.time(15, 50, 0), "table": table, "places": 4}
 
         form_correct = BookingForm()
         form_correct.cleaned_data = correct_data
 
         content = ContentParameters.objects.all().delete()
-        content.save()
+        # content.save()
+        # 'tuple' object has no attribute 'save' - а как тогда?
+        # content = ContentParameters.objects.get(title="work_start")
+        # content.delete()
         # нет параметров работы ресторана в БД, выбросит исключение
         with self.assertRaises(ValidationError) as e_1:
             content = ContentParameters.objects.all().delete()

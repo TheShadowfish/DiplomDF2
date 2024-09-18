@@ -1,7 +1,10 @@
 import datetime
 from django.test import TestCase
+
 from restaurant.models import Table, Booking
 from django.urls import reverse
+
+from restaurant.templates.restaurant.services import cache_clear
 from users.models import User
 
 
@@ -30,7 +33,13 @@ class QuestionsListViewTest(TestCase):
 
 
 class HomeListViewTest(TestCase):
+    # CACHE_ENABLED = False
+    # cache_clear()
     fixtures = ["test_data.json"]
+
+    def setUp(self):
+        self.CACHE_ENABLED = False
+        cache_clear()
 
     def test_home_url_exists_at_desired_location(self):
         resp = self.client.get("/")
@@ -46,6 +55,9 @@ class HomeListViewTest(TestCase):
         self.assertTemplateUsed(resp, "restaurant/home.html")
 
     def test_lists_resp_context(self):
+        self.cache_off = False
+        self.CACHE_ENABLED = False
+
         resp = self.client.get(reverse("restaurant:main"))
         self.assertEqual(resp.status_code, 200)
 
@@ -63,7 +75,14 @@ class HomeListViewTest(TestCase):
 
 
 class AboutListViewTest(TestCase):
+    # CACHE_ENABLED = False
+    # cache_clear()
     fixtures = ["test_data.json"]
+
+    def setUp(self):
+        # self.cache_off = False
+        self.CACHE_ENABLED = False
+        cache_clear()
 
     def test_home_url_exists_at_desired_location(self):
         resp = self.client.get("/about_us/")
@@ -189,9 +208,9 @@ class BookingCreateViewTest(TestCase):
         number_of_booking_copies = 10
 
         for i, booking in enumerate(range(number_of_booking_copies), start=1):
-            date_next = datetime.date.today() + datetime.timedelta(days=1)
-            time_next_1h = datetime.time((8 + i), 0, 0)
-            time_next_2h = datetime.time((9 + i), 0, 0)
+            date_next = datetime.date.today() + datetime.timedelta(days=2)
+            time_next_1h = datetime.time((9 + i), 0, 0)
+            time_next_2h = datetime.time((10 + i), 0, 0)
 
             booking = Booking.objects.create(user=test_user2, table=table_2, places=4, description="test_booking",
                                              notification=0,
