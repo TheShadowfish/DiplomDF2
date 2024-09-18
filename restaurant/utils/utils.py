@@ -16,7 +16,12 @@ def get_content_image_from_postgre(title):
         str_part_1 = "Для изменения изображения создайте запись '"
         str_part_2 = "' в таблице ContentImage и загрузите изображение (необходимы полномочия администратора)"
         description = f"{str_part_1}{title}{str_part_2}"
-        return ContentImage.objects.create(title="not_found", description=description, image=None)
+
+        try:
+            not_found=ContentImage.objects.create(title="not_found", description=description, image=None)
+        except Exception:
+            not_found=ContentImage.objects.filter(title="not_found")
+        return not_found
 
 
 def get_content_link_from_postgre(title):
@@ -24,8 +29,11 @@ def get_content_link_from_postgre(title):
         return Contentlink.objects.get(title=title)
     except Exception:
         text = f"Для создания ссылки создайте запись '{title}' в таблице ContentLink (необходимы полномочия администратора)"
-
-        return Contentlink.objects.create(title="not_found", text="ссылка не найдена", link="#", description=text)
+        try:
+            not_found=Contentlink.objects.create(title="not_found", text="ссылка не найдена", link="#", description=text)
+        except Exception:
+            not_found=Contentlink.objects.filter(title="not_found")
+        return not_found
 
 
 def time_segment(date: datetime.date, start: datetime.time, end: datetime.time) -> tuple[datetime, datetime]:
