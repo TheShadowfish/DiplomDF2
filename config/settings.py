@@ -166,19 +166,13 @@ CORS_ALLOW_ALL_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS") == "True"
 
 # Часовой пояс для работы Celery
 CELERY_TIMEZONE = TIME_ZONE
-
 # Флаг отслеживания выполнения задач
 CELERY_TASK_TRACK_STARTED = True
-
 # Максимальное время на выполнение задачи
 CELERY_TASK_TIME_LIMIT = 30 * 60
-
-
 CELERY_ENABLE_UTC = False
-
 # URL-адрес брокера сообщений
 CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
-
 # URL-адрес брокера результатов, также Redis
 CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND")
 
@@ -191,7 +185,6 @@ CELERY_BEAT_SCHEDULE = {
 # CELERY_BEAT_SCHEDULE = "django_celery_beat.schedulers:DatabaseScheduler"
 
 TELEGRAM_URL = os.getenv("TELEGRAM_URL")
-# "https://api.telegram.org/bot"
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 
 CACHE_ENABLED = os.getenv("CACHE_ENABLED") == "True"
@@ -200,8 +193,7 @@ if CACHE_ENABLED:
     CACHES = {
         "default": {
             "BACKEND": "django.core.cache.backends.redis.RedisCache",
-            # "LOCATION": os.getenv("LOCATION"),
-            "LOCATION": "redis://127.0.0.1:6379",
+            "LOCATION": os.getenv("LOCATION"),
             "TIMEOUT": 300  # Ручная регулировка времени жизни кеша в секундах, по умолчанию 300
         }
     }
