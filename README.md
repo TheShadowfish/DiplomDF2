@@ -14,14 +14,17 @@
 4. Создание и последующий запуск контейнера командой **docker-compose up -d --build**,
 Либо **docker-compose build**, а затем **docker-compose up -d**
 
+! - в последних версиях docker команда изменилась на **docker compose up -d** (без '-')
 
 5. Для корректного отображения сайта заполните базу данными, демонстрационные данные:
 
 docker exec -it <ID контейнера приложения> python3 manage.py loaddata data/test_data.json
+Далее возможно понадобится
+docker-compose down
 
-docker exec -it diplomdf2-app-1 python3 manage.py collectstatic
 
-docker exec -it <ID контейнера приложения> python3 manage.py loaddata data/habits_data.json
+~~docker exec -it diplomdf2-app-1 python3 manage.py collectstatic~~
+
 
 
 ### Описание задачи:
