@@ -1,3 +1,29 @@
+1. Настройте свой сервер (система Ubuntu 22.04)
+
+
+2. Создайте на сервере ssh ключ, запульте из репозитория на github 
+
+(git@github.com:TheShadowfish/DiplomDF2.git) код проекта, 
+Код клонировать на свой репозиторий и пулить оттуда.
+При необходимости прописать в config/settings.py адрес сервера в ALLOWED_HOSTS = [<адрес сервера>] (строка 17)
+Создайте на сервере в корне проекта файл .env по образцу **.env-sample**
+
+3. На сервере должен быть установлен Docker и docker-compose 
+(команда **apt-install docker docker-compose**)
+
+4. Создание и последующий запуск контейнера командой **docker-compose up -d --build**,
+Либо **docker-compose build**, а затем **docker-compose up -d**
+
+
+5. Для корректного отображения сайта заполните базу данными, демонстрационные данные:
+
+docker exec -it <ID контейнера приложения> python3 manage.py loaddata data/test_data.json
+
+docker exec -it diplomdf2-app-1 python3 manage.py collectstatic
+
+docker exec -it <ID контейнера приложения> python3 manage.py loaddata data/habits_data.json
+
+
 ### Описание задачи:
 
 Необходимо создать сайт для бронирования столиков в ресторане. Сайт должен быть сверстан и подключен к админке. Для выполнения задачи необходимо использовать Django и Bootstrap. Сайт должен содержать основные разделы, необходимые для бронирования столиков и управления бронированиями.
