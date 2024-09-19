@@ -7,6 +7,7 @@ from django.utils import timezone
 
 from restaurant.forms import BookingForm, QuestionsForm, LimitedQuestionsForm
 from restaurant.models import Table, Booking, BookingToken, ContentParameters
+from restaurant.utils.utils import get_content_parameters
 from users.models import User
 
 
@@ -352,16 +353,13 @@ class TestBookingForm(TestCase):
         form_correct = BookingForm()
         form_correct.cleaned_data = correct_data
 
+        self.assertTrue(form_correct.clean())
+
+    def test_content_parameters_get(self):
         content = ContentParameters.objects.all().delete()
-        # content.save()
-        # 'tuple' object has no attribute 'save' - а как тогда?
-        # content = ContentParameters.objects.get(title="work_start")
-        # content.delete()
-        # нет параметров работы ресторана в БД, выбросит исключение
-        with self.assertRaises(ValidationError) as e_1:
-            content = ContentParameters.objects.all().delete()
-            form_correct.clean()
-        self.assertTrue(e_1.exception.message)
+
+        self.assertFalse(get_content_parameters(False))
+        self.assertTrue(get_content_parameters(True))
 
         # а теперь не выбросит
         content = ContentParameters.objects.create(title="period_of_booking", body=10)
@@ -372,4 +370,5 @@ class TestBookingForm(TestCase):
         content.save()
         content = ContentParameters.objects.create(title="confirm_timedelta", body=50)
         content.save()
-        self.assertTrue(form_correct.clean())
+
+        self.assertTrue(get_content_parameters(False))
