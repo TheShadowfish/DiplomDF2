@@ -8,6 +8,8 @@ from django.utils import timezone
 from restaurant.models import Booking, BookingToken, Questions
 from restaurant.utils.utils import time_segment, get_content_parameters, get_actual_bookings
 
+PARAMETERS = get_content_parameters(True)
+
 
 class StyleFormMixin:
     def __init__(self, *args, **kwargs):
@@ -133,7 +135,7 @@ class BookingForm(StyleFormMixin, forms.ModelForm):
 
     def clean(self):
 
-        parameters_dict = get_content_parameters(False)
+        parameters_dict = PARAMETERS
 
         if parameters_dict:
             confirm_timedelta = parameters_dict.get("confirm_timedelta")

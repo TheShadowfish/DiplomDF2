@@ -11,16 +11,20 @@ from django.views.generic import TemplateView, ListView, CreateView, UpdateView,
 
 from config.settings import EMAIL_HOST_USER
 from restaurant.forms import BookingForm, QuestionsForm, LimitedQuestionsForm
-from restaurant.models import Booking, Table, BookingToken, ContentParameters, Questions
+from restaurant.models import Booking, Table, BookingToken, Questions
 
 from dotenv import load_dotenv
 
+from restaurant.tasks import celery_send_mail
 from restaurant.templates.restaurant.services import get_cached_booking_list, get_cached_questions_list, \
     cache_delete_question_list, cache_delete_booking_list
 from restaurant.utils.utils import get_content_text_from_postgre, \
     get_content_image_from_postgre, get_content_link_from_postgre, get_actual_bookings, get_content_parameters
+from users.models import User
 
 load_dotenv()
+
+PARAMETERS = get_content_parameters(True)
 
 
 class HomePageView(TemplateView):
@@ -129,10 +133,13 @@ class BookingListView(LoginRequiredMixin, ListView):
         return context
 
 
+class Users:
+    pass
+
+
 class BookingCreateUpdateMixin:
 
     def form_valid(self, form):
-
         # Xозяином рассылки автоматически становится тот, кто её создал
         booking = form.save()
         user = self.request.user
@@ -150,12 +157,29 @@ class BookingCreateUpdateMixin:
         host = self.request.get_host()
         url = f"http://{host}/booking_verification/{token}/"
 
-        send_mail(
-            subject="Подтверждение бронирования",
-            message=f"Привет, перейди по ссылке для подтверждения бронирования: {url}",
-            from_email=EMAIL_HOST_USER,
-            recipient_list=[email]
-        )
+        subject = "Подтверждение бронирования",
+        message = f"Привет, перейди по ссылке для подтверждения бронирования: {url} ",
+        # from_email = EMAIL_HOST_USER,
+        # recipient_list = [email]
+
+        # send_mail(
+        #     subject="Подтверждение бронирования",
+        #     message=f"Привет, перейди по ссылке для подтверждения бронирования: {url}",
+        #     from_email=EMAIL_HOST_USER,
+        #     recipient_list=[email]
+        # )
+
+        email_list = []
+        # email_list.append(user.email)
+
+        subscriptions = User.objects.filter(pk=self.request.user.pk)
+        for s in subscriptions:
+            email_list.append(s.email)
+
+        # The values_list() method returns a QuerySet containing tuples: <QuerySet [(1,), (2,)]>
+        # values_list() with a single field, use flat=True to return a QuerySet instead of 1-tuples: <QuerySet [1, 2]>
+        # email_list = subscriptions.values_list("email", flat=True)
+        celery_send_mail.delay(subject, message, email_list)
 
         get_cached_booking_list(recached=True)
         return super().form_valid(form)
@@ -169,11 +193,18 @@ class BookingCreateUpdateMixin:
         context = super().get_context_data(**kwargs)
 
         # получение времени подтверждения бронирования, получение времени, которое определяет границу регистрации
-        try:
-            confirm_timedelta = timezone.timedelta(
-                minutes=ContentParameters.objects.get(title="confirm_timedelta"))
-        except Exception:
-            confirm_timedelta = timezone.timedelta(minutes=45)
+
+        confirm_timedelta = timezone.timedelta(minutes=PARAMETERS.get("confirm_timedelta"))
+
+        # try:
+        #
+        #     confirm_timedelta = timezone.timedelta(
+        #         minutes=ContentParameters.objects.get(title="confirm_timedelta"))
+        #
+        #     confirm_timedelta = timezone.timedelta(
+        #         minutes=ContentParameters.objects.get(title="confirm_timedelta"))
+        # except Exception:
+        #     confirm_timedelta = timezone.timedelta(minutes=45)
 
         time_border = timezone.now() - confirm_timedelta
 
@@ -195,15 +226,9 @@ class BookingCreateUpdateMixin:
         context["tables_list"] = tables
         context["booking_list"] = bookings
 
-        parameters = get_content_parameters(False)
-        if parameters:
-            context["period_of_booking"] = parameters.get("period_of_booking")
-            context["work_start"] = parameters.get("work_start")
-            context["work_end"] = parameters.get("work_end")
-        else:
-            context["period_of_booking"] = "[period_of_booking - ошибка получения]"
-            context["work_start"] = "[work_start - ошибка получения]"
-            context["work_end"] = "[work_end - ошибка получения]"
+        context["period_of_booking"] = PARAMETERS.get("period_of_booking")
+        context["work_start"] = PARAMETERS.get("work_start")
+        context["work_end"] = PARAMETERS.get("work_end")
 
         CONST1 = "booking_create"
         context[CONST1.replace("-", "_")] = get_content_text_from_postgre(CONST1)
@@ -212,12 +237,8 @@ class BookingCreateUpdateMixin:
 
 
 def confirm_booking(request, email):
-    try:
-        confirm_timedelta = ContentParameters.objects.get(title="confirm_timedelta")
-    except Exception as e:
-        confirm_timedelta = 45
-        print(f"Ошибка при обращении к параметру базы данных 'ContentParameters:confirm_timedelta' {e}")
 
+    confirm_timedelta = timezone.timedelta(minutes=PARAMETERS.get("confirm_timedelta"))
     context = {
         "email": email, "confirm_timedelta": confirm_timedelta
     }
@@ -228,13 +249,13 @@ def booking_verification(request, token):
     this_booking_token = get_object_or_404(BookingToken, token=token)
     booking = this_booking_token.booking
 
-    try:
-        confirm_timedelta_raw = ContentParameters.objects.get(title="confirm_timedelta")
-        # confirm_timedelta = timezone.timedelta(minutes=ContentParameters.objects.get(title="confirm_timedelta"))
-    except Exception:
-        confirm_timedelta_raw = timezone.timedelta(minutes=45)
-
-    confirm_timedelta = timezone.timedelta(minutes=int(confirm_timedelta_raw.body))
+    # try:
+    #     confirm_timedelta_raw = ContentParameters.objects.get(title="confirm_timedelta")
+    #     # confirm_timedelta = timezone.timedelta(minutes=ContentParameters.objects.get(title="confirm_timedelta"))
+    # except Exception:
+    #     confirm_timedelta_raw = timezone.timedelta(minutes=45)
+    confirm_timedelta = timezone.timedelta(minutes=PARAMETERS.get("confirm_timedelta"))
+    # confirm_timedelta = timezone.timedelta(minutes=int(confirm_timedelta_raw.body))
 
     if this_booking_token.created_at < timezone.now() - confirm_timedelta:
         booking.delete()

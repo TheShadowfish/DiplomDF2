@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from celery import shared_task
-from restaurant.services import send_telegram_message
+
+from restaurant.services import send_telegram_message, send_email_message
 from restaurant.utils.utils import get_actual_bookings, time_segment
 
 
@@ -8,6 +9,18 @@ from restaurant.utils.utils import get_actual_bookings, time_segment
 def send_information_about_bookings(message, tg_chat_id):
     """Отправляет сообщение пользователю о поставленном лайке"""
     send_telegram_message(message, tg_chat_id)
+
+
+@shared_task
+def celery_send_mail(subject, message, recipient_list):
+    send_email_message(subject, message, recipient_list)
+    #
+    # send_mail(
+    #     subject=subject,
+    #     message=message,
+    #     from_email=from_email,
+    #     recipient_list=recipient_list
+    # )
 
 
 @shared_task

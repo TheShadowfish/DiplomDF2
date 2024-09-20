@@ -12,6 +12,7 @@ from django.views.generic import CreateView, UpdateView, DetailView
 
 from config.settings import EMAIL_HOST_USER
 from restaurant.models import ContentParameters
+from restaurant.tasks import celery_send_mail
 from restaurant.templates.restaurant.services import get_cached_booking_list, cache_clear
 from users.forms import UserRegisterForm, UserProfileForm
 from users.models import User, UserToken
@@ -50,12 +51,20 @@ class RegisterView(CreateView):
         host = self.request.get_host()
         url = f"http://{host}/users/email-confirm/{token}/"
         # print(url)
-        send_mail(
-            subject="Подтверждение почты",
-            message=f"Привет, перейди по ссылке для подтверждения почты {url}",
-            from_email=EMAIL_HOST_USER,
-            recipient_list=[user.email]
-        )
+        # send_mail(
+        #     subject="Подтверждение почты",
+        #     message=f"Привет, перейди по ссылке для подтверждения почты {url}",
+        #     from_email=EMAIL_HOST_USER,
+        #     recipient_list=[user.email]
+        # )
+        subject = "Подтверждение почты",
+        message = f"Привет, перейди по ссылке для подтверждения почты {url} ",
+
+        email_list = []
+        email_list.append(user.email)
+
+        celery_send_mail.delay(subject, message, email_list)
+
 
         redirect_url = reverse("users:confirm_email", args=[user.email])
         self.success_url = redirect_url
