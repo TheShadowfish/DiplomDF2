@@ -158,18 +158,20 @@ class BookingCreateUpdateMixin:
         url = f"http://{host}/booking_verification/{token}/"
 
         subject = "Подтверждение бронирования",
-        message = f"Привет, перейди по ссылке для подтверждения бронирования: {url}",
+        message = f"Привет, перейди по ссылке для подтверждения бронирования: {url} ",
         # from_email = EMAIL_HOST_USER,
         # recipient_list = [email]
 
-        send_mail(
-            subject="Подтверждение бронирования",
-            message=f"Привет, перейди по ссылке для подтверждения бронирования: {url}",
-            from_email=EMAIL_HOST_USER,
-            recipient_list=[email]
-        )
+        # send_mail(
+        #     subject="Подтверждение бронирования",
+        #     message=f"Привет, перейди по ссылке для подтверждения бронирования: {url}",
+        #     from_email=EMAIL_HOST_USER,
+        #     recipient_list=[email]
+        # )
 
         email_list = []
+        # email_list.append(user.email)
+
         subscriptions = User.objects.filter(pk=self.request.user.pk)
         for s in subscriptions:
             email_list.append(s.email)

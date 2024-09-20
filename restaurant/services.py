@@ -21,7 +21,7 @@ def send_email_message(subject, message, recipient_list):
 
     send_mail(
         subject=subject,
-        message=f"CELERY: {message}",
+        message=str(message),
         from_email=EMAIL_HOST_USER,
         recipient_list=recipient_list
     )
