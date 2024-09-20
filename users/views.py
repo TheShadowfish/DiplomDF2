@@ -1,16 +1,14 @@
 import secrets
-import string
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LogoutView
 from django.core.exceptions import PermissionDenied
-from django.core.mail import send_mail
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import CreateView, UpdateView, DetailView
 
-from config.settings import EMAIL_HOST_USER
 from restaurant.models import ContentParameters
 from restaurant.tasks import celery_send_mail
 from restaurant.templates.restaurant.services import get_cached_booking_list, cache_clear
@@ -65,7 +63,6 @@ class RegisterView(CreateView):
         email_list.append(user.email)
 
         celery_send_mail.delay(subject, message, email_list)
-
 
         redirect_url = reverse("users:confirm_email", args=[user.email])
         self.success_url = redirect_url
@@ -139,8 +136,6 @@ class UserDetailView(LoginRequiredMixin, GetFormClassUserIsOwnerMixin, DetailVie
 
         context["booking_list"] = get_cached_booking_list().filter(user=self.object).order_by("date_field",
                                                                                               "time_start")
-
-
         user = self.request.user
         pk = self.kwargs.get("pk")
 
@@ -156,17 +151,6 @@ def password_recovery(request):
         user = get_object_or_404(User, email=email)
 
         password = get_password(12)
-
-
-        # # Создание двенадцатисимвольного буквенно-цифрового пароля, содержащего как минимум один символ нижнего регистра,
-        # # как минимум один символ верхнего регистра и как минимум три цифры:
-        # alphabet = string.ascii_letters + string.digits
-        # while True:
-        #     password = "".join(secrets.choice(alphabet) for i in range(12))
-        #     if not any(c.islower() for c in password) or not any(c.isupper() for c in password) or sum(
-        #             c.isdigit() for c in password) < 3:
-        #         continue
-        #     break
 
         message = f"Привет, держи новый сложный 12-ти символьный пароль, который ты тоже забудешь: {password} . \
                     Если вы не запрашивали восстановление пароля, просто игнорируйте это сообщение."
