@@ -16,6 +16,7 @@ from restaurant.tasks import celery_send_mail
 from restaurant.templates.restaurant.services import get_cached_booking_list, cache_clear
 from users.forms import UserRegisterForm, UserProfileForm
 from users.models import User, UserToken
+from users.services import get_password
 
 
 class GetFormKwargsGetUserMixin:
@@ -106,7 +107,7 @@ def confirm_email(request, email):
         confirm_timedelta = ContentParameters.objects.get(title="confirm_timedelta")
     except Exception:
         confirm_timedelta = 45
-        print("confirm_timedelta - установлено по умолчаеию (45 минут)")
+        print("confirm_timedelta - установлено по умолчанию (45 минут)")
 
     context = {
         "email": email, "confirm_timedelta": confirm_timedelta
@@ -139,8 +140,6 @@ class UserDetailView(LoginRequiredMixin, GetFormClassUserIsOwnerMixin, DetailVie
         context["booking_list"] = get_cached_booking_list().filter(user=self.object).order_by("date_field",
                                                                                               "time_start")
 
-        # unfiltered_booking = Booking.objects.filter(user=self.object)
-        # context["booking_list"] = unfiltered_booking.order_by("date_field", "time_start")
 
         user = self.request.user
         pk = self.kwargs.get("pk")
@@ -156,25 +155,35 @@ def password_recovery(request):
         email = request.POST.get("email")
         user = get_object_or_404(User, email=email)
 
-        # Создание двенадцатисимвольного буквенно-цифрового пароля, содержащего как минимум один символ нижнего регистра,
-        # как минимум один символ верхнего регистра и как минимум три цифры:
-        alphabet = string.ascii_letters + string.digits
-        while True:
-            password = "".join(secrets.choice(alphabet) for i in range(12))
-            if not any(c.islower() for c in password) or not any(c.isupper() for c in password) or sum(
-                    c.isdigit() for c in password) < 3:
-                continue
-            break
+        password = get_password(12)
 
-        message = f"Привет, держи новый сложный 12-ти символьный пароль, который ты тоже забудешь: {password}. \
+
+        # # Создание двенадцатисимвольного буквенно-цифрового пароля, содержащего как минимум один символ нижнего регистра,
+        # # как минимум один символ верхнего регистра и как минимум три цифры:
+        # alphabet = string.ascii_letters + string.digits
+        # while True:
+        #     password = "".join(secrets.choice(alphabet) for i in range(12))
+        #     if not any(c.islower() for c in password) or not any(c.isupper() for c in password) or sum(
+        #             c.isdigit() for c in password) < 3:
+        #         continue
+        #     break
+
+        message = f"Привет, держи новый сложный 12-ти символьный пароль, который ты тоже забудешь: {password} . \
                     Если вы не запрашивали восстановление пароля, просто игнорируйте это сообщение."
 
-        send_mail(
-            subject="Восстановление пароля",
-            message=message,
-            from_email=EMAIL_HOST_USER,
-            recipient_list=[email]
-        )
+        # send_mail(
+        #     subject="Восстановление пароля",
+        #     message=message,
+        #     from_email=EMAIL_HOST_USER,
+        #     recipient_list=[email]
+        # )
+        subject = "Восстановление пароля",
+        # message = f"Привет, перейди по ссылке для подтверждения почты {url} ",
+
+        email_list = []
+        email_list.append(email)
+
+        celery_send_mail.delay(subject, message, email_list)
 
         user.set_password(password)
         user.save()
