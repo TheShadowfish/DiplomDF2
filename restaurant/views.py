@@ -2,14 +2,13 @@ import secrets
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
-from django.core.mail import send_mail
+
 from django.db.models import Q
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
 from django.utils import timezone
 from django.views.generic import TemplateView, ListView, CreateView, UpdateView, DeleteView, DetailView
 
-from config.settings import EMAIL_HOST_USER
 from restaurant.forms import BookingForm, QuestionsForm, LimitedQuestionsForm
 from restaurant.models import Booking, Table, BookingToken, Questions
 
@@ -147,7 +146,7 @@ class BookingCreateUpdateMixin:
         booking.active = False
 
         token = secrets.token_hex(16)
-        email = user.email
+        # email = user.email
 
         booking.save()
 
