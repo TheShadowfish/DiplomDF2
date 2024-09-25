@@ -11,7 +11,7 @@ from django.views.generic import CreateView, UpdateView, DetailView
 
 from restaurant.models import ContentParameters
 from restaurant.tasks import celery_send_mail
-from restaurant.templates.restaurant.services import get_cached_booking_list, cache_clear
+from restaurant.services import get_cached_booking_list, cache_clear
 from users.forms import UserRegisterForm, UserProfileForm
 from users.models import User, UserToken
 from users.services import get_password

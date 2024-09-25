@@ -14,9 +14,11 @@ from restaurant.models import Booking, Table, BookingToken, Questions
 
 from dotenv import load_dotenv
 
+from restaurant.services import get_cached_booking_list, cache_delete_booking_list, get_cached_questions_list, \
+    cache_delete_question_list
 from restaurant.tasks import celery_send_mail
-from restaurant.templates.restaurant.services import get_cached_booking_list, get_cached_questions_list, \
-    cache_delete_question_list, cache_delete_booking_list
+# from restaurant.templates.restaurant.services import get_cached_booking_list, get_cached_questions_list, \
+#     cache_delete_question_list, cache_delete_booking_list
 from restaurant.utils.utils import get_content_text_from_postgre, \
     get_content_image_from_postgre, get_content_link_from_postgre, get_actual_bookings, get_content_parameters
 from users.models import User

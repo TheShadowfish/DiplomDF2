@@ -50,6 +50,7 @@ class BookingForm(StyleFormMixin, forms.ModelForm):
         exclude = ("user", "active", "created_at")
 
     def validate_date_time(self, parametr_dict):
+        """проверка допустимости бронирования с учетом времени работы и срока предварительного бронирования"""
         # проверка допустимости бронирования с учетом времени работы и срока предварительного бронирования
         cleaned_data_date_time = self.cleaned_data
 

@@ -1,10 +1,12 @@
 import datetime
+
+from django.shortcuts import render
 from django.test import TestCase
 
 from restaurant.models import Table, Booking
 from django.urls import reverse
 
-from restaurant.templates.restaurant.services import cache_clear
+from restaurant.services import cache_clear
 from users.models import User
 
 
@@ -273,3 +275,88 @@ class BookingCreateViewTest(TestCase):
             else:
                 self.assertTrue(copy.date_field >= date_last)
                 self.assertTrue(copy.time_start >= time_last)
+
+
+
+class QuestionsSuccessTestView(TestCase):
+
+    # def test_questions_success(self):
+    #     pass
+
+    # def setUpTestData(cls):
+    #     # Create 13 authors for pagination tests
+    #     number_of_authors = 13
+    #     for author_num in range(number_of_authors):
+    #         Author.objects.create(first_name='Christian %s' % author_num, last_name='Surname %s' % author_num, )
+
+    # def test_view_url_exists_at_desired_location(self):
+    #         # confirm_timedelta = timezone.timedelta(minutes=PARAMETERS.get("confirm_timedelta"))
+    #     context = {
+    #         "message": "question_premoderated"
+    #     }
+    #         # (request, "restaurant/confirm_booking.html", context)
+    #
+    #         # render(request, "restaurant/confirm_booking.html", context)
+    #     resp = self.client.get((render(request, '/restaurant/questions_success.html', context))
+    #     # questions_success
+    #     self.assertEqual(resp.status_code, 200)
+
+    def test_view_url_accessible_by_name(self):
+        resp = self.client.get(reverse("restaurant:questions_success", args=["question_premoderated"]))
+        self.assertEqual(resp.status_code, 200)
+
+    def test_view_uses_correct_template(self):
+        resp = self.client.get(reverse("restaurant:questions_success", args=["question_premoderated"]))
+        # resp = self.client.get(reverse('question_success'))
+        self.assertEqual(resp.status_code, 200)
+
+        self.assertTemplateUsed(resp, 'restaurant/questions_success.html')
+
+    # def test_pagination_is_ten(self):
+    #     resp = self.client.get(reverse('authors'))
+    #     self.assertEqual(resp.status_code, 200)
+    #     self.assertTrue('is_paginated' in resp.context)
+    #     self.assertTrue(resp.context['is_paginated'] == True)
+    #     self.assertTrue(len(resp.context['author_list']) == 10)
+    #
+    # def test_lists_all_authors(self):
+    #     # Get second page and confirm it has (exactly) remaining 3 items
+    #     resp = self.client.get(reverse('authors') + '?page=2')
+    #     self.assertEqual(resp.status_code, 200)
+    #     self.assertTrue('is_paginated' in resp.context)
+    #     self.assertTrue(resp.context['is_paginated'] == True)
+    #     self.assertTrue(len(resp.context['author_list']) == 3)
+
+
+# class ConfirmBookingsTestView(TestCase):
+
+    # def test_questions_success(self):
+    #     pass
+
+    # def setUpTestData(cls):
+    #     # Create 13 authors for pagination tests
+    #     number_of_authors = 13
+    #     for author_num in range(number_of_authors):
+    #         Author.objects.create(first_name='Christian %s' % author_num, last_name='Surname %s' % author_num, )
+
+    # def test_view_url_exists_at_desired_location(self):
+    #     resp = self.client.get('/restaurant/questions_success/')
+    #     # questions_success
+    #     self.assertEqual(resp.status_code, 200)
+
+    # def test_view_url_accessible_by_name(self):
+    #     resp = self.client.get(reverse("restaurant:questions_success", args=["question_premoderated"]))
+    #     self.assertEqual(resp.status_code, 200)
+    #
+    #     confirm_timedelta = timezone.timedelta(minutes=PARAMETERS.get("confirm_timedelta"))
+    #     context = {
+    #         "email": email, "confirm_timedelta": confirm_timedelta
+    #     }
+    #     return render(request, "restaurant/confirm_booking.html", context)
+    #
+    # def test_view_uses_correct_template(self):
+    #     resp = self.client.get(reverse("restaurant:questions_success", args=["question_premoderated"]))
+    #     # resp = self.client.get(reverse('question_success'))
+    #     self.assertEqual(resp.status_code, 200)
+    #
+    #     self.assertTemplateUsed(resp, 'restaurant/questions_success.html')
